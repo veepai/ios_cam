@@ -35,7 +35,7 @@ CPPPPChannelManagement::~CPPPPChannelManagement()
 }
 
 int CPPPPChannelManagement::Start(const char * szDID, const char *user, const char *pwd)
-{ 
+{
     [m_Lock lock];
     
     int i;
@@ -48,17 +48,17 @@ int CPPPPChannelManagement::Start(const char * szDID, const char *user, const ch
             return 0;
         }
     }
-
+    
     for(i = 0; i < MAX_PPPP_CHANNEL_NUM; i++)
     {
         if(m_PPPPChannel[i].bValid == 0)
         {
-            m_PPPPChannel[i].bValid = 1;            
-            strcpy(m_PPPPChannel[i].szDID, szDID);      
+            m_PPPPChannel[i].bValid = 1;
+            strcpy(m_PPPPChannel[i].szDID, szDID);
             CCircleBuf *pVideoBuf = new CCircleBuf();
             //pVideoBuf->Create(VBUF_SIZE);
             m_PPPPChannel[i].pVideoBuf = pVideoBuf;
-            //m_PPPPChannel[i].pEglDisplay = NULL;      
+            //m_PPPPChannel[i].pEglDisplay = NULL;
             
             CCircleBuf *pPlaybackVideoBuf = new CCircleBuf();
             m_PPPPChannel[i].pPlaybackVideoBuf = pPlaybackVideoBuf;
@@ -80,16 +80,16 @@ int CPPPPChannelManagement::Start(const char * szDID, const char *user, const ch
 int CPPPPChannelManagement::Stop(const char * szDID)
 {
     [m_Lock lock];
-
+    
     int i;
     for(i = 0; i < MAX_PPPP_CHANNEL_NUM; i++)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
-        {            
+        {
             memset(m_PPPPChannel[i].szDID, 0, sizeof(m_PPPPChannel[i].szDID));
-            SAFE_DELETE(m_PPPPChannel[i].pPPPPChannel);       
+            SAFE_DELETE(m_PPPPChannel[i].pPPPPChannel);
             SAFE_DELETE(m_PPPPChannel[i].pVideoBuf);
-            //SAFE_DELETE(m_PPPPChannel[i].pEglDisplay);  
+            //SAFE_DELETE(m_PPPPChannel[i].pEglDisplay);
             SAFE_DELETE(m_PPPPChannel[i].pPlaybackVideoBuf);
             m_PPPPChannel[i].bValid = 0;
             
@@ -97,7 +97,7 @@ int CPPPPChannelManagement::Stop(const char * szDID)
             
             return 1;
         }
-    }  
+    }
     
     [m_Lock unlock];
     
@@ -105,7 +105,7 @@ int CPPPPChannelManagement::Stop(const char * szDID)
 }
 
 void CPPPPChannelManagement::StopAll()
-{    
+{
     [m_Lock lock];
     
     NSLog(@"StopAll begin....");
@@ -117,24 +117,24 @@ void CPPPPChannelManagement::StopAll()
         {
             m_PPPPChannel[i].pPPPPChannel->SetStop();
         }
-    }  
+    }
     
-//  NSLog(@"StopAll 1111111");
+    //  NSLog(@"StopAll 1111111");
     
     PPPP_Connect_Break();
-
+    
     for(i = 0; i < MAX_PPPP_CHANNEL_NUM; i++)
     {
         if(m_PPPPChannel[i].bValid == 1)
         {
-//          NSLog(@"StopAll  channel: %d", i);
+            //          NSLog(@"StopAll  channel: %d", i);
             memset(m_PPPPChannel[i].szDID, 0, sizeof(m_PPPPChannel[i].szDID));
-            SAFE_DELETE(m_PPPPChannel[i].pPPPPChannel);          
+            SAFE_DELETE(m_PPPPChannel[i].pPPPPChannel);
             SAFE_DELETE(m_PPPPChannel[i].pVideoBuf);
-            //SAFE_DELETE(m_PPPPChannel[i].pEglDisplay);            
+            //SAFE_DELETE(m_PPPPChannel[i].pEglDisplay);
             m_PPPPChannel[i].bValid = 0;
         }
-    }  
+    }
     
     //NSLog(@"StopAll end...");
     [m_Lock unlock];
@@ -149,11 +149,11 @@ int CPPPPChannelManagement::StartPPPPAudio(const char *szDID)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            int nRet = m_PPPPChannel[i].pPPPPChannel->StartAudio(); 
-            [m_Lock unlock];            
-            return nRet;          
+            int nRet = m_PPPPChannel[i].pPPPPChannel->StartAudio(1);
+            [m_Lock unlock];
+            return nRet;
         }
-    }  
+    }
     
     [m_Lock unlock];
     
@@ -169,11 +169,11 @@ int CPPPPChannelManagement::StopPPPPAudio(const char *szDID)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            int nRet = m_PPPPChannel[i].pPPPPChannel->StopAudio(); 
-            [m_Lock unlock];            
-            return nRet;          
+            int nRet = m_PPPPChannel[i].pPPPPChannel->StopAudio(1);
+            [m_Lock unlock];
+            return nRet;
         }
-    }  
+    }
     
     [m_Lock unlock];
     
@@ -189,11 +189,11 @@ int CPPPPChannelManagement::StartPPPPTalk(const char *szDID)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            int nRet = m_PPPPChannel[i].pPPPPChannel->StartTalk(); 
-            [m_Lock unlock];            
-            return nRet;          
+            int nRet = m_PPPPChannel[i].pPPPPChannel->StartTalk();
+            [m_Lock unlock];
+            return nRet;
         }
-    }  
+    }
     
     [m_Lock unlock];
     
@@ -209,11 +209,11 @@ int CPPPPChannelManagement::StopPPPPTalk(const char *szDID)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            int nRet = m_PPPPChannel[i].pPPPPChannel->StopTalk(); 
-            [m_Lock unlock];            
-            return nRet;          
+            int nRet = m_PPPPChannel[i].pPPPPChannel->StopTalk();
+            [m_Lock unlock];
+            return nRet;
         }
-    }  
+    }
     
     [m_Lock unlock];
     
@@ -229,9 +229,9 @@ int CPPPPChannelManagement::TalkAudioData(const char *szDID, const char *data, i
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            int nRet = m_PPPPChannel[i].pPPPPChannel->TalkAudioData(data, len); 
-            [m_Lock unlock];            
-            return nRet;          
+            int nRet = m_PPPPChannel[i].pPPPPChannel->TalkAudioData(data, len);
+            [m_Lock unlock];
+            return nRet;
         }
     }
     
@@ -248,15 +248,15 @@ int CPPPPChannelManagement::StartPPPPLivestream(const char * szDID, int streamid
     for(i = 0; i < MAX_PPPP_CHANNEL_NUM; i++)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
-        {   
+        {
             m_PPPPChannel[i].pPPPPChannel->SetPlayViewPPPPStatusDelegate(delegate);
             m_PPPPChannel[i].pPPPPChannel->SetPlayViewParamNotifyDelegate(delegate);
             m_PPPPChannel[i].pPPPPChannel->SetPlayViewImageNotifyDelegate(delegate);
             int nRet = m_PPPPChannel[i].pPPPPChannel->cgi_livestream(1, streamid,substreamID);
-            [m_Lock unlock];            
-            return nRet;          
+            [m_Lock unlock];
+            return nRet;
         }
-    }  
+    }
     
     [m_Lock unlock];
     
@@ -264,9 +264,9 @@ int CPPPPChannelManagement::StartPPPPLivestream(const char * szDID, int streamid
 }
 
 int CPPPPChannelManagement::StopPPPPLivestream(const char * szDID)
-{ 
+{
     [m_Lock lock];
-
+    
     int i;
     for(i = 0; i < MAX_PPPP_CHANNEL_NUM; i++)
     {
@@ -279,8 +279,8 @@ int CPPPPChannelManagement::StopPPPPLivestream(const char * szDID)
             [m_Lock unlock];
             return 1;
         }
-    }  
-   
+    }
+    
     [m_Lock unlock];
     return 0;
 }
@@ -293,12 +293,12 @@ int CPPPPChannelManagement::GetCGI(const char* szDID, int cgi)
     for(i = 0; i < MAX_PPPP_CHANNEL_NUM; i++)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
-        {            
+        {
             m_PPPPChannel[i].pPPPPChannel->get_cgi(cgi);
             [m_Lock unlock];
             return 1;
         }
-    }  
+    }
     
     [m_Lock unlock];
     return 0;
@@ -332,12 +332,12 @@ int CPPPPChannelManagement::PTZ_Control(const char *szDID, int command)
     for(i = 0; i < MAX_PPPP_CHANNEL_NUM; i++)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
-        {            
+        {
             m_PPPPChannel[i].pPPPPChannel->PTZ_Control(command);
             [m_Lock unlock];
             return 1;
         }
-    }  
+    }
     
     [m_Lock unlock];
     return 0;
@@ -351,12 +351,12 @@ int CPPPPChannelManagement::CameraControl(const char *szDID, int param, int valu
     for(i = 0; i < MAX_PPPP_CHANNEL_NUM; i++)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
-        {            
+        {
             m_PPPPChannel[i].pPPPPChannel->CameraControl(param, value);
             [m_Lock unlock];
             return 1;
         }
-    }  
+    }
     
     [m_Lock unlock];
     return 0;
@@ -370,12 +370,12 @@ int CPPPPChannelManagement::Snapshot(const char *szDID)
     for(i = 0; i < MAX_PPPP_CHANNEL_NUM; i++)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
-        {            
+        {
             m_PPPPChannel[i].pPPPPChannel->Snapshot();
             [m_Lock unlock];
             return 1;
         }
-    }  
+    }
     
     [m_Lock unlock];
     return 0;
@@ -420,7 +420,7 @@ int CPPPPChannelManagement::PPPPStartPlayback(char *szDID, char *szFileName, int
                 return 0;
             }
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -451,7 +451,7 @@ int CPPPPChannelManagement::PPPPGetSDCardRecordFileList(char *szDID, int PageInd
                 return 0;
             }
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -478,7 +478,7 @@ int CPPPPChannelManagement::PPPPStopPlayback(char *szDID)
                 return 0;
             }
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -505,7 +505,7 @@ int CPPPPChannelManagement::PPPPSetSystemParams(char * szDID,int type,char * msg
                 return 0;
             }
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -534,12 +534,12 @@ int CPPPPChannelManagement::SetWifiParamDelegate(char *szDID, id delegate)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            m_PPPPChannel[i].pPPPPChannel->SetWifiParamsDelegate(delegate);        
+            m_PPPPChannel[i].pPPPPChannel->SetWifiParamsDelegate(delegate);
             [m_Lock unlock];
             return 1;
-        
+            
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -554,12 +554,12 @@ int CPPPPChannelManagement::SetWifi(char *szDID, int enable, char *szSSID, int c
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            m_PPPPChannel[i].pPPPPChannel->SetWifi(enable, szSSID, channel, mode, authtype, encrypt, keyformat, defkey, strKey1, strKey2, strKey3, strKey4, key1_bits, key2_bits, key3_bits, key4_bits, wpa_psk);        
+            m_PPPPChannel[i].pPPPPChannel->SetWifi(enable, szSSID, channel, mode, authtype, encrypt, keyformat, defkey, strKey1, strKey2, strKey3, strKey4, key1_bits, key2_bits, key3_bits, key4_bits, wpa_psk);
             [m_Lock unlock];
             return 1;
             
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -576,12 +576,12 @@ int CPPPPChannelManagement::SetUserPwdParamDelegate(char *szDID, id delegate)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            m_PPPPChannel[i].pPPPPChannel->SetUserPwdParamsDelegate(delegate);        
+            m_PPPPChannel[i].pPPPPChannel->SetUserPwdParamsDelegate(delegate);
             [m_Lock unlock];
             return 1;
             
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -595,12 +595,12 @@ int CPPPPChannelManagement::SetUserPwd(char *szDID,char *user1,char *pwd1,char *
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            m_PPPPChannel[i].pPPPPChannel->SetUserPwd(user1, pwd1, user2, pwd2, user3, pwd3);        
+            m_PPPPChannel[i].pPPPPChannel->SetUserPwd(user1, pwd1, user2, pwd2, user3, pwd3);
             [m_Lock unlock];
             return 1;
             
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -616,12 +616,12 @@ int CPPPPChannelManagement::SetDateTimeDelegate(char *szDID, id delegate)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            m_PPPPChannel[i].pPPPPChannel->SetDateTimeParamsDelegate(delegate);        
+            m_PPPPChannel[i].pPPPPChannel->SetDateTimeParamsDelegate(delegate);
             [m_Lock unlock];
             return 1;
             
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -635,12 +635,12 @@ int CPPPPChannelManagement::SetDateTime(char *szDID,int now,int tz,int ntp_enabl
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            m_PPPPChannel[i].pPPPPChannel->SetDateTime(now, tz, ntp_enable, ntp_svr);        
+            m_PPPPChannel[i].pPPPPChannel->SetDateTime(now, tz, ntp_enable, ntp_svr);
             [m_Lock unlock];
             return 1;
             
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -655,12 +655,12 @@ int CPPPPChannelManagement::SetAlarmDelegate(char *szDID, id delegate)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            m_PPPPChannel[i].pPPPPChannel->SetAlarmParamsDelegate(delegate);        
+            m_PPPPChannel[i].pPPPPChannel->SetAlarmParamsDelegate(delegate);
             [m_Lock unlock];
             return 1;
             
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -674,12 +674,12 @@ int CPPPPChannelManagement::SetSDCardSearchDelegate(char *szDID, id delegate)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
-            m_PPPPChannel[i].pPPPPChannel->SetSDCardSearchDelegate(delegate);        
+            m_PPPPChannel[i].pPPPPChannel->SetSDCardSearchDelegate(delegate);
             [m_Lock unlock];
             return 1;
             
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -768,7 +768,7 @@ int CPPPPChannelManagement::SetFTP(char *szDID, char *szSvr, char *szUser, char 
     
 }
 
-int CPPPPChannelManagement::SetAlarm(char *szDID,    
+int CPPPPChannelManagement::SetAlarm(char *szDID,
                                      int motion_armed,
                                      int motion_sensitivity,
                                      int input_armed,
@@ -792,7 +792,7 @@ int CPPPPChannelManagement::SetAlarm(char *szDID,
             return 1;
             
         }
-    } 
+    }
     
     [m_Lock unlock];
     return 0;
@@ -916,3 +916,4 @@ int CPPPPChannelManagement::FirmwareUpgrade(const char *szDID, char *downloadser
     [m_Lock unlock];
     return  0;
 }
+

@@ -20,15 +20,15 @@
 //#import "libH264Dec.h"
 
 CPPPPChannel::CPPPPChannel(CCircleBuf *pVideoBuf, CCircleBuf *pPlaybackVideoBuf, const char *DID, const char *user, const char *pwd)
-{ 
+{
     memset(szDID, 0, sizeof(szDID));
     strcpy(szDID, DID);
-
+    
     memset(szUser, 0, sizeof(szUser));
     strcpy(szUser, user);
-
+    
     memset(szPwd, 0, sizeof(szPwd));
-    strcpy(szPwd, pwd);     
+    strcpy(szPwd, pwd);
     
     //init
     m_bAlarmThreadRuning = 0;
@@ -38,7 +38,7 @@ CPPPPChannel::CPPPPChannel(CCircleBuf *pVideoBuf, CCircleBuf *pPlaybackVideoBuf,
     m_bTalkThreadRuning = 0;
     m_bCommandRecvThreadRuning = 0;
     m_bAudioThreadRuning = 0;
-
+    m_nCamType = 128;
     m_CommandRecvThreadID = NULL;
     m_CommandThreadID = NULL;
     m_DataThreadID = NULL;
@@ -53,10 +53,10 @@ CPPPPChannel::CPPPPChannel(CCircleBuf *pVideoBuf, CCircleBuf *pPlaybackVideoBuf,
     m_hSessionHandle = -1;
     m_bOnline = 0;
     
-    m_PPPPStatusDelegate = nil;   
+    m_PPPPStatusDelegate = nil;
     m_CameraViewSnapshotDelegate = nil;
     m_PlayViewPPPPStatusDelegate = nil;
-    //m_PlayViewAVDataDelegate = nil;    
+    //m_PlayViewAVDataDelegate = nil;
     m_PlayViewParamNotifyDelegate = nil;
     m_PlayViewImageNotifyDelegate = nil;
     m_WifiParamsDelegate = nil;
@@ -89,15 +89,15 @@ CPPPPChannel::CPPPPChannel(CCircleBuf *pVideoBuf, CCircleBuf *pPlaybackVideoBuf,
     m_bPlayThreadRuning = 0;
     m_PlayThreadID = NULL;
     
-    m_EnumVideoMode = ENUM_VIDEO_MODE_UNKNOWN;    
-    m_bReconnectImmediately = 0;    
+    m_EnumVideoMode = ENUM_VIDEO_MODE_UNKNOWN;
+    m_bReconnectImmediately = 0;
     m_bAudioStarted = 0;
     m_bTalkStarted = 0;
     
     m_pTalkAdpcm = NULL;
     m_pAudioBuf = NULL;
     m_pTalkAudioBuf = NULL;
-    m_pAudioAdpcm = NULL;    
+    m_pAudioAdpcm = NULL;
     m_pPCMPlayer = NULL;
     m_pPCMRecorder = NULL;
     
@@ -106,7 +106,8 @@ CPPPPChannel::CPPPPChannel(CCircleBuf *pVideoBuf, CCircleBuf *pPlaybackVideoBuf,
     m_bPlaybackStarted = 0;
     m_EnumPlayBackVideoMode = ENUM_VIDEO_MODE_UNKNOWN;
     m_PlaybackVideoPlayerThreadID = NULL;
-
+    
+    m_deviceEnableAdpcm = 0;
 }
 
 CPPPPChannel::~CPPPPChannel()
@@ -162,8 +163,8 @@ void CPPPPChannel::PPPPClose()
     [m_PPPPCloseCondition lock];
     
     PPPP_Connect_Break();
-    if (m_hSessionHandle >= 0) {        
-        //PPPP_Close(m_hSessionHandle);    
+    if (m_hSessionHandle >= 0) {
+        //PPPP_Close(m_hSessionHandle);
         PPPP_ForceClose(m_hSessionHandle);
         m_hSessionHandle = -1;
     }
@@ -176,11 +177,11 @@ void CPPPPChannel::MsgNotify(int MsgType,int Param)
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     MainWindowNotify(MsgType, Param);
     PlayWindowNotify(MsgType, Param);
-    [pool release]; 
+    [pool release];
 }
 
 int CPPPPChannel::Start()
-{  
+{
     m_pCommandBuffer = new CCircleBuf();
     m_pCommandBuffer->Create(COMMAND_BUFFER_SIZE);
     
@@ -188,7 +189,7 @@ int CPPPPChannel::Start()
     m_pTalkAudioBuf = new CCircleBuf();
     m_pAudioAdpcm = new CAdpcm();
     m_pTalkAdpcm = new CAdpcm();
-  
+    
     return StartCommandChannel();
 }
 
@@ -221,8 +222,8 @@ void CPPPPChannel::ProcessAudioBuf(AudioQueueRef inAQ, AudioQueueBufferRef buffe
     int nAudioBufSize = AVCODEC_MAXAUDIO_FRAME_SIZE * 4;
     char PCMBuf[AVCODEC_MAXAUDIO_FRAME_SIZE*4 + 1] = {0};
     
-    //读取包数据    
-    AudioQueueBufferRef outBufferRef = buffer;      
+    //读取包数据
+    AudioQueueBufferRef outBufferRef = buffer;
     
     memset(PCMBuf, 0, sizeof(PCMBuf));
     if (0 == m_pAudioBuf->Read(PCMBuf, nAudioBufSize)) {
@@ -230,14 +231,14 @@ void CPPPPChannel::ProcessAudioBuf(AudioQueueRef inAQ, AudioQueueBufferRef buffe
     }else {
         memcpy(outBufferRef->mAudioData, PCMBuf, nAudioBufSize);
     }
-
+    
     outBufferRef->mAudioDataByteSize = nAudioBufSize;
-    AudioQueueEnqueueBuffer(inAQ, outBufferRef, 0, nil);  
+    AudioQueueEnqueueBuffer(inAQ, outBufferRef, 0, nil);
 }
 
 void CPPPPChannel::Stop()
-{ 
-    [m_StopCondition lock];    
+{
+    [m_StopCondition lock];
     
     m_bCommandThreadRuning = 0;
     m_bCommandRecvThreadRuning = 0;
@@ -245,37 +246,37 @@ void CPPPPChannel::Stop()
     m_bDataThreadRuning = 0;
     m_bPlaybackThreadRuning = 0;
     m_bSensorAlarmThreadRuning = 0;
-
+    
     PPPPClose();
-
+    
     //NSLog(@"Stop CommandThread... %s", szDID);
     if(m_CommandThreadID != NULL)
     {
         pthread_join(m_CommandThreadID, NULL);
         m_CommandThreadID = NULL;
     }
-
+    
     //NSLog(@"Stop CommandRecvThread...%s", szDID);
     if(m_CommandRecvThreadID!= NULL)
     {
         pthread_join(m_CommandRecvThreadID, NULL);
         m_CommandRecvThreadID = NULL;
     }
-
+    
     //NSLog(@"Stop DataThread... %s", szDID);
     if(m_DataThreadID!= NULL)
     {
         pthread_join(m_DataThreadID, NULL);
         m_DataThreadID = NULL;
     }
-
+    
     //NSLog(@"Stop AlarmThread...%s", szDID);
     if(m_AlarmThreadID!= NULL)
     {
         pthread_join(m_AlarmThreadID, NULL);
         m_AlarmThreadID = NULL;
     }
-
+    
     //NSLog(@"Stop PlaybackThread...%s", szDID);
     if(m_PlaybackThreadID!= NULL)
     {
@@ -290,15 +291,15 @@ void CPPPPChannel::Stop()
     }
     
     StopTalk();
-    StopAudio();
+    StopAudio(1);
     
-    SAFE_DELETE(m_pCommandBuffer); 
+    SAFE_DELETE(m_pCommandBuffer);
     SAFE_DELETE(m_pAudioBuf);
     SAFE_DELETE(m_pTalkAudioBuf);
     SAFE_DELETE(m_pAudioAdpcm);
     SAFE_DELETE(m_pTalkAdpcm);
     
-    StopVideoPlay();   
+    StopVideoPlay();
     StopPlaybackVideoPlayer();
     
     [m_StopCondition unlock];
@@ -314,28 +315,28 @@ int CPPPPChannel::AddCommand(void * data, int len)
     
     if(m_pCommandBuffer == NULL)
         return 0;
-
+    
     CMD_BUF_HEAD bufhead;
     memset(&bufhead, 0, sizeof(bufhead));
-
+    
     int headlen = sizeof(bufhead);
     int Length = headlen + len;
     char *pbuf = new char[Length];
-
+    
     bufhead.head = BUFFER_HEAD_CODE;
     bufhead.len = len;
-
+    
     memcpy(pbuf, (char*)&bufhead, headlen);
     memcpy(pbuf + headlen, data, len);
-
+    
     if(0 == m_pCommandBuffer->Write(pbuf, Length))
     {
         SAFE_DELETE(pbuf);
         return 0;
     }
-
-    SAFE_DELETE(pbuf);    
-
+    
+    SAFE_DELETE(pbuf);
+    
     return 1;
 }
 
@@ -438,7 +439,7 @@ void* CPPPPChannel::CommandRecvThread(void * param)
 }
 
 void CPPPPChannel::CommandRecvProcess()
-{    
+{
     while(m_bCommandRecvThreadRuning)
     {
         //read head
@@ -450,13 +451,13 @@ void CPPPPChannel::CommandRecvProcess()
             //NSLog(@"CommandRecvProcess PPPP_IndeedRead...1111 return: %d", res);
             return ;
         }
-
+        
         //check head
         if(cmdhead.startcode != CMD_START_CODE)
         {
             //NSLog(@"cmdhead.startcode != CMD_START_CODE");
             return ;
-        }        
+        }
         
         if (cmdhead.len < 0) {
             //NSLog(@"CommandRecvProcess cmdhead.len < 0  error!");
@@ -466,13 +467,13 @@ void CPPPPChannel::CommandRecvProcess()
         if (cmdhead.len == 0) {
             continue;
         }
-
-        char *pbuf = new char[cmdhead.len]; 
+        
+        char *pbuf = new char[cmdhead.len];
         if (pbuf == NULL) {
             //NSLog(@"CommandRecvProcess pbuf == NULL");
             return;
         }
-
+        
         //read data
         res = PPPP_IndeedRead(P2P_CMDCHANNEL, (CHAR *)pbuf, cmdhead.len, m_bCommandThreadRuning);
         if(res < 0)
@@ -480,24 +481,24 @@ void CPPPPChannel::CommandRecvProcess()
             //NSLog(@"CommandRecvProcess PPPP_IndeedRead...2222 return: %d", res);
             return;
         }
-
+        
         //Process command
         ProcessCommand(cmdhead.cmd, pbuf, cmdhead.len);
-
-        //NSLog(@"Command recv: %s", pbuf);        
-        SAFE_DELETE(pbuf);      
+        
+        //NSLog(@"Command recv: %s", pbuf);
+        SAFE_DELETE(pbuf);
         
     }
 }
 
 void CPPPPChannel::ProcessSnapshot(char *pbuf, int len)
 {
-    //NSLog(@"ProcessSnapshot....");     
+    //NSLog(@"ProcessSnapshot....");
     if (m_CameraViewSnapshotDelegate != nil) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        [m_CameraViewSnapshotDelegate SnapshotNotify:[NSString stringWithUTF8String:szDID] data:pbuf length:len];        
+        [m_CameraViewSnapshotDelegate SnapshotNotify:[NSString stringWithUTF8String:szDID] data:pbuf length:len];
         [pool release];
-    }    
+    }
 }
 
 //void CPPPPChannel::ProcessCommand(int cmd, char *pbuf, int len)
@@ -514,7 +515,7 @@ void CPPPPChannel::ProcessSnapshot(char *pbuf, int len)
 //            ProcessSnapshot(pbuf, len);
 //            break;
 //    }
-//    
+//
 //}
 
 void CPPPPChannel::ProcessWifiScanResult(STRU_WIFI_SEARCH_RESULT_LIST wifiSearchResultList)
@@ -527,10 +528,10 @@ void CPPPPChannel::ProcessWifiScanResult(STRU_WIFI_SEARCH_RESULT_LIST wifiSearch
     
     int nCount = wifiSearchResultList.nResultCount;
     int i;
-    for (i = 0; i < nCount; i++) 
+    for (i = 0; i < nCount; i++)
     {
         int bEnd = 0;
-        if (i == nCount - 1) 
+        if (i == nCount - 1)
         {
             bEnd = 1;
         }
@@ -575,18 +576,18 @@ void CPPPPChannel::ProcessMailParams(STRU_MAIL_PARAMS mailParam)
 {
     [m_MailLock lock];
     if (m_MailDelegate != nil) {
-//        [m_MailDelegate MailParam:[NSString stringWithFormat:@"%s",mailParam.sender]
-//                          smtpsvr:[NSString stringWithFormat:@"%s",mailParam.svr]
-//                         smtpport:mailParam.port
-//                              ssl:mailParam.ssl
-//                             auth:(strlen(mailParam.user) > 0 ? 1 : 0)
-//                             user:[NSString stringWithFormat:@"%s",mailParam.user]
-//                              pwd:[NSString stringWithFormat:@"%s",mailParam.pwd]
-//                            recv1:[NSString stringWithFormat:@"%s",mailParam.receiver1]
-//                            recv2:[NSString stringWithFormat:@"%s",mailParam.receiver2]
-//                            recv3:[NSString stringWithFormat:@"%s",mailParam.receiver3]
-//                            recv4:[NSString stringWithFormat:@"%s",mailParam.receiver4]];
-    
+        //        [m_MailDelegate MailParam:[NSString stringWithFormat:@"%s",mailParam.sender]
+        //                          smtpsvr:[NSString stringWithFormat:@"%s",mailParam.svr]
+        //                         smtpport:mailParam.port
+        //                              ssl:mailParam.ssl
+        //                             auth:(strlen(mailParam.user) > 0 ? 1 : 0)
+        //                             user:[NSString stringWithFormat:@"%s",mailParam.user]
+        //                              pwd:[NSString stringWithFormat:@"%s",mailParam.pwd]
+        //                            recv1:[NSString stringWithFormat:@"%s",mailParam.receiver1]
+        //                            recv2:[NSString stringWithFormat:@"%s",mailParam.receiver2]
+        //                            recv3:[NSString stringWithFormat:@"%s",mailParam.receiver3]
+        //                            recv4:[NSString stringWithFormat:@"%s",mailParam.receiver4]];
+        
         [m_MailDelegate MailParam:[NSString stringWithUTF8String:mailParam.sender]
                           smtpsvr:[NSString stringWithUTF8String:mailParam.svr]
                          smtpport:mailParam.port
@@ -625,9 +626,9 @@ int CPPPPChannel::GetResult(char *pbuf, int len)
     //result
     char *p = strstr(pbuf, "result=");
     if (p == NULL)
-        return 0;    
+        return 0;
     
-    sscanf(p, "result=%d;\r\n", &result);    
+    sscanf(p, "result=%d;\r\n", &result);
     
     if(result != 0)
     {
@@ -651,35 +652,35 @@ void CPPPPChannel::ProcessCommand(int cmd, char *pbuf, int len)
         case CGI_IESET_SNAPSHOT:
             ProcessSnapshot(pbuf, len);
             break;
-//        case CGI_DECODER_CONTROL: 
-////            ProcessResult(pbuf, len, MSG_TYPE_DECODER_CONTROL);
-//            break;
-//        case CGI_IEGET_CAM_PARAMS:
-//        {
-//            //TRACE("CGI_IEGET_CAM_PARAMS pbuf: %s\n", pbuf) ;
-//            STRU_CAMERA_PARAMS cameraParams;
-//            memset(&cameraParams, 0, sizeof(cameraParams));
-//            if(m_CgiPacket.UnpacketCameraParam(pbuf, cameraParams))
-//            {
-//                ProcessCameraParam(cameraParams);
-//            }
-//        }
-//            break;
-//        case CGI_IESET_SNAPSHOT:
-//            ProcessSnapshot(pbuf, len);
-//            break;
+            //        case CGI_DECODER_CONTROL:
+            ////            ProcessResult(pbuf, len, MSG_TYPE_DECODER_CONTROL);
+            //            break;
+            //        case CGI_IEGET_CAM_PARAMS:
+            //        {
+            //            //TRACE("CGI_IEGET_CAM_PARAMS pbuf: %s\n", pbuf) ;
+            //            STRU_CAMERA_PARAMS cameraParams;
+            //            memset(&cameraParams, 0, sizeof(cameraParams));
+            //            if(m_CgiPacket.UnpacketCameraParam(pbuf, cameraParams))
+            //            {
+            //                ProcessCameraParam(cameraParams);
+            //            }
+            //        }
+            //            break;
+            //        case CGI_IESET_SNAPSHOT:
+            //            ProcessSnapshot(pbuf, len);
+            //            break;
         case CGI_CAM_CONTROL:
-//            ProcessResult(pbuf, len, MSG_TYPE_CAMERA_CONTROL);
+            //            ProcessResult(pbuf, len, MSG_TYPE_CAMERA_CONTROL);
             break;
         case CGI_IESET_NETWORK:
-//            ProcessResult(pbuf, len, MSG_TYPE_SET_NETWORK);
+            //            ProcessResult(pbuf, len, MSG_TYPE_SET_NETWORK);
             break;
         case CGI_IESET_DATE:
- //           ProcessResult(pbuf, len, MSG_TYPE_SET_DATETIME);
+            //           ProcessResult(pbuf, len, MSG_TYPE_SET_DATETIME);
             break;
-//        case CGI_CHECK_USER:          
-//            //ProcessCheckUser(pbuf, len);
-//            break;
+            //        case CGI_CHECK_USER:
+            //            //ProcessCheckUser(pbuf, len);
+            //            break;
         case CGI_IESET_WIFISCAN:
         {
             //TRACE("CGI_IESET_WIFISCAN pbuf: %s\n", pbuf) ;
@@ -699,7 +700,7 @@ void CPPPPChannel::ProcessCommand(int cmd, char *pbuf, int len)
             memset(&networkParams, 0 ,sizeof(networkParams));
             if (m_CgiPacket.UnpacketNetworkParam(pbuf, networkParams))
             {
-           //     ProcessNetworkParams(networkParams);
+                //     ProcessNetworkParams(networkParams);
             }
             
             STRU_WIFI_PARAMS wifiParams;
@@ -734,7 +735,7 @@ void CPPPPChannel::ProcessCommand(int cmd, char *pbuf, int len)
             memset(&ddnsParams, 0, sizeof(ddnsParams));
             if (m_CgiPacket.UnpacketDdnsParam(pbuf, ddnsParams))
             {
-           //     ProcessDdnsParams(ddnsParams);
+                //     ProcessDdnsParams(ddnsParams);
             }
             
             STRU_DATETIME_PARAMS datetimeParams;
@@ -773,32 +774,32 @@ void CPPPPChannel::ProcessCommand(int cmd, char *pbuf, int len)
             memset(&ptzParams, 0, sizeof(ptzParams));
             if (m_CgiPacket.UnpacketPtzParam(pbuf, ptzParams))
             {
-           //     ProcessPtzParams(ptzParams);
+                //     ProcessPtzParams(ptzParams);
             }
         }
             break;
         case CGI_IEGET_ALARMLOG:
             break;
         case CGI_IESET_USER:
-         //   ProcessResult(pbuf, len, MSG_TYPE_SET_USER);
+            //   ProcessResult(pbuf, len, MSG_TYPE_SET_USER);
             break;
         case CGI_IESET_MAIL:
-        //    ProcessResult(pbuf, len, MSG_TYPE_SET_MAIL);
+            //    ProcessResult(pbuf, len, MSG_TYPE_SET_MAIL);
             break;
         case CGI_IESET_FTP:
-         //   ProcessResult(pbuf, len, MSG_TYPE_SET_FTP);
+            //   ProcessResult(pbuf, len, MSG_TYPE_SET_FTP);
             break;
         case CGI_IESET_WIFI:
-        //    ProcessResult(pbuf, len, MSG_TYPE_SET_WIFI);
-   
+            //    ProcessResult(pbuf, len, MSG_TYPE_SET_WIFI);
+            
             break;
         case CGI_IESET_ALARM:
-         //   ProcessResult(pbuf, len, MSG_TYPE_SET_ALARM);
+            //   ProcessResult(pbuf, len, MSG_TYPE_SET_ALARM);
             break;
         case CGI_IEGET_RECORD_FILE:
         {
-           // NSLog(@"CGI_IEGET_RECORD_FILE: %s", pbuf);
-
+            // NSLog(@"CGI_IEGET_RECORD_FILE: %s", pbuf);
+            
             STRU_RECORD_FILE_LIST recordFileList;
             memset(&recordFileList, 0, sizeof(recordFileList));
             
@@ -814,7 +815,7 @@ void CPPPPChannel::ProcessCommand(int cmd, char *pbuf, int len)
             // NSLog(@"CGI_IEGET_RECORD_FILE: %s", pbuf);
             ProcessCheckUser(pbuf, len);
             break;
-        
+            
         case CGI_IEGET_RECORD:
         {
             STRU_SD_RECORD_PARAM recordParam;
@@ -826,7 +827,7 @@ void CPPPPChannel::ProcessCommand(int cmd, char *pbuf, int len)
             
         }
             break;
-            case CGI_MUSIC_OPERATION:
+        case CGI_MUSIC_OPERATION:
         {
             NSString *resultStr = [NSString stringWithCString:pbuf encoding:NSUTF8StringEncoding];
             if (resultStr == nil) {
@@ -930,7 +931,7 @@ void CPPPPChannel::ProcessCameraStatusParams(STRU_CAMERA_STATUS cameraStatus){
     }
     
     [m_SDCardStatusLock unlock];
-
+    
     [m_CamStatusDelegateLock lock];
     
     if (m_CamStatusDelegate != nil) {
@@ -1028,25 +1029,25 @@ void CPPPPChannel::ProcessCheckUser(char *pbuf, int len){
 
 void CPPPPChannel::ProcessCameraParams(char *pbuf, int len)
 {
-//    NSLog(@"ProcessCameraParams....");
-//    NSLog(@"pbuf: %s", pbuf);
-//    NSLog(@"len: %d", len);
-//    
-//    resolution=0;
-//    vbright=0;
-//    vcontrast=128;
-//    vhue=0;
-//    vsaturation=0;
-//    OSDEnable=0;
-//    mode=0;
-//    flip=0;
-//    enc_framerate=30;
-//    sub_enc_framerate=15;    
+    //    NSLog(@"ProcessCameraParams....");
+    //    NSLog(@"pbuf: %s", pbuf);
+    //    NSLog(@"len: %d", len);
+    //
+    //    resolution=0;
+    //    vbright=0;
+    //    vcontrast=128;
+    //    vhue=0;
+    //    vsaturation=0;
+    //    OSDEnable=0;
+    //    mode=0;
+    //    flip=0;
+    //    enc_framerate=30;
+    //    sub_enc_framerate=15;
     
     STRU_CAMERA_PARAM CameraParam;
     memset(&CameraParam, 0, sizeof(CameraParam));
     
-    int result = 0;    
+    int result = 0;
     
     //result
     char *p = strstr(pbuf, "result=");
@@ -1114,7 +1115,7 @@ void CPPPPChannel::ProcessCameraParams(char *pbuf, int len)
     if(p != NULL)
     {
         sscanf(p, "flip=%d", &(CameraParam.flip));
-    }    
+    }
     
     PlayViewParamNotify(CGI_IEGET_CAM_PARAMS, (void*)&CameraParam);
     
@@ -1128,7 +1129,7 @@ int CPPPPChannel::PTZ_Control(int command)
     }
     
     char buf[128];
-    char cmdbuf[512];  
+    char cmdbuf[512];
     
     CMD_CHANNEL_HEAD cmdhead;
     memset(&cmdhead, 0, sizeof(cmdhead));
@@ -1139,7 +1140,7 @@ int CPPPPChannel::PTZ_Control(int command)
         onestep = 1;
     }
     
-    memset(buf, 0, sizeof(buf));    
+    memset(buf, 0, sizeof(buf));
     sprintf(buf, "GET /decoder_control.cgi?command=%d&onestep=%d&&user=%s&pwd=%s&", command, onestep, szUser, szPwd);
     cmdhead.len = strlen(buf);
     
@@ -1164,13 +1165,13 @@ int CPPPPChannel::CameraControl(int param, int value)
     }
     
     char buf[128];
-    char cmdbuf[512];  
+    char cmdbuf[512];
     
     CMD_CHANNEL_HEAD cmdhead;
     memset(&cmdhead, 0, sizeof(cmdhead));
     cmdhead.startcode = CMD_START_CODE;
     
-    memset(buf, 0, sizeof(buf));    
+    memset(buf, 0, sizeof(buf));
     sprintf(buf, "GET /camera_control.cgi?param=%d&value=%d&&user=%s&pwd=%s&", param, value, szUser, szPwd);
     cmdhead.len = strlen(buf);
     
@@ -1192,7 +1193,7 @@ void CPPPPChannel::PlayViewParamNotify(int paramType, void *param)
 int CPPPPChannel::StartAlarmChannel()
 {
     m_bAlarmThreadRuning= 1;
-	pthread_create(&m_AlarmThreadID, NULL, AlarmThread, (void*)this);
+    pthread_create(&m_AlarmThreadID, NULL, AlarmThread, (void*)this);
     return 1;
 }
 
@@ -1212,17 +1213,17 @@ void CPPPPChannel::AlarmProcess()
 }
 
 int CPPPPChannel::StartCommandChannel()
-{    
+{
     m_bCommandThreadRuning = 1;
-	pthread_create(&m_CommandThreadID, NULL, CommandThread, (void*)this);
+    pthread_create(&m_CommandThreadID, NULL, CommandThread, (void*)this);
     
     return 1;
 }
 
 void* CPPPPChannel::CommandThread(void * param)
-{  
-    CPPPPChannel *pPPPChannel = (CPPPPChannel*)param;    
-    pPPPChannel->CommandProcess();    
+{
+    CPPPPChannel *pPPPChannel = (CPPPPChannel*)param;
+    pPPPChannel->CommandProcess();
     return NULL;
 }
 
@@ -1230,49 +1231,49 @@ void CPPPPChannel::StopOtherThread()
 {
     [m_StopCondition lock];
     
-    //NSLog(@"CPPPPChannel::StopOtherThread()...begin...");    
+    //NSLog(@"CPPPPChannel::StopOtherThread()...begin...");
     m_bCommandRecvThreadRuning = 0;
     m_bAlarmThreadRuning = 0;
     m_bDataThreadRuning = 0;
     m_bPlaybackThreadRuning = 0;
     m_bTalkThreadRuning = 0;
-
+    
     PPPPClose();
-
+    
     //NSLog(@"wait for CommondThread stop");
     if(m_CommandRecvThreadID!= NULL)
     {
         pthread_join(m_CommandRecvThreadID, NULL);
         m_CommandRecvThreadID = NULL;
     }
-
+    
     //NSLog(@"wait for DataThread stop...");
     if(m_DataThreadID!= NULL)
     {
         pthread_join(m_DataThreadID, NULL);
         m_DataThreadID = NULL;
     }
-
+    
     //NSLog(@"wait for AlarmThread stop...");
     if(m_AlarmThreadID!= NULL)
     {
         pthread_join(m_AlarmThreadID, NULL);
         m_AlarmThreadID = NULL;
     }
-
-    //NSLog(@"wait for TalkThread stop");    
+    
+    //NSLog(@"wait for TalkThread stop");
     if(m_TalkThreadID!= NULL)
     {
         pthread_join(m_TalkThreadID, NULL);
         m_TalkThreadID = NULL;
     }
-
+    
     //NSLog(@"wait for PlaybackThread stop");
     if(m_PlaybackThreadID!= NULL)
     {
         pthread_join(m_PlaybackThreadID, NULL);
         m_PlaybackThreadID = NULL;
-    }    
+    }
     
     if(m_AudioThreadID != NULL)
     {
@@ -1280,13 +1281,13 @@ void CPPPPChannel::StopOtherThread()
         m_AudioThreadID = NULL;
     }
     
-    StopVideoPlay();    
+    StopVideoPlay();
     StopPlaybackVideoPlayer();
     
-    m_pCommandBuffer->Reset();    
-    //NSLog(@"StopOtherThread end..");    
+    m_pCommandBuffer->Reset();
+    //NSLog(@"StopOtherThread end..");
     [m_StopCondition unlock];
-
+    
 }
 
 int CPPPPChannel::StartAudioChannel()
@@ -1317,25 +1318,51 @@ void CPPPPChannel::AudioProcess()
             return ;
         }
         
-        //NSLog(@"AudioProces avhead.type:%d, avhead.streamid:%d, avhead.militime:%d, avhead.sectime:%d, avhead.len:%d, avhead.frameno:%d\n", 
-		//	avhead.type, avhead.streamid, avhead.militime, avhead.sectime, avhead.len, avhead.frameno);
+        //NSLog(@"AudioProces avhead.type:%d, avhead.streamid:%d, avhead.militime:%d, avhead.sectime:%d, avhead.len:%d, avhead.frameno:%d\n",
+        //    avhead.type, avhead.streamid, avhead.militime, avhead.sectime, avhead.len, avhead.frameno);
         
         //check invalid data
         if(avhead.len > MAX_AUDIO_DATA_LENGTH)
         {
-			NSLog(@"recv audio data is invalid!!\n");
-			return;
-        }  
+            NSLog(@"recv audio data is invalid!!\n");
+            return;
+        }
         
         if(avhead.len == 0)
         {
             continue;
         }
         
+        NSLog(@"m_bAudioPreSample1: %d %d", m_bAudioPreSample, avhead.version);
+        NSLog(@"m_bAudioPreSample:%d m_deviceEnableAdpcm:%d",m_bAudioPreSample,m_deviceEnableAdpcm);
+        if((m_nCamType != 128 && m_nCamType != 126) || (0 == avhead.sample && 0 == avhead.index && m_nCamType == 128))
+        {
+            m_pAudioAdpcm->DecoderClr();
+            m_bAudioPreSample = 1;
+            NSLog(@"########### avhead == 0  && avhead.index == 0");
+        }
+        else
+        {
+            NSLog(@"########### avhead != 0  !! avhead.sample != 0");
+            if(m_bAudioPreSample)
+            {
+                m_pAudioAdpcm->m_nDeAudioPreSample = avhead.sample;
+                m_pAudioAdpcm->m_nDeAudioIndex = avhead.index;
+                m_bAudioPreSample = 0;
+                m_deviceEnableAdpcm =1;
+                NSLog(@"###########in m_deviceEnableAdpcm%d",m_deviceEnableAdpcm);
+                NSLog(@"###########in avhead.version%d",avhead.version);
+            }
+        }
+        NSLog(@"m_bAudioPreSample:%d m_deviceEnableAdpcm:%d",m_bAudioPreSample,m_deviceEnableAdpcm);
+        NSLog(@"########### m_bAudioPreSample%d",m_bAudioPreSample);
+        NSLog(@"########### avhead.sample%d",avhead.sample);
+        NSLog(@"########### avhead.index%d",avhead.index);
+        NSLog(@"########### m_nCamType%d",m_nCamType);
         int Length = avhead.len;
         
         //----- read data ------------------------------------------
-        char *pbuf = new char[Length + 1];  
+        char *pbuf = new char[Length + 1];
         nRet = PPPP_IndeedRead(P2P_AUDIOCHANNEL, (CHAR*)pbuf, Length, m_bAudioThreadRuning);
         if(nRet < 0)
         {
@@ -1358,24 +1385,24 @@ void CPPPPChannel::AudioProcess()
         SAFE_DELETE(pPCMBuf);
         SAFE_DELETE(pbuf);
     }
-
+    
 }
 
 //获取cgi的公共函数
 int CPPPPChannel::cgi_get_common(char * cgi)
-{ 
+{
     if (m_bOnline == 0) {
         return 0;
     }
     
     char buf[2048];
-    char cmdbuf[2048];  
+    char cmdbuf[2048];
     
     CMD_CHANNEL_HEAD cmdhead;
     memset(&cmdhead, 0, sizeof(cmdhead));
     cmdhead.startcode = CMD_START_CODE;
-
-    memset(buf, 0, sizeof(buf));    
+    
+    memset(buf, 0, sizeof(buf));
     sprintf(buf, "GET /%sloginuse=%s&loginpas=%s&user=%s&pwd=%s&", cgi, szUser, szPwd, szUser, szPwd);
     cmdhead.len = strlen(buf);
     
@@ -1383,36 +1410,45 @@ int CPPPPChannel::cgi_get_common(char * cgi)
     
     memcpy(cmdbuf , (char*)&cmdhead, sizeof(cmdhead));
     memcpy(cmdbuf + sizeof(cmdhead), buf, cmdhead.len);
-
+    
     return CPPPPChannel::AddCommand(cmdbuf, sizeof(cmdhead) + cmdhead.len);
 }
 
-int CPPPPChannel::StartAudio()
+int CPPPPChannel::StartAudio(char request)
 {
-    //NSLog(@"StartAudio....");
-    if (m_bAudioStarted == 1) {
-        //NSLog(@"if (m_bAudioStarted == 1)");
+    NSLog(@"StartAudio did %s...." , szDID);
+    if(request)
+    {
+        cgi_get_common((char*)"audiostream.cgi?streamid=1&adpcm_ver=1&");
+        //        cgi_get_common((char*)"audiostream.cgi?streamid=1&");
+    }
+    if (m_bAudioStarted == 1)
+    {
         return 1;
-    }    
+    }
     m_pAudioBuf->Create(ABUF_SIZE);
-    cgi_get_common((char*)"audiostream.cgi?streamid=1&");    
     m_pPCMPlayer = new CPCMPlayer(PlaybackAudioBuffer_Callback, (void*)this);
-    m_pPCMPlayer->StartPlay();     
-    m_bAudioStarted = 1;  
-    //NSLog(@"StartAudio....end");
+    m_pPCMPlayer->StartPlay();
+    m_bAudioStarted = 1;
+    m_bAudioPreSample=1;
+    NSLog(@"StartAudio did %s....................................end" , szDID);
     return 1;
 }
 
-int CPPPPChannel::StopAudio()
+int CPPPPChannel::StopAudio(char request)
 {
+    NSLog(@"stopAudio did %s....................................end" , szDID);
+    if(request)
+    {
+        cgi_get_common((char*)"audiostream.cgi?streamid=16&");
+    }
     if (m_bAudioStarted == 0) {
         return 1;
     }
     m_pAudioBuf->Release();
-    cgi_get_common((char*)"audiostream.cgi?streamid=16&");    
-    //m_pPCMPlayer->StopPlay(); 
+    
     SAFE_DELETE(m_pPCMPlayer);
-    m_bAudioStarted = 0;    
+    m_bAudioStarted = 0;
     return 1;
 }
 
@@ -1427,12 +1463,12 @@ int CPPPPChannel::StartTalk()
         m_pPCMRecorder = new CPCMRecorder(CPPPPChannel::RecordAudioBuffer_Callback, this);
         m_pPCMRecorder->StartRecord();
     }
-    m_bTalkStarted = 1;    
+    m_bTalkStarted = 1;
     return 1;
 }
 
 int CPPPPChannel::StopTalk()
-{  
+{
     if (m_bTalkStarted == 0) {
         return 1;
     }
@@ -1478,9 +1514,9 @@ void CPPPPChannel::CommandProcess()
     int nWaitTime = 0;
     
     int nReconnectCount = 0;
-
+    
 RE_CONNECT:
-
+    
     m_bOnline = 0;
     
     //if the status is ReConnect , first ,stop the other thread
@@ -1489,15 +1525,15 @@ RE_CONNECT:
         StopOtherThread();
     }
     
-    nWaitTime = 0;    
+    nWaitTime = 0;
     //====== ReConnect wait ==================================================================
     while(1)
-    {        
+    {
         if(m_bCommandThreadRuning == 0)
         {
             return;
         }
-
+        
         if(ReConnect == 1)
         {
             nWaitTime++;
@@ -1508,12 +1544,12 @@ RE_CONNECT:
                 usleep(100000);
                 continue;
             }
-
+            
             m_bReconnectImmediately = 0;
             ReConnect = 0;
             nWaitTime = 0;
         }
-
+        
         //NSLog(@"PPPP_Connect begin...%s", szDID);
         MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_CONNECTING);
         NSString *uid = [NSString stringWithUTF8String:szDID];
@@ -1527,7 +1563,7 @@ RE_CONNECT:
             //NSLog(@"PPPP_Connect failed.. %s return: %d", szDID, m_hSessionHandle);
             /**************************************************************************************
              //连接超时 --> 重连一定的次数后，如果还不成功，则停止p2p
-             ERROR_PPPP_TIME_OUT 
+             ERROR_PPPP_TIME_OUT
              
              //ID号无效 --> 停止p2p
              ERROR_PPPP_INVALID_ID
@@ -1568,7 +1604,7 @@ RE_CONNECT:
                     return;
             }
             
-            usleep(100000) ;            
+            usleep(100000) ;
             ReConnect = 1;
             
             nReconnectCount++;
@@ -1577,13 +1613,13 @@ RE_CONNECT:
             {
                 nReconnectCount = 0;
                 ReConnect = 0;
-                MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_CONNECT_TIMEOUT);                
+                MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_CONNECT_TIMEOUT);
                 return;
             }
             continue;
         }
         //NSLog(@"PPPP_Connect success...m_hSessionHandle: %d %s", m_hSessionHandle, szDID);
-
+        
         /* pppp session */
         st_PPPP_Session SInfo;
         int nRet = PPPP_Check(m_hSessionHandle, &SInfo);
@@ -1594,7 +1630,7 @@ RE_CONNECT:
             }
             ReConnect = 1;
             goto RE_CONNECT;
-        }        
+        }
         
         int mode;
         if(SInfo.bMode == 0)
@@ -1608,7 +1644,7 @@ RE_CONNECT:
         
         MsgNotify(MSG_NOTIFY_TYPE_PPPP_MODE, mode);
         MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_INITIALING);
-       // MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_ON_LINE);
+        // MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_ON_LINE);
         m_bOnline = 1;
         ReConnect = 0;
         break;
@@ -1618,18 +1654,18 @@ RE_CONNECT:
     StartSensorAlarmChannel();
     StartCommandRecvThread();
     StartDataChannel();
-//    StartAlarmChannel();
+    //    StartAlarmChannel();
     StartAudioChannel();
     StartPlaybackChannel();
-
+    
     nReconnectCount = 0;
     //XMXM  check_user.cgi?
     cgi_get_common((char*)"check_user.cgi?");
     //snapshot.cgi
     cgi_get_common((char*)"snapshot.cgi?");
-
+    
     while(m_bCommandThreadRuning)
-    {         
+    {
         UINT32 uiReadSize = 0;
         UINT32 uiWriteSize = 0;
         
@@ -1646,7 +1682,7 @@ RE_CONNECT:
             MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_DISCONNECT);
             goto RE_CONNECT;
         }
-
+        
         //NSLog(@"CommandProcess PPPP_Check_Buffer CHANNEL_COMMAND: uiWriteSize: %d, uiReadSize: %d", uiWriteSize, uiReadSize);
         
         if(uiWriteSize >= PPPP_WRITE_BUFFER_MAX_SIZE)
@@ -1654,11 +1690,11 @@ RE_CONNECT:
             usleep(10000);
             continue;
         }
-
+        
         //---- read head -----------------------------------------
         CMD_BUF_HEAD bufhead;
         int nHeadLen = sizeof(CMD_BUF_HEAD);
-        memset(&bufhead, 0, sizeof(bufhead));        
+        memset(&bufhead, 0, sizeof(bufhead));
         int nRet = m_pCommandBuffer->Read((char*)&bufhead, nHeadLen);
         if(nRet == 0)
         {
@@ -1666,9 +1702,9 @@ RE_CONNECT:
             usleep(10000);
             continue;
         }
-
+        
         //Log("CommandBuffer read success");
-
+        
         //----- read data ----------------------------------------------------
         char *pbuf = new char[bufhead.len];
         nRet = m_pCommandBuffer->Read(pbuf, bufhead.len);
@@ -1678,8 +1714,8 @@ RE_CONNECT:
             SAFE_DELETE(pbuf);
             return ;
         }
-
-         //---- send ----------------------------------------------------------
+        
+        //---- send ----------------------------------------------------------
         res = PPPP_Write(m_hSessionHandle, P2P_CMDCHANNEL, pbuf, bufhead.len);
         if(res < 0)
         {
@@ -1687,12 +1723,12 @@ RE_CONNECT:
             if (res != ERROR_PPPP_SESSION_CLOSED_CALLED) {
                 PPPPClose();
             }
-            SAFE_DELETE(pbuf);    
+            SAFE_DELETE(pbuf);
             ReConnect = 1;
             MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_DISCONNECT);
             goto RE_CONNECT;
-        }        
-                
+        }
+        
         SAFE_DELETE(pbuf);
     }
     
@@ -1701,7 +1737,7 @@ RE_CONNECT:
 int CPPPPChannel::StartDataChannel()
 {
     m_bDataThreadRuning= 1;
-	pthread_create(&m_DataThreadID, NULL, DataThread, (void*)this);
+    pthread_create(&m_DataThreadID, NULL, DataThread, (void*)this);
     return 1;
 }
 
@@ -1713,7 +1749,7 @@ void* CPPPPChannel::DataThread(void * param)
 }
 
 void CPPPPChannel::DataProcess()
-{    
+{
     while(m_bDataThreadRuning)
     {
         //read head
@@ -1726,29 +1762,29 @@ void CPPPPChannel::DataProcess()
             PPPPClose();
             return ;
         }
-
+        
         //NSLog(@"DataProcess avhead.type:%d, avhead.streamid:%d, avhead.militime:%d, avhead.sectime:%d, avhead.len:%d, avhead.frameno:%d\n", avhead.type, avhead.streamid, avhead.militime, avhead.sectime, avhead.len, avhead.frameno);
-
+        
         //check invalid data
         if(avhead.len > MAX_FRAME_LENGTH)
         {
-			NSLog(@"recv data is invalid!!\n");
-			return;
+            NSLog(@"recv data is invalid!!\n");
+            return;
         }
         
         if (avhead.len == 0) {
             continue;
         }
-
+        m_nCamType = avhead.version;
         int Length = sizeof(VIDEO_BUF_HEAD) + avhead.len;
-
+        
         //read data
         char *pbuf = new char[Length];
         VIDEO_BUF_HEAD *phead = (VIDEO_BUF_HEAD*)pbuf;
-		phead->head = VIDEO_HEAD_VALUE;
-		phead->timestamp = avhead.sectime * 1000 + avhead.militime;
-		phead->len = avhead.len;
-		phead->frametype = avhead.type ;
+        phead->head = VIDEO_HEAD_VALUE;
+        phead->timestamp = avhead.sectime;
+        phead->len = avhead.len;
+        phead->frametype = avhead.type ;
         
         nRet = PPPP_IndeedRead(P2P_VIDEOCHANNEL, (CHAR*)(pbuf + sizeof(VIDEO_BUF_HEAD)), avhead.len, m_bDataThreadRuning);
         if(nRet < 0)
@@ -1756,20 +1792,20 @@ void CPPPPChannel::DataProcess()
             //NSLog(@"DataProcess PPPP_IndeedRead error: %d", nRet);
             SAFE_DELETE(pbuf);
             return ;
-        }        
+        }
         
         int streamType;
         if (m_EnumVideoMode == ENUM_VIDEO_MODE_UNKNOWN && (avhead.type == 0 || avhead.type == 1)) {
             m_EnumVideoMode = ENUM_VIDEO_MODE_H264;
             streamType = STREAM_CODEC_TYPE_H264;
             PlayViewParamNotify(STREAM_CODEC_TYPE, (void*)&streamType);
-       
+            
         }
         
         if (m_EnumVideoMode == ENUM_VIDEO_MODE_UNKNOWN && avhead.type == 3) {
             m_EnumVideoMode = ENUM_VIDEO_MODE_MJPEG;
             streamType = STREAM_CODEC_TYPE_JPEG;
-            PlayViewParamNotify(STREAM_CODEC_TYPE, (void*)&streamType);    
+            PlayViewParamNotify(STREAM_CODEC_TYPE, (void*)&streamType);
         }
         
         if(m_EnumVideoMode == ENUM_VIDEO_MODE_UNKNOWN)
@@ -1777,17 +1813,17 @@ void CPPPPChannel::DataProcess()
             SAFE_DELETE(pbuf);
             continue;
         }
-
+        
         //---------H.264------------------------------------------
         if(m_EnumVideoMode == ENUM_VIDEO_MODE_H264)
         {
             if(m_bFindIFrame)
-            {                
+            {
                 if(avhead.type == ENUM_FRAME_TYPE_I)
                 {
                     m_bFindIFrame = true;
                     m_pVideoBuf->Write(pbuf, Length);
-                }                
+                }
             }
             else
             {
@@ -1805,7 +1841,7 @@ void CPPPPChannel::DataProcess()
                             m_bFindIFrame = false;
                         }
                     }
-                }                
+                }
             }
         }
         else/*-------------------------MJPEG----------------------- */
@@ -1817,14 +1853,14 @@ void CPPPPChannel::DataProcess()
             }
         }
         
-        SAFE_DELETE(pbuf);       
+        SAFE_DELETE(pbuf);
     }
 }
 
 int CPPPPChannel::StartPlaybackChannel()
 {
     m_bPlaybackThreadRuning = 1;
-	pthread_create(&m_PlaybackThreadID, NULL, PlaybackThread, (void*)this);
+    pthread_create(&m_PlaybackThreadID, NULL, PlaybackThread, (void*)this);
     return 1;
 }
 
@@ -1855,7 +1891,10 @@ void CPPPPChannel::PlaybackProcess()
         if(nRet < 0)
         {
             //NSLog(@"DataProcess  PPPP_IndeedRead failed  return: %d", nRet);
-            PPPPClose();
+            if (nRet != ERROR_PPPP_SESSION_CLOSED_CALLED) {
+                PPPPClose();
+            }
+            m_bPlaybackThreadRuning = 0;
             return ;
         }
         
@@ -1864,83 +1903,169 @@ void CPPPPChannel::PlaybackProcess()
         //check invalid data
         if(avhead.len > MAX_FRAME_LENGTH)
         {
-			NSLog(@"recv data is invalid!!\n");
-			return;
+            NSLog(@"recv data is invalid!!\n");
+            m_bPlaybackThreadRuning = 0;
+            return;
         }
         
         if (avhead.len == 0) {
             continue;
         }
         
-        int Length = sizeof(VIDEO_BUF_HEAD) + avhead.len;
-        
-        //read data
-        char *pbuf = new char[Length];
-        VIDEO_BUF_HEAD *phead = (VIDEO_BUF_HEAD*)pbuf;
-		phead->head = VIDEO_HEAD_VALUE;
-		phead->timestamp = avhead.sectime * 1000 + avhead.militime;
-		phead->len = avhead.len;
-		phead->frametype = avhead.type ;
-        
-        nRet = PPPP_IndeedRead(P2P_PLAYBACK, (CHAR*)(pbuf + sizeof(VIDEO_BUF_HEAD)), avhead.len, m_bPlaybackThreadRuning);
-        if(nRet < 0)
+        if(avhead.type == 6)
         {
-            //NSLog(@"DataProcess PPPP_IndeedRead error: %d", nRet);
-            SAFE_DELETE(pbuf);
-            return ;
-        } 
-        
-        if (m_bPlaybackStarted == 0) {
-            SAFE_DELETE(pbuf);
-            usleep(10000);
-            continue;
-        }
-        
-        if (m_EnumPlayBackVideoMode == ENUM_VIDEO_MODE_UNKNOWN && (avhead.type == 0 || avhead.type == 1)) {
-            m_EnumPlayBackVideoMode = ENUM_VIDEO_MODE_H264;
-         
-        }
-        
-        if (m_EnumPlayBackVideoMode == ENUM_VIDEO_MODE_UNKNOWN && avhead.type == 3) {
-            m_EnumPlayBackVideoMode = ENUM_VIDEO_MODE_MJPEG;
-        }
-        
-        if(m_EnumPlayBackVideoMode == ENUM_VIDEO_MODE_UNKNOWN)
-        {
-            SAFE_DELETE(pbuf);
-            continue;
-        }
-        
-        //---------H.264------------------------------------------
-        if(m_EnumPlayBackVideoMode == ENUM_VIDEO_MODE_H264)
-        {
-            if(!m_bPlayBackFindIFrame)
+            if((m_nCamType != 128 && m_nCamType != 126) || (0 == avhead.sample && 0 == avhead.index && m_nCamType == 128))
             {
-                if(avhead.type == ENUM_FRAME_TYPE_I)
-                {
-                    m_bPlayBackFindIFrame = true;
-                    m_pPlayBackVideoBuf->Reset();
-                    m_pPlayBackVideoBuf->Write(pbuf, Length);
-                }
+                m_pAudioAdpcm->DecoderClr();
+                m_bAudioPreSample = 1;
+                NSLog(@"########### avhead == 0  && avhead.index == 0");
             }
             else
             {
-                if(0 == m_pPlayBackVideoBuf->Write(pbuf, Length))
+                NSLog(@"########### avhead != 0  !! avhead.index != 0");
+                if(m_bAudioPreSample)
                 {
-                    m_bPlayBackFindIFrame = false;
+                    m_pAudioAdpcm->m_nDeAudioPreSample = avhead.sample;
+                    m_pAudioAdpcm->m_nDeAudioIndex = avhead.index;
+                    m_bAudioPreSample = 0;
+                    m_deviceEnableAdpcm =1;
+                    NSLog(@"m_bAudioPreSample3: %d %d", m_deviceEnableAdpcm, avhead.version);
                 }
             }
+            ProcessAudio(&avhead , P2P_PLAYBACK);
         }
-        else/*-------------------------MJPEG----------------------- */
+        else
         {
-            if(avhead.type == ENUM_FRAME_TYPE_MJPEG)
+            m_nCamType=avhead.version;
+            ProcessPlaybackVideo(&avhead , P2P_PLAYBACK);
+        }
+        
+    }
+}
+void CPPPPChannel::ProcessPlaybackVideo(AV_HEAD * pAVHead , unsigned char chn)
+{
+    int Length = sizeof(VIDEO_BUF_HEAD) + pAVHead->len;
+    int nRet = 0;
+    //read data
+    char *pbuf = new char[Length];
+    VIDEO_BUF_HEAD *phead = (VIDEO_BUF_HEAD*)pbuf;
+    phead->head = VIDEO_HEAD_VALUE;
+    phead->timestamp = pAVHead->sectime;
+    phead->len = pAVHead->len;
+    phead->frametype = pAVHead->type ;
+    
+    nRet = PPPP_IndeedRead(chn, (CHAR*)(pbuf + sizeof(VIDEO_BUF_HEAD)), pAVHead->len,m_bPlaybackThreadRuning);
+    if(nRet < 0)
+    {
+        NSLog(@"DataProcess PPPP_IndeedRead error: %d", nRet);
+        SafeDel(pbuf);
+        m_bPlaybackThreadRuning = 0;
+        return ;
+    }
+    
+    if (m_bPlaybackStarted == 0) {
+        SafeDel(pbuf);
+        usleep(10000);
+        return;
+    }
+    
+    if (m_EnumPlayBackVideoMode == ENUM_VIDEO_MODE_UNKNOWN && (pAVHead->type == 0 || pAVHead->type == 1)) {
+        m_EnumPlayBackVideoMode = ENUM_VIDEO_MODE_H264;
+        
+    }
+    
+    if (m_EnumPlayBackVideoMode == ENUM_VIDEO_MODE_UNKNOWN && pAVHead->type == 3) {
+        m_EnumPlayBackVideoMode = ENUM_VIDEO_MODE_MJPEG;
+    }
+    
+    if(m_EnumPlayBackVideoMode == ENUM_VIDEO_MODE_UNKNOWN)
+    {
+        SafeDel(pbuf);
+        return;
+    }
+    
+    
+    if(m_EnumPlayBackVideoMode == ENUM_VIDEO_MODE_H264)
+    {
+        if(!m_bPlayBackFindIFrame)
+        {
+            if(pAVHead->type == ENUM_FRAME_TYPE_I)
             {
-                //m_pPlayBackVideoBuf->Reset();
+                m_bPlayBackFindIFrame = true;
+                m_pPlayBackVideoBuf->Reset();
+                //NSLog(@"----------------------执行录像回放Write---------");
                 m_pPlayBackVideoBuf->Write(pbuf, Length);
             }
         }
-        
-        SAFE_DELETE(pbuf);       
+        else
+        {
+            int n = m_pPlayBackVideoBuf->Write(pbuf, Length);
+            //NSLog(@"----------------------执行录像回放Write2 %d---------", n);
+            if(0 == n)
+            {
+                // NSLog(@"----------------------执行录像回放Write3---------");
+                m_bPlayBackFindIFrame = false;
+            }
+        }
+    }
+    else
+    {
+        if(pAVHead->type == ENUM_FRAME_TYPE_MJPEG)
+        {
+            m_pPlayBackVideoBuf->Reset();
+            m_pPlayBackVideoBuf->Write(pbuf, Length);
+        }
+    }
+    NSLog(@"\n---------------endWrite");
+    SafeDel(pbuf);
+}
+void CPPPPChannel::ProcessAudio(AV_HEAD * pHead , unsigned char chn)
+{
+    
+    int nRet = 0;
+    int Length = pHead->len;
+    char *pbuf = new char[Length + 1];
+    memset(pbuf, 0, Length + 1);
+    nRet = PPPP_IndeedRead(chn, (CHAR*)pbuf, Length,m_bAudioThreadRuning);
+    if(nRet < 0)
+    {
+        NSLog(@"AudioProces PPPP_IndeedRead error: %d", nRet);
+        SafeDel(pbuf);
+        m_bAudioThreadRuning = 0;
+        return ;
+    }
+    if(m_bAudioStarted == 0)
+    {
+        SafeDel(pbuf);
+        return;
+    }
+    if (m_bPlaybackStarted == 0 && chn == P2P_PLAYBACK)
+    {
+        SafeDel(pbuf);
+        usleep(10000);
+        return;
+    }
+    int nPCMLen = 4 * Length;
+    char *pPCMBuf = new char[nPCMLen];
+    if(NULL == m_pAudioAdpcm)
+    {
+        SafeDel(pPCMBuf);
+        SafeDel(pbuf);
+        return;
+    }
+    m_pAudioAdpcm->ADPCMDecode(pbuf, Length, pPCMBuf);
+    if( m_pAudioBuf)
+    {
+        m_pAudioBuf->Write(pPCMBuf, nPCMLen);
+    }
+    SafeDel(pPCMBuf);
+    SafeDel(pbuf);
+}
+
+void CPPPPChannel::SafeDel(CHAR *buf){
+    if (buf != NULL) {
+        delete [] buf;
+        buf = 0;
     }
 }
 
@@ -1963,7 +2088,7 @@ void CPPPPChannel::PlayWindowNotify(int MsgType, int Param)
 int CPPPPChannel::StartTalkChannel()
 {
     m_bTalkThreadRuning= 1;
-	pthread_create(&m_TalkThreadID, NULL, TalkThread, (void*)this);
+    pthread_create(&m_TalkThreadID, NULL, TalkThread, (void*)this);
     return 1;
 }
 
@@ -1989,7 +2114,7 @@ void CPPPPChannel::TalkProcess()
             return;
         }
         
-        //Log("PPPP_Check_Buffer.. uiWriteSize: %d, uiReadSize: %d", uiWriteSize, uiReadSize);        
+        //Log("PPPP_Check_Buffer.. uiWriteSize: %d, uiReadSize: %d", uiWriteSize, uiReadSize);
         if(uiWriteSize >= TALK_WRITE_BUFFER_MAX_SIZE)
         {
             usleep(10000);
@@ -2012,17 +2137,27 @@ void CPPPPChannel::TalkProcess()
         
         //pcm --> adpcm
         memset(AdpcmBuf, 0, sizeof(AdpcmBuf));
+        if(!m_deviceEnableAdpcm)
+        {
+            m_pTalkAdpcm->EncoderClr();
+        }
         m_pTalkAdpcm->ADPCMEncode((unsigned char*)AudioBuf, MIN_PCM_AUDIO_SIZE, (unsigned char*)AdpcmBuf);
         if(!SendTalk(AdpcmBuf, 256))
         {
             return;
-        }        
+        }
     }
 }
 
 int CPPPPChannel::SendTalk(char * pbuf,int len)
 {
-    //Log("SendTalk, len: %d", len);    
+    int adpcmIndex = 0;
+    int adpcmPresample = 0;
+    if(m_deviceEnableAdpcm)
+    {
+        m_pTalkAdpcm->EncoderGetIndex(&adpcmPresample, &adpcmIndex);
+    }
+    //Log("SendTalk, len: %d", len);
     AV_HEAD avhead;
     memset(&avhead, 0, sizeof(avhead));
     avhead.type = 8;
@@ -2045,18 +2180,18 @@ int CPPPPChannel::SendTalk(char * pbuf,int len)
 
 int CPPPPChannel::PPPP_IndeedRead(UCHAR channel, CHAR * buf,int len, int &bRunning)
 {
-    CHAR *p = buf;    
+    CHAR *p = buf;
     INT32 readSize ;
     INT32 remainSize = len;
-    INT32 res; 
-        
+    INT32 res;
+    
     do
     {
         readSize = remainSize;
         if (readSize > 32*1024) {
             readSize = 32*1024;
         }
-        res = PPPP_Read(m_hSessionHandle, channel, p, &readSize, 100);  
+        res = PPPP_Read(m_hSessionHandle, channel, p, &readSize, 100);
         if(res == ERROR_PPPP_TIME_OUT)
         {
             //Log("PPPP_Read timeout: readSize: %d, %s", readSize, szDID);
@@ -2070,22 +2205,22 @@ int CPPPPChannel::PPPP_IndeedRead(UCHAR channel, CHAR * buf,int len, int &bRunni
         {
             //NSLog(@"PPPP_Read error : %d", res);
             return res;
-        }    
-
+        }
+        
         remainSize -= readSize;
-        p += readSize;        
+        p += readSize;
     }while(remainSize > 0 && bRunning);
-
-    return 0;    
+    
+    return 0;
 }
 
 int CPPPPChannel::cgi_livestream(int bstart, int streamid,int subStreamID)
-{    
+{
     if(m_bOnline == 0)
-        return 0;    
+        return 0;
     
     char buf[128];
-
+    
     if(bstart == 1)
     {
         if(0 == m_pVideoBuf->Create(VBUF_SIZE))
@@ -2093,18 +2228,18 @@ int CPPPPChannel::cgi_livestream(int bstart, int streamid,int subStreamID)
             return 0;
         }
         
-        StartVideoPlay();   
-        m_EnumVideoMode = ENUM_VIDEO_MODE_UNKNOWN;        
+        StartVideoPlay();
+        m_EnumVideoMode = ENUM_VIDEO_MODE_UNKNOWN;
     }
     else
     {
         StopVideoPlay();
-        m_pVideoBuf->Release();        
-    }   
-
-    memset(buf, 0, sizeof(buf));    
+        m_pVideoBuf->Release();
+    }
+    
+    memset(buf, 0, sizeof(buf));
     sprintf(buf, "GET /livestream.cgi?streamid=%d&", streamid);
-    return cgi_get_common(buf);     
+    return cgi_get_common(buf);
 }
 
 void CPPPPChannel::StartPlaybackVideoPlayer()
@@ -2114,7 +2249,7 @@ void CPPPPChannel::StartPlaybackVideoPlayer()
     }
     
     m_bPlaybackVideoPlayerThreadRuning = 1;
-	pthread_create(&m_PlaybackVideoPlayerThreadID, NULL, PlaybackVideoPlayerThread, (void*)this);
+    pthread_create(&m_PlaybackVideoPlayerThreadID, NULL, PlaybackVideoPlayerThread, (void*)this);
 }
 
 void* CPPPPChannel::PlaybackVideoPlayerThread(void *param)
@@ -2246,7 +2381,7 @@ void CPPPPChannel::PlaybackVideoPlayerProcess()
 }
 
 //void CPPPPChannel::PlaybackVideoPlayerProcess()
-//{ 
+//{
 //    unsigned int oldTimeStamp = 0;
 //    CH264Decoder *pH264Decoder=new CH264Decoder();
 //    while(m_bPlaybackVideoPlayerThreadRuning)
@@ -2255,19 +2390,19 @@ void CPPPPChannel::PlaybackVideoPlayerProcess()
 //            usleep(100000);
 //            continue;
 //        }
-//        
+//
 //        if(m_pPlayBackVideoBuf->GetStock() == 0)
 //        {
 //            //Log("videobuf is empty...");
 //            usleep(10000);
 //            continue;
-//        }        
-//        
+//        }
+//
 //        char *pbuf = NULL;
 //        int videoLen = 0;
 //        VIDEO_BUF_HEAD videobufhead;
 //        memset(&videobufhead, 0, sizeof(videobufhead));
-//        
+//
 //        //读取一帧视频数据
 //        pbuf = m_pPlayBackVideoBuf->ReadOneFrame1(videoLen, videobufhead) ;
 //        if(NULL == pbuf)
@@ -2275,7 +2410,7 @@ void CPPPPChannel::PlaybackVideoPlayerProcess()
 //            usleep(10000);
 //            continue;
 //        }
-//        
+//
 //        if(oldTimeStamp > 0)
 //        {
 //            int nSleepTime = videobufhead.timestamp - oldTimeStamp;
@@ -2284,47 +2419,47 @@ void CPPPPChannel::PlaybackVideoPlayerProcess()
 //                nSleepTime = 30;
 //            }
 //            oldTimeStamp = videobufhead.timestamp;
-//            
+//
 //            //usleep(1000 * nSleepTime);
 //            int iSleep = 0;
 //            for (iSleep = 0; iSleep <= nSleepTime; iSleep++) {
 //                if (m_bPlaybackVideoPlayerThreadRuning == 0) {
-//                    SAFE_DELETE(pbuf) ;  
+//                    SAFE_DELETE(pbuf) ;
 //                    return;
 //                }
 //                usleep(1000);
-//                
+//
 //            }
-//            
+//
 //            //Log("nSleepTime: %d", nSleepTime);
 //        }
-//        
+//
 //        if(oldTimeStamp == 0)
 //        {
 //            oldTimeStamp = videobufhead.timestamp;
 //        }
 //
 //        unsigned int untimestamp = videobufhead.timestamp;
-//        //Log("get one frame");        
+//        //Log("get one frame");
 //        if(ENUM_VIDEO_MODE_H264 == m_EnumPlayBackVideoMode)
-//        {   
+//        {
 ////            if (videobufhead.frametype == 0) {
 ////                UninitH264Decoder();
 ////                InitH264Decoder();
 ////            }
-//            
+//
 //            NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-//            
+//
 //            [m_PlaybackViewAVDataDelegateLock lock];
-//            
+//
 //            if (m_PlaybackViewImageNotifyDelegate != nil) {
 //               // uint8_t *yuvBuf = NULL;
 //                int yuvlen = 0;
 //                int nWidth = 0;
 //                int nHeight = 0;
-//                
+//
 //                //NSLog(@"DecoderH264Frame being.. id: %s frametype: %d", szDID, videobufhead.frametype);
-//                
+//
 //                /*int nRet = DecoderH264Frame((uint8_t*)pbuf, videoLen, &yuvBuf, &yuvlen, &nWidth, &nHeight);
 //                if (nRet > 0) {
 //                    //NSLog(@"decoder success... videoLen: %d, yuvlen: %d, nWidth: %d, nHeight: %d",
@@ -2332,48 +2467,48 @@ void CPPPPChannel::PlaybackVideoPlayerProcess()
 //                    //PlaybackYUVNotify(yuvBuf, yuvlen, nWidth, nHeight, untimestamp);
 //                    [m_PlaybackViewImageNotifyDelegate YUVNotify:yuvBuf length:yuvlen width:nWidth height:nHeight timestamp:untimestamp];
 //                }
-//                
+//
 //                //NSLog(@"DecoderH264Frame end.. id: %s", szDID);
-//                
+//
 //                SAFE_DELETE(yuvBuf);*/
 //                if (pH264Decoder->DecoderFrame((uint8_t*)pbuf, videoLen, nWidth, nHeight)) {
 //                    yuvlen=nWidth*nHeight*3/2;
 //                    uint8_t *pYUVBuffer = new uint8_t[yuvlen];
 //                    if (pYUVBuffer != NULL) {
 //                        int nRec=pH264Decoder->GetYUVBuffer(pYUVBuffer, yuvlen);
-//                        
+//
 //                        if (nRec>0) {
 //                            YUVNotify(pYUVBuffer, yuvlen, nWidth, nHeight, untimestamp);
 //                            [m_PlaybackViewImageNotifyDelegate YUVNotify:pYUVBuffer length:yuvlen width:nWidth height:nHeight timestamp:untimestamp];
 //                        }
-//                        
+//
 //                        delete pYUVBuffer;
 //                        pYUVBuffer = NULL;
 //                    }
-//                
+//
 //            }
-//            
+//
 //            [m_PlaybackViewAVDataDelegateLock unlock];
-//            
+//
 //            [pool release];
-//            
-//        }      
+//
+//        }
 //        else /* JPEG */
 //        {
 //            NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 //            NSData *image = [[NSData alloc] initWithBytes:pbuf length:videoLen];
-//            UIImage *img = [[UIImage alloc] initWithData:image];  
+//            UIImage *img = [[UIImage alloc] initWithData:image];
 //            PlaybackImageNotify(img, 0);
 //            [img release];
 //            [image release];
 //            [pool release];
-//            
+//
 //        }
-//        
-//        SAFE_DELETE(pbuf) ;         
-//        usleep(10000);       
-//        
-//    }    
+//
+//        SAFE_DELETE(pbuf) ;
+//        usleep(10000);
+//
+//    }
 //        delete pH264Decoder;
 //        pH264Decoder=NULL;
 //}
@@ -2388,20 +2523,20 @@ void CPPPPChannel::StopPlaybackVideoPlayer()
 }
 
 int CPPPPChannel::StartPlayback(char *szFilename, int offset)
-{  
+{
     if(m_bOnline == 0)
-        return 0;    
+        return 0;
     
     char buf[128];
     
     m_bFindIFrame = 0;
-    
+    m_nCamType = 128;
     if(0 == m_pPlayBackVideoBuf->Create(VBUF_SIZE))
     {
         return 0;
     }
     
-    memset(buf, 0, sizeof(buf));    
+    memset(buf, 0, sizeof(buf));
     sprintf(buf, (char*)"livestream.cgi?streamid=4&filename=%s&offset=%d&", szFilename, offset);
     int nRet = cgi_get_common(buf);
     if(nRet == 1)
@@ -2410,22 +2545,23 @@ int CPPPPChannel::StartPlayback(char *szFilename, int offset)
     }
     
     StartPlaybackVideoPlayer();
-    
+    StartAudio(0);
     return nRet;
 }
 
 int CPPPPChannel::StopPlayback()
 {
     char buf[128];
-
-    memset(buf, 0, sizeof(buf));    
+    
+    memset(buf, 0, sizeof(buf));
     sprintf(buf, (char*)"livestream.cgi?streamid=%d", 0x11);
     cgi_get_common(buf);
     
-    m_pPlayBackVideoBuf->Release(); 
+    StopPlaybackVideoPlayer();
+    m_pPlayBackVideoBuf->Release();
     m_bPlaybackStarted = 0;
     
-    StopPlaybackVideoPlayer();
+    StopAudio(0);
     
     return 1;
 }
@@ -2439,8 +2575,8 @@ void CPPPPChannel::SetPlayViewParamNotifyDelegate(id<ParamNotifyProtocol> delega
 
 void CPPPPChannel::SetPlayViewPPPPStatusDelegate(id<PPPPStatusProtocol> delegate)
 {
-    [m_PlayViewPPPPStatusDelegateLock lock];    
-    m_PlayViewPPPPStatusDelegate = delegate;    
+    [m_PlayViewPPPPStatusDelegateLock lock];
+    m_PlayViewPPPPStatusDelegate = delegate;
     [m_PlayViewPPPPStatusDelegateLock unlock];
 }
 
@@ -2448,7 +2584,7 @@ void CPPPPChannel::StartVideoPlay()
 {
     //StartPlayThread
     m_bPlayThreadRuning = 1;
-	pthread_create(&m_PlayThreadID, NULL, PlayThread, (void*)this);
+    pthread_create(&m_PlayThreadID, NULL, PlayThread, (void*)this);
 }
 
 void CPPPPChannel::StopVideoPlay()
@@ -2462,7 +2598,7 @@ void CPPPPChannel::StopVideoPlay()
 }
 
 void CPPPPChannel::PlayProcess()
-{ 
+{
     CH264Decoder *pH264Decoder = new CH264Decoder();//创建h264的解码库
     while(m_bPlayThreadRuning)
     {
@@ -2476,7 +2612,7 @@ void CPPPPChannel::PlayProcess()
             //Log("videobuf is empty...");
             usleep(10000);
             continue;
-        }        
+        }
         
         char *pbuf = NULL;
         int videoLen = 0;
@@ -2486,7 +2622,7 @@ void CPPPPChannel::PlayProcess()
         pbuf = m_pVideoBuf->ReadOneFrame1(videoLen, videohead) ;
         if(NULL == pbuf)
         {
-           
+            
             usleep(10000);
             continue;
         }
@@ -2497,52 +2633,52 @@ void CPPPPChannel::PlayProcess()
         if(ENUM_VIDEO_MODE_H264 == m_EnumVideoMode)
         {
             
-//            if (videohead.frametype == 0) {
-//                UninitH264Decoder();
-//                InitH264Decoder();
-//            }
-//            
+            //            if (videohead.frametype == 0) {
+            //                UninitH264Decoder();
+            //                InitH264Decoder();
+            //            }
+            //
             NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
             
-           // uint8_t *yuvBuf = NULL;
+            // uint8_t *yuvBuf = NULL;
             int yuvlen = 0;
             int nWidth = 0;
             int nHeight = 0;
             
             //NSLog(@"DecoderH264Frame being.. id: %s", szDID);
             
-             
+            
             /*int nRet = DecoderH264Frame((uint8_t*)pbuf, videoLen, &yuvBuf, &yuvlen, &nWidth, &nHeight);
-            if (nRet > 0) {
-                //NSLog(@"decoder success... videoLen: %d, yuvlen: %d, nWidth: %d, nHeight: %d",
-                //      videoLen, yuvlen, nWidth, nHeight);
-                YUVNotify(yuvBuf, yuvlen, nWidth, nHeight, untimestamp);
-            }
+             if (nRet > 0) {
+             //NSLog(@"decoder success... videoLen: %d, yuvlen: %d, nWidth: %d, nHeight: %d",
+             //      videoLen, yuvlen, nWidth, nHeight);
+             YUVNotify(yuvBuf, yuvlen, nWidth, nHeight, untimestamp);
+             }
+             
+             //NSLog(@"DecoderH264Frame end.. id: %s", szDID);
+             
+             SAFE_DELETE(yuvBuf);
+             
+             H264DataNotify((unsigned char*)pbuf, videoLen, videohead.frametype, untimestamp);
+             
+             [pool release];
+             
+             
+             }
+             else  //JPEG
+             {
+             NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+             NSData *image = [[NSData alloc] initWithBytes:pbuf length:videoLen];
+             UIImage *img = [[UIImage alloc] initWithData:image];
+             ImageNotify(img, untimestamp);
+             [img release];
+             [image release];
+             
+             [pool release];
+             
+             }*/
             
-            //NSLog(@"DecoderH264Frame end.. id: %s", szDID);
-            
-            SAFE_DELETE(yuvBuf);
-            
-            H264DataNotify((unsigned char*)pbuf, videoLen, videohead.frametype, untimestamp);
-            
-            [pool release];
-            
-            
-        }      
-        else  //JPEG 
-        {
-            NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-            NSData *image = [[NSData alloc] initWithBytes:pbuf length:videoLen];
-            UIImage *img = [[UIImage alloc] initWithData:image];  
-            ImageNotify(img, untimestamp);
-            [img release];
-            [image release];
-            
-            [pool release];
-            
-        }*/
-        
-        if (pH264Decoder->DecoderFrame((uint8_t*)pbuf, videoLen, nWidth, nHeight)) {
+            if (pH264Decoder->DecoderFrame((uint8_t*)pbuf, videoLen, nWidth, nHeight)) {
                 yuvlen=nWidth*nHeight*3/2;
                 uint8_t *pYUVBuffer = new uint8_t[yuvlen];
                 if (pYUVBuffer != NULL) {
@@ -2578,9 +2714,9 @@ void CPPPPChannel::PlayProcess()
             
         }
         
-            
-        SAFE_DELETE(pbuf) ;         
-        usleep(10000);       
+        
+        SAFE_DELETE(pbuf) ;
+        usleep(10000);
         
     }
     delete pH264Decoder;
@@ -2602,7 +2738,7 @@ void CPPPPChannel::H264DataNotify(unsigned char *h264Data, int length, int type,
         [m_PlayViewImageNotifyDelegate H264Data:h264Data length:length type:type timestamp:timestamp szdid:[NSString stringWithUTF8String:szDID]];
     }
     
-   // NSLog(@"szDid YUv%s",szDID);
+    // NSLog(@"szDid YUv%s",szDID);
     [m_PlayViewAVDataDelegateLock unlock];
 }
 
@@ -2622,12 +2758,12 @@ void CPPPPChannel::ImageNotify(UIImage *image, unsigned int timestamp)
     [m_PlayViewAVDataDelegateLock lock];
     [m_PlayViewImageNotifyDelegate ImageNotify:image timestamp:timestamp];
     if ([m_PlayViewImageNotifyDelegate respondsToSelector:@selector(ImageNotify:timestamp:szdid:)]) {
-       [m_PlayViewImageNotifyDelegate ImageNotify:image timestamp:timestamp szdid:[NSString stringWithUTF8String:szDID]]; 
+        [m_PlayViewImageNotifyDelegate ImageNotify:image timestamp:timestamp szdid:[NSString stringWithUTF8String:szDID]];
     }
     
     //NSLog(@"szDid IMage %s",szDID);
     [m_PlayViewAVDataDelegateLock unlock];
-
+    
 }
 
 void CPPPPChannel::PlaybackYUVNotify(unsigned char *yuv, int len, int width, int height, unsigned int timestamp)
@@ -2648,9 +2784,9 @@ void CPPPPChannel::PlaybackImageNotify(UIImage *image, unsigned int timestamp)
 
 void* CPPPPChannel::PlayThread(void* param)
 {
-	CPPPPChannel *pPPPP = (CPPPPChannel*)param ;	    
-    pPPPP->PlayProcess();	    
-	return NULL;	
+    CPPPPChannel *pPPPP = (CPPPPChannel*)param ;
+    pPPPP->PlayProcess();
+    return NULL;
 }
 
 void CPPPPChannel::SetPlayViewImageNotifyDelegate(id<ImageNotifyProtocol> delegate)
@@ -2674,8 +2810,8 @@ int CPPPPChannel::get_cgi(int cgi)
             strcpy(szCGI, "set_formatsd.cgi?");
             break;
         default:
-            return 0;        
-    }    
+            return 0;
+    }
     return cgi_get_common(szCGI);
 }
 
@@ -2743,15 +2879,15 @@ int CPPPPChannel::SetSystemParams(int type,char * msg,int len)
             if (pTemp->now == 0)
             {
                 sprintf(buf,"set_datetime.cgi?tz=%d&ntp_enable=%d&ntp_svr=%s&",
-                          pTemp->tz,pTemp->ntp_enable,pTemp->ntp_svr
-                          );
+                        pTemp->tz,pTemp->ntp_enable,pTemp->ntp_svr
+                        );
             }
             else{
                 sprintf(buf,"set_datetime.cgi?now=%d&tz=%d&ntp_enable=%d&ntp_svr=%s&",
-                          pTemp->now,pTemp->tz,pTemp->ntp_enable,pTemp->ntp_svr
-                          );
+                        pTemp->now,pTemp->tz,pTemp->ntp_enable,pTemp->ntp_svr
+                        );
             }
-
+            
             nRet = cgi_get_common(buf);
         }
             break;
@@ -2766,7 +2902,7 @@ int CPPPPChannel::SetSystemParams(int type,char * msg,int len)
             sprintf(buf,"set_ftp.cgi?svr=%s&port=%d&user=%s&pwd=%s&mode=%d&dir=%s&interval=%d&",
                     pftpParam->svr_ftp, pftpParam->port, pftpParam->user,
                     pftpParam->pwd, pftpParam->mode, pftpParam->dir, pftpParam->upload_interval);
-      
+            
             nRet = cgi_get_common(buf);
             
         }
@@ -2819,7 +2955,7 @@ int CPPPPChannel::SetSystemParams(int type,char * msg,int len)
             return cgi_get_common(buf);
         }
             break;
-        
+            
         case MSG_TYPE_GET_PARAMS:
             nRet = cgi_get_common((char*)"get_params.cgi?");
             break;
@@ -2838,39 +2974,39 @@ int CPPPPChannel::SetSystemParams(int type,char * msg,int len)
             char buf[1024];
             STRU_ALARM_PARAMS *pTemp = (STRU_ALARM_PARAMS *)msg;
             sprintf(buf,"set_alarm.cgi?motion_armed=%d&motion_sensitivity=%d&input_armed=%d&ioin_level=%d&preset=%d&iolinkage=%d&ioout_level=%d&mail=%d&record=%d&upload_interval=%d&schedule_enable=%d&schedule_sun_0=%d&schedule_sun_1=%d&schedule_sun_2=%d&schedule_mon_0=%d&schedule_mon_1=%d&schedule_mon_2=%d&schedule_tue_0=%d&schedule_tue_1=%d&schedule_tue_2=%d&schedule_wed_0=%d&schedule_wed_1=%d&schedule_wed_2=%d&schedule_thu_0=%d&schedule_thu_1=%d&schedule_thu_2=%d&schedule_fri_0=%d&schedule_fri_1=%d&schedule_fri_2=%d&schedule_sat_0=%d&schedule_sat_1=%d&schedule_sat_2=%d&",
-                      pTemp->motion_armed,pTemp->motion_sensitivity,pTemp->input_armed,pTemp->ioin_level,
-                      pTemp->alarmpresetsit,pTemp->iolinkage,pTemp->ioout_level,pTemp->mail,pTemp->record, pTemp->upload_interval,
+                    pTemp->motion_armed,pTemp->motion_sensitivity,pTemp->input_armed,pTemp->ioin_level,
+                    pTemp->alarmpresetsit,pTemp->iolinkage,pTemp->ioout_level,pTemp->mail,pTemp->record, pTemp->upload_interval,
                     ((pTemp->motion_armed>0)||(pTemp->input_armed>0))?1:0,
-                      0xffffffff,0xffffffff,0xffffffff,
-                        0xffffffff,0xffffffff,0xffffffff,
-                        0xffffffff,0xffffffff,0xffffffff,
-                        0xffffffff,0xffffffff,0xffffffff,
-                        0xffffffff,0xffffffff,0xffffffff,
-                        0xffffffff,0xffffffff,0xffffffff,
-                        0xffffffff,0xffffffff,0xffffffff
-                      );
+                    0xffffffff,0xffffffff,0xffffffff,
+                    0xffffffff,0xffffffff,0xffffffff,
+                    0xffffffff,0xffffffff,0xffffffff,
+                    0xffffffff,0xffffffff,0xffffffff,
+                    0xffffffff,0xffffffff,0xffffffff,
+                    0xffffffff,0xffffffff,0xffffffff,
+                    0xffffffff,0xffffffff,0xffffffff
+                    );
             nRet = cgi_get_common(buf);
-          /*  if (msg == NULL || len != sizeof(STRU_ALARM_PARAMS))
-            {
-                return -1;
-            }
+            /*  if (msg == NULL || len != sizeof(STRU_ALARM_PARAMS))
+             {
+             return -1;
+             }
+             
+             PSTRU_ALARM_PARAMS pAlarm = (PSTRU_ALARM_PARAMS)msg;
+             char buf[1024] = {0};
+             sprintf(buf, "set_alarm.cgi?motion_armed=%d&motion_sensitivity=%d&input_armed=%d&ioin_level=%d&iolinkage=%d&ioout_level=%d&preset=%d&mail=%d&snapshot=%d&record=%d&upload_interval=%d&schedule_enable=%d&schedule_sun_0=%d&schedule_sun_1=%d&schedule_sun_2=%d&schedule_mon_0=%d&schedule_mon_1=%d&schedule_mon_2=%d&schedule_tue_0=%d&schedule_tue_1=%d&schedule_tue_2=%d&schedule_wed_0=%d&schedule_wed_1=%d&schedule_wed_2=%d&schedule_thu_0=%d&schedule_thu_1=%d&schedule_thu_2=%d&schedule_fri_0=%d&schedule_fri_1=%d&schedule_fri_2=%d&schedule_sat_0=%d&schedule_sat_1=%d&schedule_sat_2=%d&",
+             pAlarm->motion_armed, pAlarm->motion_sensitivity, pAlarm->input_armed, pAlarm->ioin_level, pAlarm->iolinkage,
+             pAlarm->ioout_level, pAlarm->alarmpresetsit, pAlarm->mail, pAlarm->snapshot, pAlarm->record, pAlarm->upload_interval, pAlarm->schedule_enable,
+             pAlarm->schedule_sun_0, pAlarm->schedule_sun_1, pAlarm->schedule_sun_2,
+             pAlarm->schedule_mon_0,pAlarm->schedule_mon_1,pAlarm->schedule_mon_2,
+             pAlarm->schedule_tue_0,pAlarm->schedule_tue_1,pAlarm->schedule_tue_2,
+             pAlarm->schedule_wed_0,pAlarm->schedule_wed_1,pAlarm->schedule_wed_2,
+             pAlarm->schedule_thu_0,pAlarm->schedule_thu_1,pAlarm->schedule_thu_2,
+             pAlarm->schedule_fri_0,pAlarm->schedule_fri_1,pAlarm->schedule_fri_2,
+             pAlarm->schedule_sat_0,pAlarm->schedule_sat_1,pAlarm->schedule_sat_2);
+             
+             //TRACE("buf: %s\n", buf);
+             return cgi_get_common(buf);*/
             
-            PSTRU_ALARM_PARAMS pAlarm = (PSTRU_ALARM_PARAMS)msg;
-            char buf[1024] = {0};
-            sprintf(buf, "set_alarm.cgi?motion_armed=%d&motion_sensitivity=%d&input_armed=%d&ioin_level=%d&iolinkage=%d&ioout_level=%d&preset=%d&mail=%d&snapshot=%d&record=%d&upload_interval=%d&schedule_enable=%d&schedule_sun_0=%d&schedule_sun_1=%d&schedule_sun_2=%d&schedule_mon_0=%d&schedule_mon_1=%d&schedule_mon_2=%d&schedule_tue_0=%d&schedule_tue_1=%d&schedule_tue_2=%d&schedule_wed_0=%d&schedule_wed_1=%d&schedule_wed_2=%d&schedule_thu_0=%d&schedule_thu_1=%d&schedule_thu_2=%d&schedule_fri_0=%d&schedule_fri_1=%d&schedule_fri_2=%d&schedule_sat_0=%d&schedule_sat_1=%d&schedule_sat_2=%d&",
-                    pAlarm->motion_armed, pAlarm->motion_sensitivity, pAlarm->input_armed, pAlarm->ioin_level, pAlarm->iolinkage,
-                    pAlarm->ioout_level, pAlarm->alarmpresetsit, pAlarm->mail, pAlarm->snapshot, pAlarm->record, pAlarm->upload_interval, pAlarm->schedule_enable,
-                    pAlarm->schedule_sun_0, pAlarm->schedule_sun_1, pAlarm->schedule_sun_2,
-                    pAlarm->schedule_mon_0,pAlarm->schedule_mon_1,pAlarm->schedule_mon_2,
-                    pAlarm->schedule_tue_0,pAlarm->schedule_tue_1,pAlarm->schedule_tue_2,
-                    pAlarm->schedule_wed_0,pAlarm->schedule_wed_1,pAlarm->schedule_wed_2,
-                    pAlarm->schedule_thu_0,pAlarm->schedule_thu_1,pAlarm->schedule_thu_2,
-                    pAlarm->schedule_fri_0,pAlarm->schedule_fri_1,pAlarm->schedule_fri_2,
-                    pAlarm->schedule_sat_0,pAlarm->schedule_sat_1,pAlarm->schedule_sat_2);
-            
-            //TRACE("buf: %s\n", buf);
-            return cgi_get_common(buf);*/
-
         }
             break;
         case MSG_TYPE_GET_PTZ_PARAMS:
@@ -2903,7 +3039,7 @@ int CPPPPChannel::SetSystemParams(int type,char * msg,int len)
             //NSLog(@"PPPPChannel---录像计划");
             nRet = cgi_get_common((char*)"get_record.cgi?");
             break;
-        
+            
         default:
             nRet = 0;
             break;
@@ -2913,7 +3049,7 @@ int CPPPPChannel::SetSystemParams(int type,char * msg,int len)
 }
 
 int CPPPPChannel::SendWifiSetting(char *msg, int len)
-{    
+{
     if (msg == NULL || len != sizeof(STRU_WIFI_PARAMS))
     {
         return -1;
@@ -2956,10 +3092,10 @@ int CPPPPChannel::SetWifi(int enable, char *szSSID, int channel, int mode, int a
     wifiParams.key1_bits = key1_bits;
     wifiParams.key2_bits = key2_bits;
     wifiParams.key3_bits = key3_bits;
-    wifiParams.key4_bits = key4_bits; 
+    wifiParams.key4_bits = key4_bits;
     
     return SetSystemParams(MSG_TYPE_SET_WIFI, (char*)&wifiParams, sizeof(wifiParams));
-
+    
 }
 
 void CPPPPChannel::SetUserPwdParamsDelegate(id delegate)
@@ -2978,7 +3114,7 @@ int CPPPPChannel::SetUserPwd(char *user1,char *pwd1,char *user2,char *pwd2,char 
     strcpy(UseParam.pwd1, pwd1);
     strcpy(UseParam.pwd2, pwd2);
     strcpy(UseParam.pwd3, pwd3);
-
+    
     
     return SetSystemParams(MSG_TYPE_SET_USER, (char*)&UseParam, sizeof(UseParam));
     
@@ -3017,7 +3153,7 @@ int CPPPPChannel::SetFtp(char *szSvr, char *szUser, char *szPwd, char *dir, int 
     ftpParam.port = port;
     ftpParam.mode = mode;
     ftpParam.upload_interval = uploadinterval;
-
+    
     return SetSystemParams(MSG_TYPE_SET_FTP, (char*)&ftpParam, sizeof(ftpParam));
 }
 
@@ -3058,7 +3194,7 @@ int CPPPPChannel::SetDateTime(int now,int tz,int ntp_enable,char *ntp_svr)
 {
     STRU_DATETIME_PARAMS datetimePama;
     memset(&datetimePama, 0, sizeof(datetimePama));
-
+    
     datetimePama.now = now;
     datetimePama.tz = tz;
     datetimePama.ntp_enable = ntp_enable;
@@ -3066,7 +3202,7 @@ int CPPPPChannel::SetDateTime(int now,int tz,int ntp_enable,char *ntp_svr)
     
     
     return SetSystemParams(MSG_TYPE_SET_DATETIME, (char*)&datetimePama, sizeof(datetimePama));
-   
+    
 }
 void CPPPPChannel::SetAlarmParamsDelegate(id delegate)
 {
@@ -3075,17 +3211,17 @@ void CPPPPChannel::SetAlarmParamsDelegate(id delegate)
     [m_AlarmParamsLock unlock];
 }
 
-int CPPPPChannel::SetAlarm(    
-             int motion_armed,
-             int motion_sensitivity,
-             int input_armed,
-             int ioin_level,
-             int alarmpresetsit,
-             int iolinkage,
-             int ioout_level,
-             int mail,
-             int upload_interval,
-             int record)
+int CPPPPChannel::SetAlarm(
+                           int motion_armed,
+                           int motion_sensitivity,
+                           int input_armed,
+                           int ioin_level,
+                           int alarmpresetsit,
+                           int iolinkage,
+                           int ioout_level,
+                           int mail,
+                           int upload_interval,
+                           int record)
 {
     STRU_ALARM_PARAMS alarmParam;
     memset(&alarmParam, 0, sizeof(alarmParam));
@@ -3111,60 +3247,60 @@ void CPPPPChannel::SetSDCardScheduleDelegate(id delegate){
     [m_SDCardScheduleLock unlock];
 }
 int CPPPPChannel::SetSDCardScheduleParams(
-                                              int coverage_enable,
-                                              int timelength,
-                                              int fixed_enable,
-                                              int record_schedule_sun_0,
-                                              int record_schedule_sun_1,
-                                              int record_schedule_sun_2,
-                                              int record_schedule_mon_0,
-                                              int record_schedule_mon_1,
-                                              int record_schedule_mon_2,
-                                              int record_schedule_tue_0,
-                                              int record_schedule_tue_1,
-                                              int record_schedule_tue_2,
-                                              int record_schedule_wed_0,
-                                              int record_schedule_wed_1,
-                                              int record_schedule_wed_2,
-                                              int record_schedule_thu_0,
-                                              int record_schedule_thu_1,
-                                              int record_schedule_thu_2,
-                                              int record_schedule_fri_0,
-                                              int record_schedule_fri_1,
-                                              int record_schedule_fri_2,
-                                              int record_schedule_sat_0,
-                                              int record_schedule_sat_1,
-                                              int record_schedule_sat_2){
-        NSLog(@"CPPPPChannel::SetSDCardScheduleParams====timelength=%d",timelength);
-        STRU_SD_RECORD_PARAM recordParam;
-        memset(&recordParam, 0, sizeof(recordParam));
-        recordParam.record_cover_enable=coverage_enable;
-        recordParam.record_time_enable=fixed_enable;
-        recordParam.record_timer=timelength;
-        recordParam.record_schedule_sun_0=record_schedule_sun_0;
-        recordParam.record_schedule_sun_1=record_schedule_sun_1;
-        recordParam.record_schedule_sun_2=record_schedule_sun_2;
-        recordParam.record_schedule_mon_0=record_schedule_mon_0;
-        recordParam.record_schedule_mon_1=record_schedule_mon_1;
-        recordParam.record_schedule_mon_2=record_schedule_mon_2;
-        recordParam.record_schedule_tue_0=record_schedule_tue_0;
-        recordParam.record_schedule_tue_1=record_schedule_tue_1;
-        recordParam.record_schedule_tue_2=record_schedule_tue_2;
-        recordParam.record_schedule_wed_0=record_schedule_wed_0;
-        recordParam.record_schedule_wed_1=record_schedule_wed_1;
-        recordParam.record_schedule_wed_2=record_schedule_wed_2;
-        recordParam.record_schedule_thu_0=record_schedule_thu_0;
-        recordParam.record_schedule_thu_1=record_schedule_thu_1;
-        recordParam.record_schedule_thu_2=record_schedule_thu_2;
-        recordParam.record_schedule_fri_0=record_schedule_fri_0;
-        recordParam.record_schedule_fri_1=record_schedule_fri_1;
-        recordParam.record_schedule_fri_2=record_schedule_fri_2;
-        recordParam.record_schedule_sat_0=record_schedule_sat_0;
-        recordParam.record_schedule_sat_1=record_schedule_sat_1;
-        recordParam.record_schedule_sat_2=record_schedule_sat_2;
-        
-        return SetSystemParams(MSG_TYPE_SET_RECORD_SCH, (char *)&recordParam, sizeof(recordParam));
-        return 0;
+                                          int coverage_enable,
+                                          int timelength,
+                                          int fixed_enable,
+                                          int record_schedule_sun_0,
+                                          int record_schedule_sun_1,
+                                          int record_schedule_sun_2,
+                                          int record_schedule_mon_0,
+                                          int record_schedule_mon_1,
+                                          int record_schedule_mon_2,
+                                          int record_schedule_tue_0,
+                                          int record_schedule_tue_1,
+                                          int record_schedule_tue_2,
+                                          int record_schedule_wed_0,
+                                          int record_schedule_wed_1,
+                                          int record_schedule_wed_2,
+                                          int record_schedule_thu_0,
+                                          int record_schedule_thu_1,
+                                          int record_schedule_thu_2,
+                                          int record_schedule_fri_0,
+                                          int record_schedule_fri_1,
+                                          int record_schedule_fri_2,
+                                          int record_schedule_sat_0,
+                                          int record_schedule_sat_1,
+                                          int record_schedule_sat_2){
+    NSLog(@"CPPPPChannel::SetSDCardScheduleParams====timelength=%d",timelength);
+    STRU_SD_RECORD_PARAM recordParam;
+    memset(&recordParam, 0, sizeof(recordParam));
+    recordParam.record_cover_enable=coverage_enable;
+    recordParam.record_time_enable=fixed_enable;
+    recordParam.record_timer=timelength;
+    recordParam.record_schedule_sun_0=record_schedule_sun_0;
+    recordParam.record_schedule_sun_1=record_schedule_sun_1;
+    recordParam.record_schedule_sun_2=record_schedule_sun_2;
+    recordParam.record_schedule_mon_0=record_schedule_mon_0;
+    recordParam.record_schedule_mon_1=record_schedule_mon_1;
+    recordParam.record_schedule_mon_2=record_schedule_mon_2;
+    recordParam.record_schedule_tue_0=record_schedule_tue_0;
+    recordParam.record_schedule_tue_1=record_schedule_tue_1;
+    recordParam.record_schedule_tue_2=record_schedule_tue_2;
+    recordParam.record_schedule_wed_0=record_schedule_wed_0;
+    recordParam.record_schedule_wed_1=record_schedule_wed_1;
+    recordParam.record_schedule_wed_2=record_schedule_wed_2;
+    recordParam.record_schedule_thu_0=record_schedule_thu_0;
+    recordParam.record_schedule_thu_1=record_schedule_thu_1;
+    recordParam.record_schedule_thu_2=record_schedule_thu_2;
+    recordParam.record_schedule_fri_0=record_schedule_fri_0;
+    recordParam.record_schedule_fri_1=record_schedule_fri_1;
+    recordParam.record_schedule_fri_2=record_schedule_fri_2;
+    recordParam.record_schedule_sat_0=record_schedule_sat_0;
+    recordParam.record_schedule_sat_1=record_schedule_sat_1;
+    recordParam.record_schedule_sat_2=record_schedule_sat_2;
+    
+    return SetSystemParams(MSG_TYPE_SET_RECORD_SCH, (char *)&recordParam, sizeof(recordParam));
+    return 0;
 }
 
 void CPPPPChannel::SetCameraSDCardStatusDelegate(id delegate){

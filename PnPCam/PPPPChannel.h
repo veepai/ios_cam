@@ -48,8 +48,8 @@ public:
     int CameraControl(int param, int value);
     int Snapshot();
     void ReconnectImmediately();
-    int StartAudio();
-    int StopAudio();
+    int StartAudio(char request);
+    int StopAudio(char request);
     int StartTalk();
     int StopTalk();
     int TalkAudioData(const char* data, int len);
@@ -57,7 +57,7 @@ public:
     int StartPlayback(char *szFilename, int offset);
     
     static void PlaybackAudioBuffer_Callback(void *inUserData,AudioQueueRef inAQ,
-                                       AudioQueueBufferRef buffer);
+                                             AudioQueueBufferRef buffer);
     static void RecordAudioBuffer_Callback(void *aqData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer, const AudioTimeStamp *inStartTime, UInt32 inNumPackets, const AudioStreamPacketDescription *inPacketDesc);
     
     int SetSystemParams(int type,char * msg,int len);
@@ -65,10 +65,10 @@ public:
     int SetWifi(int enable, char *szSSID, int channel, int mode, int authtype, int encrypt, int keyformat, int defkey, char *strKey1, char *strKey2, char *strKey3, char *strKey4, int key1_bits, int key2_bits, int key3_bits, int key4_bits, char *wpa_psk);
     int SendWifiSetting(char *msg, int len);
     int GetResult(char *pbuf, int len);
-
+    
     void SetUserPwdParamsDelegate(id delegate);
     int SetUserPwd(char *user1,char *pwd1,char *user2,char *pwd2,char *user3,char *pwd3);
-
+    
     void SetDateTimeParamsDelegate(id delegate);
     int SetDateTime(int now,int tz,int ntp_enable,char *ntp_svr);
     
@@ -79,7 +79,7 @@ public:
     int SetMail(char *sender, char *smtp_svr, int smtp_port, int ssl, int auth, char *user,  char *pwd, char *recv1, char *recv2, char *recv3, char *recv4);
     
     void SetAlarmParamsDelegate(id delegate);
-    int SetAlarm(  
+    int SetAlarm(
                  int motion_armed,
                  int motion_sensitivity,
                  int input_armed,
@@ -140,27 +140,30 @@ public:
     void FirmwareUpgrade(char *downloadserverAdd, char *downfilename, int FirmwareType);
     
     void UpdataPushListParam(const char * szDID);
-public:    
+public:
     //这个delegate是用来给cameraviewcontroller通知pppp的状态的
-    id <PPPPStatusProtocol> m_PPPPStatusDelegate;    
+    id <PPPPStatusProtocol> m_PPPPStatusDelegate;
     id <SnapshotProtocol> m_CameraViewSnapshotDelegate;
     //这个delegate是用来给cameraviewcontroller通知Camera的报警状态的
     id<PPPPAlarmProtocol> m_PPPPAlarmDelegate;
     void SetPlayViewPPPPStatusDelegate(id<PPPPStatusProtocol> delegate);
-    void SetPlayViewParamNotifyDelegate(id<ParamNotifyProtocol> delegate); 
+    void SetPlayViewParamNotifyDelegate(id<ParamNotifyProtocol> delegate);
     void SetPlayViewImageNotifyDelegate(id<ImageNotifyProtocol> delegate);
     id<PPPPSensorStatusProtocol> m_SensorStatusDelegate;
     //这个用来通知报警状态
     id<PPPPSensorAlarmProtocol> m_SensorAlarmDelegate;
-
-private:    
+    
+private:
     int PPPP_IndeedRead(UCHAR channel, CHAR *buf, int len, int &bRunning);
     void SensorAlarmProcess();
     void CommandRecvProcess();
     void DataProcess();
     void TalkProcess();
     void PlaybackProcess();
-    void AlarmProcess();  
+    void ProcessPlaybackVideo(AV_HEAD * pAVHead , unsigned char chn);
+    void ProcessAudio(AV_HEAD * pHead , unsigned char chn);
+    void SafeDel(CHAR *buf);
+    void AlarmProcess();
     void Stop();
     void ProcessAudioBuf(AudioQueueRef inAQ, AudioQueueBufferRef buffer);
     void ProcessRecordAudioBuf(AudioQueueRef inAQ, AudioQueueBufferRef inBuffer, const AudioTimeStamp *inStartTime, UInt32 inNumPackets, const AudioStreamPacketDescription *inPacketDesc);
@@ -180,34 +183,34 @@ private:
     
     static void* SensorAlarmThread(void* param);
     static void* CommandRecvThread(void* param);
-    static void* CommandThread(void* param);       
-    static void* DataThread(void* param); 
-    static void* TalkThread(void* param);      
-    static void* PlaybackThread(void* param);      
+    static void* CommandThread(void* param);
+    static void* DataThread(void* param);
+    static void* TalkThread(void* param);
+    static void* PlaybackThread(void* param);
     static void* AlarmThread(void* param);
     static void* AudioThread(void* param);
     static void* PlaybackVideoPlayerThread(void* param);
     void PlaybackVideoPlayerProcess();
     
-    void CommandProcess(); 
+    void CommandProcess();
     void AudioProcess();
     void ProcessCommand(int cmd, char *pbuf, int len);
     void ProcessCameraParams(char *pbuf, int len);
     void ProcessCheckUser(char *pbuf, int len);
-    int AddCommand(void* data, int len); 
+    int AddCommand(void* data, int len);
     void StopOtherThread();
     void MsgNotify(int MsgType, int Param);
     void MainWindowNotify(int MsgType, int Param);
     void PlayWindowNotify(int MsgType, int Param);
     //void AVNofity(char *buf, int len);
-    void PlayViewParamNotify(int paramType, void* param);    
+    void PlayViewParamNotify(int paramType, void* param);
     void StartVideoPlay();
-    void StopVideoPlay();    
-    void ProcessSnapshot(char *pbuf, int len);    
+    void StopVideoPlay();
+    void ProcessSnapshot(char *pbuf, int len);
     void PPPPClose();
     void ImageNotify(UIImage *image, unsigned int timestamp);
     void YUVNotify(unsigned char* yuv, int len, int width, int height, unsigned int timestamp);
-    static void* PlayThread(void* param);      
+    static void* PlayThread(void* param);
     void PlayProcess();
     void H264DataNotify(unsigned char* h264Data, int length, int type, unsigned int timestamp);
     
@@ -216,7 +219,7 @@ private:
     
     void ProcessWifiScanResult(STRU_WIFI_SEARCH_RESULT_LIST wifiSearchResultList);
     void ProcessWifiParam(STRU_WIFI_PARAMS wifiParams);
-
+    
     void ProcessUserInfo(STRU_USER_INFO userInfo);
     void ProcessDatetimeParams(STRU_DATETIME_PARAMS datetime);
     void ProcessAlaramParams(STRU_ALARM_PARAMS alarm);
@@ -233,13 +236,13 @@ private:
     void ProcessSensorList(STRU_SENSOR_LIST sensorlist);
     void ProcessSensorGetPreset(STRU_SENSOR_GET_PRESET sensorPreset);
     void ProcessSensorAlarm(STRU_SENSOR_ALARM_INFO alarmInfo);
-private:        
-    int m_bOnline;    
+private:
+    int m_bOnline;
     
     //这个delegate是用来给playviewcontroller通知ppp的状态的
     id <PPPPStatusProtocol> m_PlayViewPPPPStatusDelegate;
     //这个delegate是用来给playviewcongtroller通知音视频数据的
-    //id <AVDataProtocol> m_PlayViewAVDataDelegate;    
+    //id <AVDataProtocol> m_PlayViewAVDataDelegate;
     id <ParamNotifyProtocol> m_PlayViewParamNotifyDelegate;
     id <ImageNotifyProtocol> m_PlayViewImageNotifyDelegate;
     
@@ -298,7 +301,7 @@ private:
     int m_bTalkThreadRuning;
     int m_bPlaybackThreadRuning;
     int m_bAlarmThreadRuning;
-    int m_bAudioThreadRuning;    
+    int m_bAudioThreadRuning;
     
     pthread_t m_SensorThreadID;
     pthread_t m_CommandThreadID;
@@ -307,12 +310,12 @@ private:
     pthread_t m_PlaybackThreadID;
     pthread_t m_AlarmThreadID;
     pthread_t m_CommandRecvThreadID;
-    pthread_t m_AudioThreadID;    
+    pthread_t m_AudioThreadID;
     
     INT32 m_hSessionHandle;
     ENUM_VIDEO_MODE m_EnumVideoMode;
     int m_bFindIFrame;
-    CCircleBuf *m_pVideoBuf;    
+    CCircleBuf *m_pVideoBuf;
     
     NSCondition *m_PlayViewAVDataDelegateLock;
     NSCondition *m_PlayViewPPPPStatusDelegateLock;
@@ -320,19 +323,19 @@ private:
     
     NSCondition *m_PlaybackViewAVDataDelegateLock;
     
-	pthread_t m_PlayThreadID;    
-	int m_bPlayThreadRuning;   
+    pthread_t m_PlayThreadID;
+    int m_bPlayThreadRuning;
     
-    pthread_t m_PlaybackVideoPlayerThreadID;    
-	int m_bPlaybackVideoPlayerThreadRuning; 
+    pthread_t m_PlaybackVideoPlayerThreadID;
+    int m_bPlaybackVideoPlayerThreadRuning;
     
     char szDID[64];
     char szUser[64];
-    char szPwd[64];    
+    char szPwd[64];
     
-    CCircleBuf *m_pCommandBuffer;    
+    CCircleBuf *m_pCommandBuffer;
     NSCondition *m_PPPPCloseCondition;
-    NSCondition *m_StopCondition;    
+    NSCondition *m_StopCondition;
     int m_bReconnectImmediately;
     
     CCircleBuf *m_pAudioBuf;
@@ -341,7 +344,7 @@ private:
     CAdpcm *m_pAudioAdpcm;
     CAdpcm *m_pTalkAdpcm;
     
-    int m_bAudioStarted;  
+    int m_bAudioStarted;
     int m_bTalkStarted;
     CPCMPlayer *m_pPCMPlayer;
     CPCMRecorder *m_pPCMRecorder;
@@ -355,8 +358,10 @@ private:
     int m_bPlayBackStreamOK;
     int m_bPlaybackStarted;
     
-    
-
+    int m_nCamType;
+    int m_bAudioPreSample;
+    int m_deviceEnableAdpcm;
 };
 
 #endif
+

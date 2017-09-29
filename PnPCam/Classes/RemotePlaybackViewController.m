@@ -178,9 +178,9 @@
         return;
     }
     
-    myGLViewController = [[MyGLViewController alloc] init];
-    myGLViewController.view.frame = CGRectMake(0, 0, m_nScreenWidth, m_nScreenHeight);
-    [self.view addSubview:myGLViewController.view];
+    myGLViewController = [[IJKSDLGLView alloc] initWithFrame:CGRectMake(0, 0, m_nScreenWidth, m_nScreenHeight)];
+    myGLViewController.backgroundColor = [UIColor blackColor];
+    [self.view addSubview:myGLViewController];
     [self.view bringSubviewToFront:navigationBar];
     [self.view bringSubviewToFront:bottomView];
 }
@@ -205,7 +205,7 @@
         [bottomView release];
         bottomView = nil;
     }
-        
+    
     if (myGLViewController != nil) {
         [myGLViewController release];
         myGLViewController = nil;
@@ -248,7 +248,17 @@
     [self performSelectorOnMainThread:@selector(hideView) withObject:nil waitUntilDone:NO];
     
     [self performSelectorOnMainThread:@selector(CreateGLView) withObject:nil waitUntilDone:NO];
-    [myGLViewController WriteYUVFrame:yuv Len:length width:width height:height];
+    SDL_VoutOverlay stOverlay;
+    memset(&stOverlay, 0, sizeof(stOverlay));
+    stOverlay.w = (int)width ;
+    stOverlay.h = (int)height;
+    stOverlay.pitches[0] = width;
+    stOverlay.pitches[1] = stOverlay.pitches[2] = width /2;
+    stOverlay.pixels[0] = yuv;
+    stOverlay.pixels[1] = yuv + width*height;
+    stOverlay.pixels[2] = yuv + width*height*5/4;
+    
+    [myGLViewController display:&stOverlay];
 }
 
 - (void)ImageNotify:(UIImage *)image timestamp:(NSInteger)timestamp

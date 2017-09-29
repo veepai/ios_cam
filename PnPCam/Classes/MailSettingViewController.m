@@ -600,7 +600,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     [self.tableView convertRect:currentTextField.bounds fromView:currentTextField];
     
     NSArray *rectarray = [self.tableView indexPathsForRowsInRect:textFieldRect];
-    if (rectarray <= 0) {
+    if (rectarray.count <= 0) {
         return;
     }
     

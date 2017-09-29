@@ -16,9 +16,9 @@ typedef struct _PPPP_CHANNEL
     char szDID[MAX_DID_LENGTH] ;
     CPPPPChannel *pPPPPChannel;
     CCircleBuf *pVideoBuf;
-//    CEGLDisplay *pEglDisplay;
+    //    CEGLDisplay *pEglDisplay;
     CCircleBuf *pPlaybackVideoBuf;
-    int bValid;    
+    int bValid;
 }PPPP_CHANNEL, *PPPPPCHANNEL;
 
 //using namespace android;
@@ -30,7 +30,7 @@ public:
     ~CPPPPChannelManagement();
     int Start(const char *szDID, const char *user, const char *pwd);
     int Stop(const char *szDID);
-    void StopAll();    
+    void StopAll();
     int StartPPPPLivestream(const char *szDID, int streamid,int substreamID,  id delegate);
     int StopPPPPLivestream(const char * szDID);
     int GetCGI(const char * szDID, int cgi);
@@ -79,7 +79,7 @@ public:
     
     
     int SetAlarmDelegate(char *szDID, id delegate);
-    int SetAlarm(char *szDID,    
+    int SetAlarm(char *szDID,
                  int motion_armed,
                  int motion_sensitivity,
                  int input_armed,
@@ -129,10 +129,11 @@ public:
 public:
     
     id pCameraViewController;
-
+    
 private:
     PPPP_CHANNEL m_PPPPChannel[MAX_PPPP_CHANNEL_NUM];
     NSCondition *m_Lock;
 };
 
 #endif
+

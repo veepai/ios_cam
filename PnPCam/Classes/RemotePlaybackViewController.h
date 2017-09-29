@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "PlaybackProtocol.h"
-#import "MyGLViewController.h"
+#import "IJKSDLGLView.h"
 #import "PPPPChannelManagement.h"
 #import "ImageNotifyProtocol.h"
 
@@ -33,7 +33,7 @@
     BOOL m_bPlayPause;
     BOOL m_bHideToolBar;
     
-    MyGLViewController *myGLViewController;
+    IJKSDLGLView *myGLViewController;
     int m_nScreenHeight;
     int m_nScreenWidth;
     

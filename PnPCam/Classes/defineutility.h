@@ -9,20 +9,26 @@
 #define _DEF_STRU_AV_HEAD
 typedef struct tag_AV_HEAD
 {
-	unsigned int   		startcode;	//  0xa815aa55
+    unsigned int           startcode;    //  0xa815aa55
     
-	char				type;		//  0->264 idr frame 1->264 p frame 2->ogg audio  200->error user or passwd 201->over max user
-    //  3->pcm audio 4->jpeg 5->motion 6->gpio  255->heat
-	char  			streamid;	//  0->main stream  1->sub stream1 2->ogg 3->pcm audio 4->record play
-	unsigned short 	militime;	//  diff time
-	unsigned int 		sectime;	//  diff time
-	unsigned int    	frameno;	//  frameno
-	unsigned int 		len;			//  data len
-	
-	unsigned char		version;		// version
-	unsigned char		sessid;		
-	unsigned char		other[2];
-	unsigned char		other1[8];
+    char                type;
+    
+    char              streamid;
+    unsigned short     militime;
+    unsigned int         sectime;
+    unsigned int        frameno;
+    unsigned int         len;
+    
+    unsigned char        version;
+    unsigned char        resolution;
+    unsigned char        sessid;
+    unsigned char       currsit;
+    unsigned char       endflag;
+    char                byzone;
+    char                channel;
+    char                type1;
+    short               sample;
+    short               index;
 }AV_HEAD,*PAV_HEAD;
 #endif
 
@@ -31,26 +37,26 @@ typedef struct tag_AV_HEAD
 
 typedef enum tag_ENUM_FRAME_TYPE
 {
-	ENUM_FRAME_TYPE_I = 0,
-	ENUM_FRAME_TYPE_P = 1,
-	ENUM_FRAME_TYPE_MJPEG = 3
+    ENUM_FRAME_TYPE_I = 0,
+    ENUM_FRAME_TYPE_P = 1,
+    ENUM_FRAME_TYPE_MJPEG = 3
 }ENUM_FRAME_TYPE;
 
 typedef enum tag_ENUM_VIDEO_MODE
 {
-	ENUM_VIDEO_MODE_MJPEG,
-	ENUM_VIDEO_MODE_H264,
+    ENUM_VIDEO_MODE_MJPEG,
+    ENUM_VIDEO_MODE_H264,
     ENUM_VIDEO_MODE_UNKNOWN
 }ENUM_VIDEO_MODE;
 
 
 typedef enum tag_ENUM_STREAM
 {
-	ENUM_STREAM_MAIN_H264 = 0,
-	ENUM_STREAM_SUB_H264 = 1,
-	ENUM_STREAM_MAIN_JPEG = 2,
-	ENUM_STREAM_SUB_JPEG = 3,
-	ENUM_STREAM_RECORD = 4,
+    ENUM_STREAM_MAIN_H264 = 0,
+    ENUM_STREAM_SUB_H264 = 1,
+    ENUM_STREAM_MAIN_JPEG = 2,
+    ENUM_STREAM_SUB_JPEG = 3,
+    ENUM_STREAM_RECORD = 4,
     ENUM_STREAM_MOBILE = 10,
 }ENUM_STRAM;
 
@@ -61,7 +67,7 @@ const int MSG_TYPE_RECV_ERROR = 3; /* 接收失败 */
 
 
 /* 连接超时时间(秒) */
-#define CONNECT_TIME_OUT   10 
+#define CONNECT_TIME_OUT   10
 
 /* Select 时间 */
 #define SELECT_TIME_OUT    10
@@ -84,13 +90,13 @@ struct VIDEO_BUF_HEAD
 //播放实例的最大个数
 #define MAX_PLAY_INSTANCE   64
 
-#define K 1024
+#define KB 1024
 
 //视频缓存大小
-#define VBUF_SIZE      1*K*K
+#define VBUF_SIZE      1*KB*KB
 
 //音频缓存大小
-#define ABUF_SIZE      K*K
+#define ABUF_SIZE      KB*KB
 
 //重连时间间隔
 #define RE_CONNECT_INTERVAL 30
@@ -118,8 +124,8 @@ struct VIDEO_BUF_HEAD
 #define FRAMERATE_CNT   30
 
 //文件播放时，文件大小的最小值(字节)
-#define K 1024
-#define RECORD_FILE_MIN_SIZE 64*K
+#define KB 1024
+#define RECORD_FILE_MIN_SIZE 64*KB
 
 //播放速度
 #define PLAY_SPEED_SLOW16 -16
@@ -135,12 +141,13 @@ struct VIDEO_BUF_HEAD
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)\
 {\
-    if((p) != NULL)\
-    {\
-        delete (p);\
-        (p) = NULL;\
-    }\
+if((p) != NULL)\
+{\
+delete (p);\
+(p) = NULL;\
+}\
 }
 #endif
 
 #endif
+

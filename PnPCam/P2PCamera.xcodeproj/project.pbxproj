@@ -158,6 +158,9 @@
 		4AEA12BC1CBDFC0200A3D6DB /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12BB1CBDFC0200A3D6DB /* libz.tbd */; };
 		4AEA12BE1CBDFC3600A3D6DB /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12BD1CBDFC3600A3D6DB /* libsqlite3.tbd */; };
 		4AEA12C01CBDFC5C00A3D6DB /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12BF1CBDFC5C00A3D6DB /* libiconv.tbd */; };
+		65591C8E1F7E579F00B5DF8A /* IJKSDLGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65591C871F7E579C00B5DF8A /* IJKSDLGLView.m */; };
+		65591C8F1F7E579F00B5DF8A /* IJKSDLGLShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 65591C8B1F7E579E00B5DF8A /* IJKSDLGLShader.m */; };
+		65591C901F7E579F00B5DF8A /* IJKSDLGLRenderI420.m in Sources */ = {isa = PBXBuildFile; fileRef = 65591C8C1F7E579E00B5DF8A /* IJKSDLGLRenderI420.m */; };
 		83A99C1F1B53A183006A418F /* iCloudLivePFZUIviewQR.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.mm */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		83A99C281B53A1B6006A418F /* lineT.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C211B53A1B6006A418F /* lineT.png */; };
 		83A99C291B53A1B6006A418F /* lineT@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C221B53A1B6006A418F /* lineT@2x.png */; };
@@ -636,6 +639,13 @@
 		4AEA12BB1CBDFC0200A3D6DB /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		4AEA12BD1CBDFC3600A3D6DB /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		4AEA12BF1CBDFC5C00A3D6DB /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		65591C871F7E579C00B5DF8A /* IJKSDLGLView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IJKSDLGLView.m; sourceTree = "<group>"; };
+		65591C881F7E579D00B5DF8A /* IJKSDLGLShader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IJKSDLGLShader.h; sourceTree = "<group>"; };
+		65591C891F7E579D00B5DF8A /* IJKSDLGLRenderI420.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IJKSDLGLRenderI420.h; sourceTree = "<group>"; };
+		65591C8A1F7E579E00B5DF8A /* IJKSDLGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IJKSDLGLView.h; sourceTree = "<group>"; };
+		65591C8B1F7E579E00B5DF8A /* IJKSDLGLShader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IJKSDLGLShader.m; sourceTree = "<group>"; };
+		65591C8C1F7E579E00B5DF8A /* IJKSDLGLRenderI420.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IJKSDLGLRenderI420.m; sourceTree = "<group>"; };
+		65591C8D1F7E579F00B5DF8A /* IJKSDLGLRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IJKSDLGLRender.h; sourceTree = "<group>"; };
 		83A99C1D1B53A183006A418F /* iCloudLivePFZUIviewQR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCloudLivePFZUIviewQR.h; sourceTree = "<group>"; };
 		83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = iCloudLivePFZUIviewQR.mm; sourceTree = "<group>"; };
 		83A99C201B53A19D006A418F /* ScanStringDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScanStringDelegate.h; sourceTree = "<group>"; };
@@ -1282,6 +1292,13 @@
 				B7D869A1167973A80057C00F /* Setting */,
 				B7CD90DA1670A443005FE4FA /* MyGLViewController.h */,
 				B7CD90DB1670A443005FE4FA /* MyGLViewController.mm */,
+				65591C8D1F7E579F00B5DF8A /* IJKSDLGLRender.h */,
+				65591C891F7E579D00B5DF8A /* IJKSDLGLRenderI420.h */,
+				65591C8C1F7E579E00B5DF8A /* IJKSDLGLRenderI420.m */,
+				65591C881F7E579D00B5DF8A /* IJKSDLGLShader.h */,
+				65591C8B1F7E579E00B5DF8A /* IJKSDLGLShader.m */,
+				65591C8A1F7E579E00B5DF8A /* IJKSDLGLView.h */,
+				65591C871F7E579C00B5DF8A /* IJKSDLGLView.m */,
 				B7659685167C201D00105FA5 /* RemotePlaybackViewController.h */,
 				B7659686167C201D00105FA5 /* RemotePlaybackViewController.m */,
 				B7659687167C201D00105FA5 /* RemotePlaybackViewController.xib */,
@@ -2118,6 +2135,7 @@
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* IpCameraClientAppDelegate.mm in Sources */,
+				65591C901F7E579F00B5DF8A /* IJKSDLGLRenderI420.m in Sources */,
 				CC91860E1545203F001D459B /* StartViewController.mm in Sources */,
 				CC9186111545204A001D459B /* PlayViewController.mm in Sources */,
 				CC9186191545210F001D459B /* CameraViewController.mm in Sources */,
@@ -2182,6 +2200,7 @@
 				4A1EB5101E4B113900EABDA8 /* PlanPickerView.m in Sources */,
 				04BA9667165E046300B60006 /* RecListCell.m in Sources */,
 				B7CD90DC1670A443005FE4FA /* MyGLViewController.mm in Sources */,
+				65591C8F1F7E579F00B5DF8A /* IJKSDLGLShader.m in Sources */,
 				B7D8699416775F040057C00F /* APICommon.mm in Sources */,
 				B7D8699916785BD80057C00F /* FtpSettingViewController.m in Sources */,
 				B7D8699F1678A74C0057C00F /* MailSettingViewController.m in Sources */,
@@ -2193,6 +2212,7 @@
 				FDE039AA169FA80900A7C56C /* CustomCell.m in Sources */,
 				FDE039AB169FA80F00A7C56C /* DemoTableController.m in Sources */,
 				FDE039AC169FA81200A7C56C /* FPPopoverController.m in Sources */,
+				65591C8E1F7E579F00B5DF8A /* IJKSDLGLView.m in Sources */,
 				FDE039AD169FA81C00A7C56C /* FPPopoverView.m in Sources */,
 				FDE039AE169FA81E00A7C56C /* FPTouchView.m in Sources */,
 				FDBE863A16A161EE00748C2C /* CustomAddCameraCell.m in Sources */,
