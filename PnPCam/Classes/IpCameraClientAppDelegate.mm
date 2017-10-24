@@ -14,6 +14,7 @@
 #import "AboutViewController.h"
 #import "libH264Dec.h"
 #import "LoginViewController.h"
+
 @implementation UINavigationController (supportedOrientation)
 
 - (BOOL)shouldAutorotate{
@@ -108,8 +109,12 @@
     self.window.rootViewController = navigationController;
   //  [self.window addSubview:navigationController.view];
     [self.window makeKeyAndVisible];
+    st_PPPP_NetInfo1 netInfo;
+    XQP2P_NetworkDetect(&netInfo, 0);
     PPPP_Initialize((CHAR*)"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL"
 );
+    
+    XQP2P_Initialize((CHAR *)"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$", 0);
     //Reachability *r = [Reachability reachabilityWithHostName:@"www.aslibra.com"];
       /* NSURLRequest* request = [[NSURLRequest alloc] initWithURL:url];
     NSURLConnection* connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];

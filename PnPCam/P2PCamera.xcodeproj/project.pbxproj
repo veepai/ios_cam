@@ -161,6 +161,7 @@
 		65591C8E1F7E579F00B5DF8A /* IJKSDLGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65591C871F7E579C00B5DF8A /* IJKSDLGLView.m */; };
 		65591C8F1F7E579F00B5DF8A /* IJKSDLGLShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 65591C8B1F7E579E00B5DF8A /* IJKSDLGLShader.m */; };
 		65591C901F7E579F00B5DF8A /* IJKSDLGLRenderI420.m in Sources */ = {isa = PBXBuildFile; fileRef = 65591C8C1F7E579E00B5DF8A /* IJKSDLGLRenderI420.m */; };
+		655A16511F9F4FE200EE56BC /* libXQP2P_API_IOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 655A16501F9F4FE200EE56BC /* libXQP2P_API_IOS.a */; };
 		83A99C1F1B53A183006A418F /* iCloudLivePFZUIviewQR.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.mm */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		83A99C281B53A1B6006A418F /* lineT.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C211B53A1B6006A418F /* lineT.png */; };
 		83A99C291B53A1B6006A418F /* lineT@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C221B53A1B6006A418F /* lineT@2x.png */; };
@@ -646,6 +647,8 @@
 		65591C8B1F7E579E00B5DF8A /* IJKSDLGLShader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IJKSDLGLShader.m; sourceTree = "<group>"; };
 		65591C8C1F7E579E00B5DF8A /* IJKSDLGLRenderI420.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IJKSDLGLRenderI420.m; sourceTree = "<group>"; };
 		65591C8D1F7E579F00B5DF8A /* IJKSDLGLRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IJKSDLGLRender.h; sourceTree = "<group>"; };
+		655A164F1F9F4FCF00EE56BC /* PPPP_APINew.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PPPP_APINew.h; sourceTree = "<group>"; };
+		655A16501F9F4FE200EE56BC /* libXQP2P_API_IOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libXQP2P_API_IOS.a; sourceTree = "<group>"; };
 		83A99C1D1B53A183006A418F /* iCloudLivePFZUIviewQR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCloudLivePFZUIviewQR.h; sourceTree = "<group>"; };
 		83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = iCloudLivePFZUIviewQR.mm; sourceTree = "<group>"; };
 		83A99C201B53A19D006A418F /* ScanStringDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScanStringDelegate.h; sourceTree = "<group>"; };
@@ -998,6 +1001,7 @@
 				2559E65A1CEC0BF500AD177E /* libavdevice.a in Frameworks */,
 				04ABC84F1625522A009C65BD /* AVFoundation.framework in Frameworks */,
 				2559E65C1CEC0BF500AD177E /* libavformat.a in Frameworks */,
+				655A16511F9F4FE200EE56BC /* libXQP2P_API_IOS.a in Frameworks */,
 				04ABC84D16255224009C65BD /* AddressBookUI.framework in Frameworks */,
 				04ABC84B1625521E009C65BD /* AddressBook.framework in Frameworks */,
 				0454B863161984D0008FE9AB /* QuartzCore.framework in Frameworks */,
@@ -1268,6 +1272,7 @@
 				04B2310B15CF9BD4009ABA24 /* PCMPlayer.h */,
 				044EFA5315D144F50098D45A /* MyAudioSession.h */,
 				18AC7DFB158716BB001C670A /* PPPP_API.h */,
+				655A164F1F9F4FCF00EE56BC /* PPPP_APINew.h */,
 				CC87C69815494DC00086B180 /* defineutility.h */,
 				04C66DB71622C422006E25E2 /* CgiPacket.h */,
 				04B2311515CFC51C009ABA24 /* Adpcm.h */,
@@ -1522,6 +1527,7 @@
 				2559E6541CEC0BF500AD177E /* libavformat.a */,
 				2559E6551CEC0BF500AD177E /* libavutil.a */,
 				2559E6561CEC0BF500AD177E /* libPPPP_API.a */,
+				655A16501F9F4FE200EE56BC /* libXQP2P_API_IOS.a */,
 				2559E6571CEC0BF500AD177E /* libswresample.a */,
 				2559E6581CEC0BF500AD177E /* libswscale.a */,
 				FDE428FB16B7AB6900ACC2C4 /* SystemConfiguration.framework */,

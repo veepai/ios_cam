@@ -6,6 +6,7 @@
 #include <pthread.h>
 
 #include "PPPP_API.h"
+#include "PPPP_APINew.h"
 #include "defineutility.h"
 #include "CircleBuf.h"
 
@@ -209,6 +210,7 @@ private:
     void StopVideoPlay();
     void ProcessSnapshot(char *pbuf, int len);
     void PPPPClose();
+    void XQP2PClose();
     void ImageNotify(UIImage *image, unsigned int timestamp);
     void YUVNotify(unsigned char* yuv, int len, int width, int height, unsigned int timestamp);
     static void* PlayThread(void* param);
@@ -237,6 +239,9 @@ private:
     void ProcessSensorList(STRU_SENSOR_LIST sensorlist);
     void ProcessSensorGetPreset(STRU_SENSOR_GET_PRESET sensorPreset);
     void ProcessSensorAlarm(STRU_SENSOR_ALARM_INFO alarmInfo);
+    void XQP2PCommandProcess();
+    void PPPPCommandProcess();
+    void sleepCommandProcess(double s);
 private:
     int m_bOnline;
     
@@ -367,6 +372,7 @@ private:
     BOOL         m_bResetCoder;
     long long    m_nLastPlayFrameTime;  //最近播放设备时间
     long long    m_nLastPlayMobileTime; //最近播放手机时间
+    int          m_nP2pVer;             //使用哪家P2P库
 };
 
 #endif

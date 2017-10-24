@@ -12,17 +12,26 @@
 #include "P2P_API_Define.h"
 #include "H264Decoder.h"
 #include "obj_common.h"
-//extern "C"
-//{
-//#include "H264iPhone.h"
-//}
 
-//#import "libH264Dec.h"
+
+//使用那家P2P标识
+enum EM_USE_P2PVER
+{
+    USE_P2PVER_PPPP = 0,
+    USE_P2PVER_XQP2P  =1,
+};
 
 CPPPPChannel::CPPPPChannel(CCircleBuf *pVideoBuf, CCircleBuf *pPlaybackVideoBuf, const char *DID, const char *user, const char *pwd)
 {
     memset(szDID, 0, sizeof(szDID));
     strcpy(szDID, DID);
+    
+    NSString *uid = [NSString stringWithUTF8String:szDID];
+    //NSLog(@"RICKY CPPPPChannel:%@",uid);
+    if ([[uid uppercaseString] rangeOfString:@"VSTD"].location != NSNotFound)
+        m_nP2pVer = USE_P2PVER_XQP2P;
+    else
+        m_nP2pVer = USE_P2PVER_PPPP;
     
     memset(szUser, 0, sizeof(szUser));
     strcpy(szUser, user);
@@ -158,17 +167,45 @@ CPPPPChannel::~CPPPPChannel()
     [m_CamStatusDelegateLock release],m_CamStatusDelegateLock = nil;
 }
 
+void CPPPPChannel::XQP2PClose()
+{
+    if(m_nP2pVer == USE_P2PVER_XQP2P) {
+        
+        if(m_hSessionHandle >= 0)
+            XQP2P_ForceClose(m_hSessionHandle);
+        else
+            XQP2P_Break(szDID);
+        
+        m_hSessionHandle = -1;
+    }
+}
+
 void CPPPPChannel::PPPPClose()
 {
     [m_PPPPCloseCondition lock];
-    
+    if(m_nP2pVer == USE_P2PVER_XQP2P) {
+        /*XQP2P_Connect_Break();
+         if(m_hSessionHandle < 0)
+         {
+         return;
+         }
+         XQP2P_ForceClose(m_hSessionHandle);
+         m_hSessionHandle = -1;*/
+        if(m_hSessionHandle >= 0)
+            XQP2P_ForceClose(m_hSessionHandle);
+        else
+            XQP2P_Break(szDID);
+        
+        m_hSessionHandle = -1;
+        
+    } else {
     PPPP_Connect_Break();
     if (m_hSessionHandle >= 0) {
         //PPPP_Close(m_hSessionHandle);
         PPPP_ForceClose(m_hSessionHandle);
         m_hSessionHandle = -1;
     }
-    
+    }
     [m_PPPPCloseCondition unlock];
 }
 
@@ -247,7 +284,8 @@ void CPPPPChannel::Stop()
     m_bPlaybackThreadRuning = 0;
     m_bSensorAlarmThreadRuning = 0;
     
-    PPPPClose();
+    if(m_nP2pVer == USE_P2PVER_PPPP)
+        PPPPClose();
     
     //NSLog(@"Stop CommandThread... %s", szDID);
     if(m_CommandThreadID != NULL)
@@ -255,7 +293,8 @@ void CPPPPChannel::Stop()
         pthread_join(m_CommandThreadID, NULL);
         m_CommandThreadID = NULL;
     }
-    
+    if(m_nP2pVer == USE_P2PVER_XQP2P)
+        XQP2PClose();
     //NSLog(@"Stop CommandRecvThread...%s", szDID);
     if(m_CommandRecvThreadID!= NULL)
     {
@@ -1223,7 +1262,17 @@ int CPPPPChannel::StartCommandChannel()
 void* CPPPPChannel::CommandThread(void * param)
 {
     CPPPPChannel *pPPPChannel = (CPPPPChannel*)param;
-    pPPPChannel->CommandProcess();
+    //NSLog(@"RICKY CommandThread beg:%s",pPPPChannel->szDID);
+    if (pPPPChannel->m_nP2pVer == USE_P2PVER_XQP2P) {
+        NSLog(@"CommandThread use p2p USE_P2PVER_XQP2P");
+        pPPPChannel->XQP2PCommandProcess();
+    }
+    else
+    {
+        NSLog(@"CommandThread use p2p USE_P2PVER_PPPP");
+        pPPPChannel->PPPPCommandProcess();
+    }
+    //NSLog(@"RICKY CommandThread end:%s",pPPPChannel->szDID);
     return NULL;
 }
 
@@ -1508,7 +1557,10 @@ void CPPPPChannel::ReconnectImmediately()
     m_bReconnectImmediately = 1;
 }
 
-void CPPPPChannel::CommandProcess()
+
+
+#pragma mark *****************PPPPCommandProcess*****************
+void CPPPPChannel::PPPPCommandProcess()
 {
     int ReConnect = 0;
     int nWaitTime = 0;
@@ -1734,6 +1786,250 @@ RE_CONNECT:
         SAFE_DELETE(pbuf);
     }
     
+}
+void CPPPPChannel::sleepCommandProcess(double s)
+{
+    int ms = s * 1000;
+    for (int jj=0; jj<ms; ++jj) {
+        usleep(100);
+        if(m_bCommandThreadRuning == 0)
+        {
+            return;
+        }
+    }
+}
+
+#pragma mark *****************XQP2PCommandProcess*****************
+void CPPPPChannel::XQP2PCommandProcess()
+{
+    int ReConnect = 0;
+    int nWaitTime = 0;
+    int nReconnectCount = 0;
+    
+RE_CONNECT:
+    m_bOnline = 0;
+    nWaitTime = 0;
+    while(1)
+    {
+        if(m_bCommandThreadRuning == 0)
+            return;
+        
+        NSLog(@"PPPP_Connect begin...%s", szDID);
+        MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_CONNECTING);
+        char *svrStr = (CHAR *)"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$";
+        m_hSessionHandle = XQP2P_Connect(szDID, 1, 0, &svrStr);
+        
+        NSLog(@"#############PPPP_Connect handle is  %d id is :%s ！！！！", m_hSessionHandle, szDID);
+        if(m_hSessionHandle < 0)
+        {
+            switch(m_hSessionHandle)
+            {
+                case ERROR_PPPP_DEVICE_NOT_ONLINE:
+                case ERROR_PPPP_NO_RELAY_SERVER_AVAILABLE:
+                {
+                    sleepCommandProcess(2.0);
+                    nReconnectCount += 5;
+                    break;
+                }
+                case ERROR_PPPP_TIME_OUT:
+                {
+                    sleepCommandProcess(1.0);
+                    nReconnectCount++;
+                    break;
+                }
+                case ERROR_PPPP_INVALID_ID:
+                case ERROR_PPPP_ID_OUT_OF_DATE:
+                case ERROR_PPPP_INVALID_PREFIX:
+                    MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_INVALID_ID);
+                    m_bCommandThreadRuning = 0;
+                    return;
+                case ERROR_PPPP_NOT_INITIALIZED:
+                case ERROR_PPPP_MAX_SESSION:
+                case ERROR_PPPP_UDP_PORT_BIND_FAILED:
+                    MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_CONNECT_FAILED);
+                    m_bCommandThreadRuning = 0;
+                    return;
+                case ERROR_PPPP_USER_CONNECT_BREAK:
+                    break;
+                case ERROR_PPPP_INVALID_SESSION_HANDLE:
+                {
+                    nReconnectCount += 5;
+                    sleepCommandProcess(0.6);
+                    break;
+                }
+                default:
+                    MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_CONNECT_FAILED);
+                    m_bCommandThreadRuning = 0;
+                    return;
+            }
+            
+            ReConnect = 1;
+            if(nReconnectCount > 20)
+            {
+                nReconnectCount = 0;
+                ReConnect = 0;
+                if (m_hSessionHandle == ERROR_PPPP_DEVICE_NOT_ONLINE) {
+                    MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_DEVICE_NOT_ON_LINE);
+                }
+                else
+                    MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_CONNECT_TIMEOUT);
+                m_bCommandThreadRuning = 0;
+                return;
+            }
+            continue;
+        }//连接异常处理
+        
+        //P2P连接成功 开始工作了(^_^)
+        int nRet = 0;
+        st_PPPP_Session1 SInfo;
+        nRet = XQP2P_Check(m_hSessionHandle, &SInfo);
+        if(nRet < 0)
+        {
+            NSLog(@"#############fun %s PPPP_Check error handle is  %d id is :%s ret %d！！！！" ,__FUNCTION__ ,m_hSessionHandle, szDID , nRet);
+            if (nRet != ERROR_PPPP_SESSION_CLOSED_CALLED) {
+                PPPPClose();
+            }
+            ReConnect = 1;
+            goto RE_CONNECT;
+        }
+        
+        int mode;
+        if(SInfo.bMode == 0)
+            mode = PPPP_MODE_P2P;
+        else
+            mode = PPPP_MODE_RELAY;
+        
+        MsgNotify(MSG_NOTIFY_TYPE_PPPP_MODE, mode);
+        MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_INITIALING);
+        
+        m_bOnline = 1;
+        ReConnect = 0;
+        break;
+    }//退出P2P连接请求
+    
+    if (m_bCommandThreadRuning == 1) {
+        m_bResetCoder = YES;
+        
+        StartCommandRecvThread();
+        StartDataChannel();
+        StartAudioChannel();
+        StartPlaybackChannel();
+        StartSensorAlarmChannel();
+        nReconnectCount = 0;
+        cgi_get_common((char*)"check_user.cgi?");
+    }
+    
+    //读写P2P
+    while(m_bCommandThreadRuning)
+    {
+        UINT32 uiReadSize = 0;
+        UINT32 uiWriteSize = 0;
+        INT32 res = 0;
+        res = XQP2P_Check_Buffer(m_hSessionHandle, P2P_CMDCHANNEL, &uiWriteSize, &uiReadSize);
+        if(res < 0)
+        {
+            NSLog(@"#############fun %s PPPP_Check_Buffer error handle is  %d id is :%s ret %d！！！！" ,__FUNCTION__ ,m_hSessionHandle, szDID , res);
+            if (res != ERROR_PPPP_SESSION_CLOSED_CALLED)
+                PPPPClose();
+            
+            ReConnect = 1;
+            MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_DISCONNECT);
+            m_bResetCoder = NO;
+            goto RE_CONNECT;
+        }
+        
+        if(uiWriteSize >= PPPP_WRITE_BUFFER_MAX_SIZE)
+        {
+            BOOL tem = NO;
+            BOOL isWrite = NO;
+            for (int jj=0; jj<1000; ++jj) {
+                usleep(100);
+                if(m_bCommandThreadRuning == 0)
+                {
+                    tem = YES;
+                    break;
+                }
+                
+                XQP2P_Check_Buffer(m_hSessionHandle, P2P_CMDCHANNEL, &uiWriteSize, &uiReadSize);
+                if(uiWriteSize < PPPP_WRITE_BUFFER_MAX_SIZE)
+                {
+                    isWrite = YES;
+                    break;
+                }
+            }
+            
+            if (tem) {
+                //停止，线程要退了(*_*)
+                break;
+            }
+            
+            if (isWrite == NO) {
+                continue;
+            }
+        }//网络好慢排队吧，(*_*)等好了再往里写
+        
+        //有没东东要发的(^_^)
+        CMD_BUF_HEAD bufhead;
+        int nHeadLen = sizeof(CMD_BUF_HEAD);
+        memset(&bufhead, 0, sizeof(bufhead));
+        int nRet = m_pCommandBuffer->Read((char*)&bufhead, nHeadLen);
+        if(nRet == 0)
+        {
+            //没有东东可发，等一下过会再来(*_*)
+            BOOL tem = NO;
+            BOOL isRead = NO;
+            for (int jj=0; jj<1000; ++jj) {
+                usleep(100);
+                if(m_bCommandThreadRuning == 0)
+                {
+                    tem = YES;
+                    break;
+                }
+                
+                memset(&bufhead, 0, sizeof(bufhead));
+                int nRetA = m_pCommandBuffer->Read((char*)&bufhead, nHeadLen);
+                if (nRetA != 0) {
+                    isRead = YES;
+                    break;
+                }
+            }
+            if (tem) {
+                //停止，线程要退了(*_*)
+                break;
+            }
+            
+            if (isRead == NO) {
+                //没有东东可发。(*_*)
+                continue;
+            }
+        }
+        
+        //有可发的东东(^_^)
+        char *pbuf = new char[bufhead.len];
+        nRet = m_pCommandBuffer->Read(pbuf, bufhead.len);
+        if(nRet != bufhead.len)
+        {
+            NSLog(@"CommandProcess Read CmdData error!");
+            SafeDel(pbuf);
+            m_bCommandThreadRuning = 0;
+            return ;
+        }
+        
+        //发了(^_^)
+        res = XQP2P_Write(m_hSessionHandle, P2P_CMDCHANNEL, pbuf, bufhead.len);
+        if(res < 0)
+        {
+            NSLog(@"#############fun %s PPPP_Write error handle is  %d id is :%s ret %d！！！！" ,__FUNCTION__ ,m_hSessionHandle, szDID , res);
+            if (res != ERROR_PPPP_SESSION_CLOSED_CALLED)
+                PPPPClose();
+            SafeDel(pbuf);
+            ReConnect = 1;
+            
+            MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_DISCONNECT);
+            goto RE_CONNECT;
+        }
+        SafeDel(pbuf);
+    }
 }
 
 int CPPPPChannel::StartDataChannel()
@@ -2112,7 +2408,12 @@ void CPPPPChannel::TalkProcess()
     {
         UINT32 uiReadSize = 0;
         UINT32 uiWriteSize = 0;
-        int nRet = PPPP_Check_Buffer(m_hSessionHandle, P2P_TALKCHANNEL, &uiWriteSize, &uiReadSize);
+        int nRet = 0;
+        if(m_nP2pVer == USE_P2PVER_XQP2P) {
+            nRet = XQP2P_Check_Buffer(m_hSessionHandle, P2P_TALKCHANNEL, &uiWriteSize, &uiReadSize);
+        } else {
+            nRet = PPPP_Check_Buffer(m_hSessionHandle, P2P_TALKCHANNEL, &uiWriteSize, &uiReadSize);
+        }
         if(nRet < 0)
         {
             return;
@@ -2169,14 +2470,29 @@ int CPPPPChannel::SendTalk(char * pbuf,int len)
     avhead.len = len;
     avhead.frameno = 0;
     
-    if(PPPP_Write(m_hSessionHandle, P2P_TALKCHANNEL, (CHAR*)&avhead, sizeof(avhead)) < 0)
+    if(m_nP2pVer == USE_P2PVER_XQP2P)
     {
-        return 0;
+        if(XQP2P_Write(m_hSessionHandle, P2P_TALKCHANNEL, (CHAR*)&avhead, sizeof(avhead)) < 0)
+        {
+            return 0;
+        }
+        
+        if(XQP2P_Write(m_hSessionHandle, P2P_TALKCHANNEL, (CHAR*)pbuf, len) < 0)
+        {
+            return 0;
+        }
     }
-    
-    if(PPPP_Write(m_hSessionHandle, P2P_TALKCHANNEL, (CHAR*)pbuf, len) < 0)
+    else
     {
-        return 0;
+        if(PPPP_Write(m_hSessionHandle, P2P_TALKCHANNEL, (CHAR*)&avhead, sizeof(avhead)) < 0)
+        {
+            return 0;
+        }
+        
+        if(PPPP_Write(m_hSessionHandle, P2P_TALKCHANNEL, (CHAR*)pbuf, len) < 0)
+        {
+            return 0;
+        }
     }
     
     return 1;
@@ -2195,7 +2511,11 @@ int CPPPPChannel::PPPP_IndeedRead(UCHAR channel, CHAR * buf,int len, int &bRunni
         if (readSize > 32*1024) {
             readSize = 32*1024;
         }
-        res = PPPP_Read(m_hSessionHandle, channel, p, &readSize, 100);
+        if(m_nP2pVer == USE_P2PVER_XQP2P){
+            res = XQP2P_Read(m_hSessionHandle, channel, p, &readSize, 100);
+        } else {
+            res = PPPP_Read(m_hSessionHandle, channel, p, &readSize, 100);
+        }
         if(res == ERROR_PPPP_TIME_OUT)
         {
             //Log("PPPP_Read timeout: readSize: %d, %s", readSize, szDID);
