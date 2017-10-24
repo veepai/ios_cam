@@ -248,6 +248,7 @@
     [self performSelectorOnMainThread:@selector(hideView) withObject:nil waitUntilDone:NO];
     
     [self performSelectorOnMainThread:@selector(CreateGLView) withObject:nil waitUntilDone:NO];
+    
     SDL_VoutOverlay stOverlay;
     memset(&stOverlay, 0, sizeof(stOverlay));
     stOverlay.w = (int)width ;

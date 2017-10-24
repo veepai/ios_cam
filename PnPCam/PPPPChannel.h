@@ -191,6 +191,7 @@ private:
     static void* AudioThread(void* param);
     static void* PlaybackVideoPlayerThread(void* param);
     void PlaybackVideoPlayerProcess();
+    void IsPlaybackSleep(long long frameTime);
     
     void CommandProcess();
     void AudioProcess();
@@ -361,6 +362,11 @@ private:
     int m_nCamType;
     int m_bAudioPreSample;
     int m_deviceEnableAdpcm;
+    
+    //实时播放控制用的时间
+    BOOL         m_bResetCoder;
+    long long    m_nLastPlayFrameTime;  //最近播放设备时间
+    long long    m_nLastPlayMobileTime; //最近播放手机时间
 };
 
 #endif

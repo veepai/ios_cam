@@ -1651,6 +1651,7 @@ RE_CONNECT:
     }
     
     //=======================================================================
+    m_bResetCoder = YES;
     StartSensorAlarmChannel();
     StartCommandRecvThread();
     StartDataChannel();
@@ -1680,6 +1681,7 @@ RE_CONNECT:
             
             ReConnect = 1;
             MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_DISCONNECT);
+            m_bResetCoder = NO;
             goto RE_CONNECT;
         }
         
@@ -1866,8 +1868,10 @@ int CPPPPChannel::StartPlaybackChannel()
 
 void* CPPPPChannel::PlaybackThread(void * param)
 {
+    NSLog(@"PlaybackThread beg");
     CPPPPChannel *pPPPChannel = (CPPPPChannel*)param;
     pPPPChannel->PlaybackProcess();
+    NSLog(@"PlaybackThread end");
     return NULL;
 }
 
@@ -1918,11 +1922,11 @@ void CPPPPChannel::PlaybackProcess()
             {
                 m_pAudioAdpcm->DecoderClr();
                 m_bAudioPreSample = 1;
-                NSLog(@"########### avhead == 0  && avhead.index == 0");
+                //NSLog(@"########### avhead == 0  && avhead.index == 0");
             }
             else
             {
-                NSLog(@"########### avhead != 0  !! avhead.index != 0");
+                //NSLog(@"########### avhead != 0  !! avhead.index != 0");
                 if(m_bAudioPreSample)
                 {
                     m_pAudioAdpcm->m_nDeAudioPreSample = avhead.sample;
@@ -1953,7 +1957,7 @@ void CPPPPChannel::ProcessPlaybackVideo(AV_HEAD * pAVHead , unsigned char chn)
     phead->timestamp = pAVHead->sectime;
     phead->len = pAVHead->len;
     phead->frametype = pAVHead->type ;
-    
+    phead->militime = pAVHead->militime;
     nRet = PPPP_IndeedRead(chn, (CHAR*)(pbuf + sizeof(VIDEO_BUF_HEAD)), pAVHead->len,m_bPlaybackThreadRuning);
     if(nRet < 0)
     {
@@ -2003,7 +2007,7 @@ void CPPPPChannel::ProcessPlaybackVideo(AV_HEAD * pAVHead , unsigned char chn)
             //NSLog(@"----------------------执行录像回放Write2 %d---------", n);
             if(0 == n)
             {
-                // NSLog(@"----------------------执行录像回放Write3---------");
+                 //NSLog(@"----------------------执行录像回放Write3---------");
                 m_bPlayBackFindIFrame = false;
             }
         }
@@ -2016,7 +2020,7 @@ void CPPPPChannel::ProcessPlaybackVideo(AV_HEAD * pAVHead , unsigned char chn)
             m_pPlayBackVideoBuf->Write(pbuf, Length);
         }
     }
-    NSLog(@"\n---------------endWrite");
+    //NSLog(@"\n---------------endWrite");
     SafeDel(pbuf);
 }
 void CPPPPChannel::ProcessAudio(AV_HEAD * pHead , unsigned char chn)
@@ -2261,8 +2265,9 @@ void* CPPPPChannel::PlaybackVideoPlayerThread(void *param)
 
 void CPPPPChannel::PlaybackVideoPlayerProcess()
 {
-    unsigned int oldTimeStamp = 0;
+    //unsigned int oldTimeStamp = 0;
     CH264Decoder *pH264Decoder=new CH264Decoder();
+    m_bResetCoder = YES;
     while(m_bPlaybackVideoPlayerThreadRuning)
     {
         if (m_EnumPlayBackVideoMode == ENUM_VIDEO_MODE_UNKNOWN) {
@@ -2290,7 +2295,7 @@ void CPPPPChannel::PlaybackVideoPlayerProcess()
             continue;
         }
         
-        if(oldTimeStamp > 0)
+        /*if(oldTimeStamp > 0)
         {
             int nSleepTime = videobufhead.timestamp - oldTimeStamp;
             if(nSleepTime > 500 || nSleepTime <= 0)
@@ -2316,9 +2321,11 @@ void CPPPPChannel::PlaybackVideoPlayerProcess()
         if(oldTimeStamp == 0)
         {
             oldTimeStamp = videobufhead.timestamp;
-        }
+        }*/
         
         unsigned int untimestamp = videobufhead.timestamp;
+        long long  dFrameT = (long long )untimestamp*1000 + videobufhead.militime;
+        IsPlaybackSleep(dFrameT);
         //Log("get one frame");
         if(ENUM_VIDEO_MODE_H264 == m_EnumPlayBackVideoMode)
         {
@@ -2380,138 +2387,54 @@ void CPPPPChannel::PlaybackVideoPlayerProcess()
     pH264Decoder=NULL;
 }
 
-//void CPPPPChannel::PlaybackVideoPlayerProcess()
-//{
-//    unsigned int oldTimeStamp = 0;
-//    CH264Decoder *pH264Decoder=new CH264Decoder();
-//    while(m_bPlaybackVideoPlayerThreadRuning)
-//    {
-//        if (m_EnumPlayBackVideoMode == ENUM_VIDEO_MODE_UNKNOWN) {
-//            usleep(100000);
-//            continue;
-//        }
-//
-//        if(m_pPlayBackVideoBuf->GetStock() == 0)
-//        {
-//            //Log("videobuf is empty...");
-//            usleep(10000);
-//            continue;
-//        }
-//
-//        char *pbuf = NULL;
-//        int videoLen = 0;
-//        VIDEO_BUF_HEAD videobufhead;
-//        memset(&videobufhead, 0, sizeof(videobufhead));
-//
-//        //读取一帧视频数据
-//        pbuf = m_pPlayBackVideoBuf->ReadOneFrame1(videoLen, videobufhead) ;
-//        if(NULL == pbuf)
-//        {
-//            usleep(10000);
-//            continue;
-//        }
-//
-//        if(oldTimeStamp > 0)
-//        {
-//            int nSleepTime = videobufhead.timestamp - oldTimeStamp;
-//            if(nSleepTime > 500 || nSleepTime <= 0)
-//            {
-//                nSleepTime = 30;
-//            }
-//            oldTimeStamp = videobufhead.timestamp;
-//
-//            //usleep(1000 * nSleepTime);
-//            int iSleep = 0;
-//            for (iSleep = 0; iSleep <= nSleepTime; iSleep++) {
-//                if (m_bPlaybackVideoPlayerThreadRuning == 0) {
-//                    SAFE_DELETE(pbuf) ;
-//                    return;
-//                }
-//                usleep(1000);
-//
-//            }
-//
-//            //Log("nSleepTime: %d", nSleepTime);
-//        }
-//
-//        if(oldTimeStamp == 0)
-//        {
-//            oldTimeStamp = videobufhead.timestamp;
-//        }
-//
-//        unsigned int untimestamp = videobufhead.timestamp;
-//        //Log("get one frame");
-//        if(ENUM_VIDEO_MODE_H264 == m_EnumPlayBackVideoMode)
-//        {
-////            if (videobufhead.frametype == 0) {
-////                UninitH264Decoder();
-////                InitH264Decoder();
-////            }
-//
-//            NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-//
-//            [m_PlaybackViewAVDataDelegateLock lock];
-//
-//            if (m_PlaybackViewImageNotifyDelegate != nil) {
-//               // uint8_t *yuvBuf = NULL;
-//                int yuvlen = 0;
-//                int nWidth = 0;
-//                int nHeight = 0;
-//
-//                //NSLog(@"DecoderH264Frame being.. id: %s frametype: %d", szDID, videobufhead.frametype);
-//
-//                /*int nRet = DecoderH264Frame((uint8_t*)pbuf, videoLen, &yuvBuf, &yuvlen, &nWidth, &nHeight);
-//                if (nRet > 0) {
-//                    //NSLog(@"decoder success... videoLen: %d, yuvlen: %d, nWidth: %d, nHeight: %d",
-//                    //      videoLen, yuvlen, nWidth, nHeight);
-//                    //PlaybackYUVNotify(yuvBuf, yuvlen, nWidth, nHeight, untimestamp);
-//                    [m_PlaybackViewImageNotifyDelegate YUVNotify:yuvBuf length:yuvlen width:nWidth height:nHeight timestamp:untimestamp];
-//                }
-//
-//                //NSLog(@"DecoderH264Frame end.. id: %s", szDID);
-//
-//                SAFE_DELETE(yuvBuf);*/
-//                if (pH264Decoder->DecoderFrame((uint8_t*)pbuf, videoLen, nWidth, nHeight)) {
-//                    yuvlen=nWidth*nHeight*3/2;
-//                    uint8_t *pYUVBuffer = new uint8_t[yuvlen];
-//                    if (pYUVBuffer != NULL) {
-//                        int nRec=pH264Decoder->GetYUVBuffer(pYUVBuffer, yuvlen);
-//
-//                        if (nRec>0) {
-//                            YUVNotify(pYUVBuffer, yuvlen, nWidth, nHeight, untimestamp);
-//                            [m_PlaybackViewImageNotifyDelegate YUVNotify:pYUVBuffer length:yuvlen width:nWidth height:nHeight timestamp:untimestamp];
-//                        }
-//
-//                        delete pYUVBuffer;
-//                        pYUVBuffer = NULL;
-//                    }
-//
-//            }
-//
-//            [m_PlaybackViewAVDataDelegateLock unlock];
-//
-//            [pool release];
-//
-//        }
-//        else /* JPEG */
-//        {
-//            NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-//            NSData *image = [[NSData alloc] initWithBytes:pbuf length:videoLen];
-//            UIImage *img = [[UIImage alloc] initWithData:image];
-//            PlaybackImageNotify(img, 0);
-//            [img release];
-//            [image release];
-//            [pool release];
-//
-//        }
-//
-//        SAFE_DELETE(pbuf) ;
-//        usleep(10000);
-//
-//    }
-//        delete pH264Decoder;
-//        pH264Decoder=NULL;
-//}
+void CPPPPChannel::IsPlaybackSleep(long long frameTime)
+{
+    NSTimeInterval nowtime = [[NSDate date] timeIntervalSince1970]*1000;
+    long long theTime = [[NSNumber numberWithDouble:nowtime] longLongValue];
+    
+    if (m_bResetCoder) {
+        m_nLastPlayMobileTime = theTime;
+        m_nLastPlayFrameTime  = frameTime;
+        m_bResetCoder = NO;
+        NSLog(@"播放启起帧");
+    }
+    else
+    {
+        long long  mobileT  = theTime - m_nLastPlayMobileTime;
+        long long  frameT  = frameTime - m_nLastPlayFrameTime;
+        
+        
+        int time = frameT - mobileT ;
+        
+        if (time > 18)
+        {
+            if (time < 1000) {
+                for (int jj=0; jj < time; ++jj) {
+                    usleep(1000);
+                    if (m_bPlaybackVideoPlayerThreadRuning ==0) {
+                        break;
+                    }
+                }
+                
+                nowtime = [[NSDate date] timeIntervalSince1970]*1000;
+                theTime = [[NSNumber numberWithDouble:nowtime] longLongValue];
+            }
+            else
+            {
+                NSLog(@"时间戳超出:%d 毫秒",time);
+            }
+            
+            m_nLastPlayMobileTime = theTime;
+            m_nLastPlayFrameTime  = frameTime;
+        }
+        else
+        {
+            m_nLastPlayMobileTime = theTime;
+            m_nLastPlayFrameTime  = frameTime;
+        }
+    }
+}
+
 void CPPPPChannel::StopPlaybackVideoPlayer()
 {
     m_bPlaybackVideoPlayerThreadRuning = 0;

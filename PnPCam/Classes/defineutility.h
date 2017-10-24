@@ -82,8 +82,10 @@ struct VIDEO_BUF_HEAD
 {
     unsigned int head; /* 头，必须等于0xFF00FF */
     unsigned int timestamp; //时间戳，如果是录像，则填录像的时间戳，如果是实时视频，则为0
+    unsigned int militime;
     unsigned int len;    /*长度*/
     unsigned int frametype;
+    unsigned char		size;//	图像分辨率，0：VGA，1：QVGA, 2:720P, 3:960P,4:1080P
 };
 
 
