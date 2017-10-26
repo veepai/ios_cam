@@ -248,6 +248,12 @@
     [self performSelectorOnMainThread:@selector(hideView) withObject:nil waitUntilDone:NO];
     
     [self performSelectorOnMainThread:@selector(CreateGLView) withObject:nil waitUntilDone:NO];
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp];
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSString *time = [formatter stringFromDate:date];
+    NSLog(@"播放时间%@", time);
+    
     
     SDL_VoutOverlay stOverlay;
     memset(&stOverlay, 0, sizeof(stOverlay));

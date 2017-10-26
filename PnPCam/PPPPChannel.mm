@@ -2672,7 +2672,7 @@ void CPPPPChannel::PlaybackVideoPlayerProcess()
                             [m_PlaybackViewImageNotifyDelegate YUVNotify:pYUVBuffer length:yuvlen width:nWidth height:nHeight timestamp:untimestamp];
                         }
                         
-                        delete pYUVBuffer;
+                        delete[] pYUVBuffer;
                         pYUVBuffer = NULL;
                     }
                     
@@ -2936,7 +2936,13 @@ void CPPPPChannel::PlayProcess()
                 }
                 
             }
-            
+            else
+            {
+                delete pH264Decoder;
+                pH264Decoder = new CH264Decoder();
+                m_pVideoBuf->Reset();
+                m_bFindIFrame = 0;
+            }
             
             H264DataNotify((unsigned char*)pbuf, videoLen, videohead.frametype, untimestamp);
             
