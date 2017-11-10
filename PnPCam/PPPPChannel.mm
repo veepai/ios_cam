@@ -1607,7 +1607,11 @@ RE_CONNECT:
         NSString *uid = [NSString stringWithUTF8String:szDID];
         if ([[uid uppercaseString] rangeOfString:@"VSTA"].location != NSNotFound) {
             m_hSessionHandle =PPPP_ConnectByServer(szDID, 1, 0, (CHAR*)"EFGFFBBOKAIEGHJAEDHJFEEOHMNGDCNJCDFKAKHLEBJHKEKMCAFCDLLLHAOCJPPMBHMNOMCJKGJEBGGHJHIOMFBDNPKNFEGCEGCBGCALMFOHBCGMFK");
-        } else {
+        }else if ([[uid uppercaseString] rangeOfString:@"VSTE"].location != NSNotFound) {
+            
+            m_hSessionHandle =PPPP_ConnectByServer(szDID, 1, 0, (CHAR*)"EEGDFHBAKKIOGNJHEGHMFEEDGLNOHJMPHAFPBEDLADILKEKPDLBDDNPOHKKCIFKJBNNNKLCPPPNDBFDL");
+        }
+        else {
             m_hSessionHandle = PPPP_Connect(szDID, 1, 0);
         }
         if(m_hSessionHandle < 0)
