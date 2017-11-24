@@ -373,6 +373,7 @@ private:
     long long    m_nLastPlayFrameTime;  //最近播放设备时间
     long long    m_nLastPlayMobileTime; //最近播放手机时间
     int          m_nP2pVer;             //使用哪家P2P库
+    BOOL playbackEnd;
 };
 
 #endif

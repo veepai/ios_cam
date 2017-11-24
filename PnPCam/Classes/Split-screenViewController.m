@@ -288,7 +288,8 @@
 }
 
 - (void)startLiveStream:(NSString*)camdid{
-    if (self.ppppChannelMgt->StartPPPPLivestream([camdid UTF8String], 10,0, self) == 0) {
+    NSInteger substream = [[NSUserDefaults standardUserDefaults] integerForKey:[NSString stringWithFormat:@"%@_ResolutionValue",camdid]];
+    if (self.ppppChannelMgt->StartPPPPLivestream([camdid UTF8String], 10,(int)substream, self) == 0) {
         [self performSelectorOnMainThread:@selector(StopPlay:) withObject:camdid  waitUntilDone:NO];
     }else{
         [_cameraIsStartLive setObject:[NSNumber numberWithBool:YES] forKey:camdid];

@@ -482,13 +482,14 @@
         }
     }else{
         NSString *strFileName = [recordDic objectForKey:@STR_RECORD_FILE_NAME];
+        int record_Size = [[recordDic objectForKey:@STR_RECORD_FILE_SIZE] intValue];
         RemotePlaybackViewController *remotePlaybackViewController = [[RemotePlaybackViewController alloc] init];
         
         remotePlaybackViewController.m_strName = m_strName;
         remotePlaybackViewController.m_strFileName = strFileName;
         remotePlaybackViewController.m_pPPPPMgnt = m_pPPPPChannelMgt;
         remotePlaybackViewController.strDID = m_strDID;
-        
+        remotePlaybackViewController.record_Size = record_Size;
         IpCameraClientAppDelegate *IPCamDelegate = (IpCameraClientAppDelegate*)[[UIApplication sharedApplication] delegate];
         [IPCamDelegate switchRemotePlaybackView:remotePlaybackViewController];
         [remotePlaybackViewController release];
@@ -546,8 +547,9 @@
     NSString* dateMonth = [strFileName substringWithRange:NSMakeRange(4, 2)];
     NSString* dateDay = [strFileName substringWithRange:NSMakeRange(6, 2)];
     NSString* datemark = [NSString stringWithFormat:@"%@-%@-%@",dateYear,dateMonth,dateDay];
+    NSString* recordfileSize = [NSString stringWithFormat:@"%ld", (long)fileSize];
     if (![self.dateStr isEqualToString:datemark]){
-        NSMutableDictionary* dic = [NSMutableDictionary dictionaryWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:datemark, STR_DATE, [NSString stringWithFormat:@"%@",@"YES"], STR_GROUP_NAME, [NSString stringWithFormat:@"%@",@"NO"], STR_ISCELLTAP,nil]];
+        NSMutableDictionary* dic = [NSMutableDictionary dictionaryWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:datemark, STR_DATE, [NSString stringWithFormat:@"%@",@"YES"], STR_GROUP_NAME, [NSString stringWithFormat:@"%@",@"NO"], STR_ISCELLTAP, recordfileSize, @STR_RECORD_FILE_SIZE, nil]];
         [_m_RecordDate addObject:dic];
         self.dateStr = datemark;
     }
@@ -558,7 +560,7 @@
     NSString* dateSec = [strFileName substringWithRange:NSMakeRange(12, 2)];
     NSString* type = [strFileName substringWithRange:NSMakeRange(15, 3)];
     // NSLog(@"Year %@  Month %@ Day %@ Hour %@ Minute %@ Sec %@ type %@",dateYear,dateMonth,dateDay,dateHour,dateMinute,dateSec,type);
-    NSDictionary* datetype = [NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%@-%@-%@",dateYear,dateMonth,dateDay], STR_DATE, [NSString stringWithFormat:@"%@:%@:%@",dateHour,dateMinute,dateSec], STR_TIME, [NSString stringWithString:type], STR_TYPE,strFileName, @STR_RECORD_FILE_NAME, [NSString stringWithFormat:@"%@",@"NO"], STR_GROUP_NAME,nil];
+    NSDictionary* datetype = [NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%@-%@-%@",dateYear,dateMonth,dateDay], STR_DATE, [NSString stringWithFormat:@"%@:%@:%@",dateHour,dateMinute,dateSec], STR_TIME, [NSString stringWithString:type], STR_TYPE,strFileName, @STR_RECORD_FILE_NAME, [NSString stringWithFormat:@"%@",@"NO"], STR_GROUP_NAME, recordfileSize, @STR_RECORD_FILE_SIZE,nil];
     
     [self.m_RecordTypeparameter addObject:datetype];
     

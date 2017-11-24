@@ -26,7 +26,7 @@
     UIButton *playButton;
     UILabel *startLabel;
     UILabel *endLabel;
-    UISlider *slider;
+    
         
     int m_nTotalTime;
     
@@ -45,6 +45,7 @@
     
 }
 
+@property (nonatomic, retain) UISlider *slider;
 @property (nonatomic, retain) UIActivityIndicatorView *progressView;
 @property (nonatomic, retain) UILabel *LblProgress;
 @property (nonatomic, retain) UINavigationBar *navigationBar;
@@ -53,7 +54,8 @@
 @property (nonatomic, retain) NSString *m_strFileName;
 @property (nonatomic, assign) CPPPPChannelManagement *m_pPPPPMgnt;
 @property (nonatomic, copy) NSString *m_strName;
-
+@property (nonatomic, assign) int record_Size;
+@property (nonatomic, assign) NSInteger playLength;
 
 - (void) StopPlayback;
 

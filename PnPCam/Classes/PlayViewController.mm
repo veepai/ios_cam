@@ -816,6 +816,7 @@
         [[NSUserDefaults standardUserDefaults] setInteger:itemId forKey:[NSString stringWithFormat:@"%@itemId",strDID]];
         //item = itemId;
         [[NSUserDefaults standardUserDefaults] synchronize];
+        NSInteger resolutionValue = 0;
         switch (itemId) {
             case 10:
                 m_pPPPPChannelMgt->CameraControl([strDID UTF8String], 0, 0);
@@ -825,25 +826,33 @@
                 break;
             case 12:
                 m_pPPPPChannelMgt->CameraControl([strDID UTF8String], 16, 0);
+                resolutionValue = 0;
                 break;
             case 13:
                 m_pPPPPChannelMgt->CameraControl([strDID UTF8String], 16, 1);
+                resolutionValue = 1;
                 break;
             case 14:
                 m_pPPPPChannelMgt->CameraControl([strDID UTF8String], 16, 2);
+                resolutionValue = 2;
                 break;
             case 15:
                 m_pPPPPChannelMgt->CameraControl([strDID UTF8String], 16, 3);
+                resolutionValue = 3;
                 break;
             case 16:
                 m_pPPPPChannelMgt->CameraControl([strDID UTF8String], 16, 4);
+                resolutionValue = 4;
                 break;
             case 17:
                 m_pPPPPChannelMgt->CameraControl([strDID UTF8String], 16, 5);
+                resolutionValue = 5;
                 break;
             default:
                 break;
         }
+        [[NSUserDefaults standardUserDefaults] setInteger:resolutionValue forKey:[NSString stringWithFormat:@"%@_ResolutionValue",strDID]];
+        [[NSUserDefaults standardUserDefaults] synchronize];
         
     }else if (itemId >= 18 && itemId <= 21){
         /*int itemid = [(NSNumber*)[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@menu",strDID]] intValue];
@@ -2640,8 +2649,9 @@
     
     if (m_pPPPPChannelMgt != NULL ) {
         //如果请求视频失败，则退出播放
-        
-        if( m_pPPPPChannelMgt->StartPPPPLivestream([strDID UTF8String], 10,0, self) == 0 ){
+        NSInteger substream = [[NSUserDefaults standardUserDefaults] integerForKey:[NSString stringWithFormat:@"%@_ResolutionValue",strDID]];
+        NSLog(@"substream %ld", (long)substream);
+        if( m_pPPPPChannelMgt->StartPPPPLivestream([strDID UTF8String], 10,(int)substream, self) == 0 ){
             [self performSelectorOnMainThread:@selector(StopPlay:) withObject:nil waitUntilDone:NO];
             return;
         }else{
