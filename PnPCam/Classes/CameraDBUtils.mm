@@ -124,16 +124,19 @@
     sqlite3_bind_text(statement, 4, [pwd UTF8String], -1, nil);
     
     int sqlOK = sqlite3_step(statement);
-    sqlite3_finalize(statement);
+    
     if (sqlOK == SQLITE_DONE) {
+        sqlite3_finalize(statement);
         //NSLog(@"insert success!");
         return YES;
     }else {
         //NSLog(@"insert failed!");
         sqlOK = sqlite3_step(statement);
         if (sqlOK == SQLITE_DONE) {
+            sqlite3_finalize(statement);
             return YES;
         }
+        sqlite3_finalize(statement);
         return NO;
     }
 
