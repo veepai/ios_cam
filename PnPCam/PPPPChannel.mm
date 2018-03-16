@@ -28,7 +28,7 @@ CPPPPChannel::CPPPPChannel(CCircleBuf *pVideoBuf, CCircleBuf *pPlaybackVideoBuf,
     
     NSString *uid = [NSString stringWithUTF8String:szDID];
     //NSLog(@"RICKY CPPPPChannel:%@",uid);
-    if ([[uid uppercaseString] rangeOfString:@"VSTD"].location != NSNotFound)
+    if ([[uid uppercaseString] rangeOfString:@"VSTD"].location != NSNotFound || [[uid uppercaseString] rangeOfString:@"VSTF"].location != NSNotFound)
         m_nP2pVer = USE_P2PVER_XQP2P;
     else
         m_nP2pVer = USE_P2PVER_PPPP;
@@ -1216,7 +1216,7 @@ int CPPPPChannel::CameraControl(int param, int value)
     
     memcpy(cmdbuf , (char*)&cmdhead, sizeof(cmdhead));
     memcpy(cmdbuf + sizeof(cmdhead), buf, cmdhead.len);
-    NSLog(@"CameraControl %s", buf);
+    
     return CPPPPChannel::AddCommand(cmdbuf, sizeof(cmdhead) + cmdhead.len);
 }
 
@@ -1820,8 +1820,15 @@ RE_CONNECT:
         
         NSLog(@"PPPP_Connect begin...%s", szDID);
         MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_CONNECTING);
+    NSString *uid = [[NSString stringWithUTF8String:szDID] uppercaseString];
+    if ([uid rangeOfString:@"VSTD"].location != NSNotFound) {
         char *svrStr = (CHAR *)"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$";
         m_hSessionHandle = XQP2P_Connect(szDID, 1, 0, &svrStr);
+    } else if ([uid rangeOfString:@"VSTF"].location != NSNotFound) {
+        char *svrStr = (CHAR *)"HZLXEJIALKHYATPCHULNSVLMEELSHWIHPFIBAOHXIDICSQEHENEKPAARSTELERPDLNEPLKEILPHUHXHZEJEEEHEGEM-$$";
+        m_hSessionHandle = XQP2P_ConnectByServer(szDID, 1, 0, svrStr);
+    }
+    
         
         NSLog(@"#############PPPP_Connect handle is  %d id is :%s ！！！！", m_hSessionHandle, szDID);
         if(m_hSessionHandle < 0)
@@ -2205,11 +2212,6 @@ void CPPPPChannel::PlaybackProcess()
         //NSLog(@"DataProcess avhead.type:%d, avhead.streamid:%d, avhead.militime:%d, avhead.sectime:%d, avhead.len:%d, avhead.frameno:%d\n", avhead.type, avhead.streamid, avhead.militime, avhead.sectime, avhead.len, avhead.frameno);
         
         //check invalid data
-        
-        if (avhead.type == 100) {
-            playbackEnd = YES;
-            
-        }
         if(avhead.len > MAX_FRAME_LENGTH)
         {
             NSLog(@"recv data is invalid!!\n");
@@ -2218,7 +2220,6 @@ void CPPPPChannel::PlaybackProcess()
         }
         
         if (avhead.len == 0) {
-            
             continue;
         }
         
@@ -2246,7 +2247,6 @@ void CPPPPChannel::PlaybackProcess()
         }
         else
         {
-            
             m_nCamType=avhead.version;
             ProcessPlaybackVideo(&avhead , P2P_PLAYBACK);
         }
@@ -2573,7 +2573,7 @@ int CPPPPChannel::cgi_livestream(int bstart, int streamid,int subStreamID)
     }
     
     memset(buf, 0, sizeof(buf));
-    sprintf(buf, "GET /livestream.cgi?streamid=%d&substream=%d&", streamid, subStreamID);
+    sprintf(buf, "GET /livestream.cgi?streamid=%d&", streamid);
     return cgi_get_common(buf);
 }
 
@@ -2596,7 +2596,7 @@ void* CPPPPChannel::PlaybackVideoPlayerThread(void *param)
 
 void CPPPPChannel::PlaybackVideoPlayerProcess()
 {
-    
+    //unsigned int oldTimeStamp = 0;
     CH264Decoder *pH264Decoder=new CH264Decoder();
     m_bResetCoder = YES;
     while(m_bPlaybackVideoPlayerThreadRuning)
@@ -2655,25 +2655,9 @@ void CPPPPChannel::PlaybackVideoPlayerProcess()
         }*/
         
         unsigned int untimestamp = videobufhead.timestamp;
-        
         long long  dFrameT = (long long )untimestamp*1000 + videobufhead.militime;
-
         IsPlaybackSleep(dFrameT);
-        
-        [m_PlaybackViewAVDataDelegateLock lock];
-        if (m_PlaybackViewImageNotifyDelegate != nil)
-        {
-            if (playbackEnd) {
-                playbackEnd = NO;
-                [m_PlaybackViewImageNotifyDelegate VideoDataLength:(videoLen + sizeof(AV_HEAD)) AvheadType:(100) szdid:[NSString stringWithUTF8String:szDID]];
-            }
-            else
-            {
-                [m_PlaybackViewImageNotifyDelegate VideoDataLength:(videoLen + sizeof(AV_HEAD)) AvheadType:(videobufhead.frametype) szdid:[NSString stringWithUTF8String:szDID]];
-            }
-        }
-        [m_PlaybackViewAVDataDelegateLock unlock];
-        
+        //Log("get one frame");
         if(ENUM_VIDEO_MODE_H264 == m_EnumPlayBackVideoMode)
         {
             
@@ -2813,7 +2797,7 @@ int CPPPPChannel::StartPlayback(char *szFilename, int offset)
     {
         m_bPlaybackStarted = 1;
     }
-    playbackEnd = NO;
+    
     StartPlaybackVideoPlayer();
     StartAudio(0);
     return nRet;
@@ -2859,7 +2843,6 @@ void CPPPPChannel::StartVideoPlay()
 
 void CPPPPChannel::StopVideoPlay()
 {
-    m_bResetCoder = NO;
     m_bPlayThreadRuning = 0;
     if(m_PlayThreadID != NULL)
     {
@@ -2871,7 +2854,6 @@ void CPPPPChannel::StopVideoPlay()
 void CPPPPChannel::PlayProcess()
 {
     CH264Decoder *pH264Decoder = new CH264Decoder();//创建h264的解码库
-    m_bResetCoder = YES;
     while(m_bPlayThreadRuning)
     {
         if (m_EnumVideoMode == ENUM_VIDEO_MODE_UNKNOWN) {
