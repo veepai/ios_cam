@@ -1289,9 +1289,11 @@
     if (NO == [OSDLabel isHidden]) {
         [TimeStampLabel setHidden:NO];
     }
+    
+    //关闭转发180s限制
     if (m_nP2PMode == PPPP_MODE_RELAY  ) {
-        timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(handleTimer:) userInfo:nil repeats:YES];
-        [timeoutLabel  setHidden:NO];
+        //timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(handleTimer:) userInfo:nil repeats:YES];
+        //[timeoutLabel  setHidden:NO];
         //NSLog(@"m_nP2PMode  %d",m_nP2PMode);
         
     }
