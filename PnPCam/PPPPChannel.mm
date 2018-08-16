@@ -21,7 +21,7 @@ enum EM_USE_P2PVER
     USE_P2PVER_XQP2P  =1,
 };
 
-CPPPPChannel::CPPPPChannel(CCircleBuf *pVideoBuf, CCircleBuf *pPlaybackVideoBuf, const char *DID, const char *user, const char *pwd)
+CPPPPChannel::CPPPPChannel(CCircleBuf *pVideoBuf, CCircleBuf *pPlaybackVideoBuf, const char *DID, const char *user, const char *pwd, NSString *initializeStr)
 {
     memset(szDID, 0, sizeof(szDID));
     strcpy(szDID, DID);
@@ -1604,15 +1604,15 @@ RE_CONNECT:
         
         //NSLog(@"PPPP_Connect begin...%s", szDID);
         MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_CONNECTING);
-        NSString *uid = [NSString stringWithUTF8String:szDID];
-        if ([[uid uppercaseString] rangeOfString:@"VSTA"].location != NSNotFound) {
-            m_hSessionHandle =PPPP_ConnectByServer(szDID, 1, 0, (CHAR*)"EFGFFBBOKAIEGHJAEDHJFEEOHMNGDCNJCDFKAKHLEBJHKEKMCAFCDLLLHAOCJPPMBHMNOMCJKGJEBGGHJHIOMFBDNPKNFEGCEGCBGCALMFOHBCGMFK");
-        }else if ([[uid uppercaseString] rangeOfString:@"VSTE"].location != NSNotFound) {
-            
-            m_hSessionHandle =PPPP_ConnectByServer(szDID, 1, 0, (CHAR*)"EEGDFHBAKKIOGNJHEGHMFEEDGLNOHJMPHAFPBEDLADILKEKPDLBDDNPOHKKCIFKJBNNNKLCPPPNDBFDL");
+        if (initializeStr == nil){
+            m_hSessionHandle = PPPP_Connect(szDID, nP2pLanSearch, 0);
+            NSLog(@"#############PPCS_Connect handle is  %d id is :%s", m_hSessionHandle, szDID);
         }
-        else {
-            m_hSessionHandle = PPPP_Connect(szDID, 1, 0);
+        else
+        {
+            char *svrStr = (CHAR *)[initializeStr UTF8String];
+            m_hSessionHandle =PPPP_ConnectByServer(szDID, nP2pLanSearch, 0, svrStr);
+            NSLog(@"#############PPCS_ConnectByServer handle is  %d id is :%s ServerString:%@", m_hSessionHandle, szDID,initializeStr);
         }
         if(m_hSessionHandle < 0)
         {
@@ -1820,14 +1820,15 @@ RE_CONNECT:
         
         NSLog(@"PPPP_Connect begin...%s", szDID);
         MsgNotify(MSG_NOTIFY_TYPE_PPPP_STATUS, PPPP_STATUS_CONNECTING);
-    NSString *uid = [[NSString stringWithUTF8String:szDID] uppercaseString];
-    if ([uid rangeOfString:@"VSTD"].location != NSNotFound) {
-        char *svrStr = (CHAR *)"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$";
-        m_hSessionHandle = XQP2P_Connect(szDID, 1, 0, &svrStr);
-    } else if ([uid rangeOfString:@"VSTF"].location != NSNotFound) {
-        char *svrStr = (CHAR *)"HZLXEJIALKHYATPCHULNSVLMEELSHWIHPFIBAOHXIDICSQEHENEKPAARSTELERPDLNEPLKEILPHUHXHZEJEEEHEGEM-$$";
-        m_hSessionHandle = XQP2P_ConnectByServer(szDID, 1, 0, svrStr);
-    }
+        if (initializeStr == nil) {
+            char *svrStr = (CHAR *)"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$";
+            m_hSessionHandle = XQP2P_Connect(szDID, nP2pLanSearch, 0, &svrStr);
+            NSLog(@"#############XQP2P_Connect handle is  %d id is :%s ServerString:%s \n", m_hSessionHandle, szDID,svrStr);
+        } else {
+            char *svrStr = (CHAR *)[initializeStr UTF8String];
+            m_hSessionHandle = XQP2P_ConnectByServer(szDID, nP2pLanSearch, 0, svrStr);
+            NSLog(@"#############XQP2P_ConnectByServer handle is  %d id is :%s ServerString:%@", m_hSessionHandle, szDID,initializeStr);
+        }
     
         
         NSLog(@"#############PPPP_Connect handle is  %d id is :%s ！！！！", m_hSessionHandle, szDID);

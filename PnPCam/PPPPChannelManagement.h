@@ -28,7 +28,7 @@ class CPPPPChannelManagement
 public:
     CPPPPChannelManagement();
     ~CPPPPChannelManagement();
-    int Start(const char *szDID, const char *user, const char *pwd);
+    int Start(const char *szDID, const char *user, const char *pwd, NSString * initializeStr, int LanSearch);
     int Stop(const char *szDID);
     void StopAll();
     int StartPPPPLivestream(const char *szDID, int streamid,int substreamID,  id delegate);

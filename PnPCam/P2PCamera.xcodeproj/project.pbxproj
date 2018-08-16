@@ -162,6 +162,7 @@
 		65591C8F1F7E579F00B5DF8A /* IJKSDLGLShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 65591C8B1F7E579E00B5DF8A /* IJKSDLGLShader.m */; };
 		65591C901F7E579F00B5DF8A /* IJKSDLGLRenderI420.m in Sources */ = {isa = PBXBuildFile; fileRef = 65591C8C1F7E579E00B5DF8A /* IJKSDLGLRenderI420.m */; };
 		655A16511F9F4FE200EE56BC /* libXQP2P_API_IOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 655A16501F9F4FE200EE56BC /* libXQP2P_API_IOS.a */; };
+		6C7775A521258D2C0033F082 /* MagPPPPStrand.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C7775A421258D2C0033F082 /* MagPPPPStrand.m */; };
 		83A99C1F1B53A183006A418F /* iCloudLivePFZUIviewQR.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.mm */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		83A99C281B53A1B6006A418F /* lineT.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C211B53A1B6006A418F /* lineT.png */; };
 		83A99C291B53A1B6006A418F /* lineT@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C221B53A1B6006A418F /* lineT@2x.png */; };
@@ -649,6 +650,8 @@
 		65591C8D1F7E579F00B5DF8A /* IJKSDLGLRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IJKSDLGLRender.h; sourceTree = "<group>"; };
 		655A164F1F9F4FCF00EE56BC /* PPPP_APINew.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PPPP_APINew.h; sourceTree = "<group>"; };
 		655A16501F9F4FE200EE56BC /* libXQP2P_API_IOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libXQP2P_API_IOS.a; sourceTree = "<group>"; };
+		6C7775A321258D2C0033F082 /* MagPPPPStrand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MagPPPPStrand.h; sourceTree = "<group>"; };
+		6C7775A421258D2C0033F082 /* MagPPPPStrand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MagPPPPStrand.m; sourceTree = "<group>"; };
 		83A99C1D1B53A183006A418F /* iCloudLivePFZUIviewQR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCloudLivePFZUIviewQR.h; sourceTree = "<group>"; };
 		83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = iCloudLivePFZUIviewQR.mm; sourceTree = "<group>"; };
 		83A99C201B53A19D006A418F /* ScanStringDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScanStringDelegate.h; sourceTree = "<group>"; };
@@ -1224,6 +1227,8 @@
 		040289571627E5A3007BD608 /* Src */ = {
 			isa = PBXGroup;
 			children = (
+				6C7775A321258D2C0033F082 /* MagPPPPStrand.h */,
+				6C7775A421258D2C0033F082 /* MagPPPPStrand.m */,
 				FDC2EE6D16DB384C00FD53AC /* H264Decoder.h */,
 				FDC2EE6E16DB384C00FD53AC /* H264Decoder.mm */,
 				04C0EAD7165A32DE00FD88D8 /* RecPathManagement.h */,
@@ -1848,11 +1853,6 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0430;
-				TargetAttributes = {
-					1D6058900D05DD3D006BFB54 = {
-						DevelopmentTeam = FNE2A6M8T3;
-					};
-				};
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "P2PCamera" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -2222,6 +2222,7 @@
 				FDE039AD169FA81C00A7C56C /* FPPopoverView.m in Sources */,
 				FDE039AE169FA81E00A7C56C /* FPTouchView.m in Sources */,
 				FDBE863A16A161EE00748C2C /* CustomAddCameraCell.m in Sources */,
+				6C7775A521258D2C0033F082 /* MagPPPPStrand.m in Sources */,
 				F8CFCCD71D3DCBE3002A9307 /* MyNavigationController.m in Sources */,
 				FDC896FE16A3EBA900A081C4 /* PopupListComponent.m in Sources */,
 				FDC896FF16A3EBAD00A081C4 /* UIBarButtonItem+WEPopover.m in Sources */,
@@ -2305,6 +2306,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2345,6 +2347,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
@@ -2387,6 +2390,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

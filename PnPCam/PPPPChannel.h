@@ -37,7 +37,7 @@
 class CPPPPChannel
 {
 public:
-    CPPPPChannel(CCircleBuf *pVideoBuf, CCircleBuf *pPlaybackVideoBuf, const char *DID, const char *user, const char *pwd);
+    CPPPPChannel(CCircleBuf *pVideoBuf, CCircleBuf *pPlaybackVideoBuf, const char *DID, const char *user, const char *pwd, NSString *initializeStr);
     virtual ~CPPPPChannel();
     int Start();
     void SetStop();
@@ -56,6 +56,10 @@ public:
     int TalkAudioData(const char* data, int len);
     int StopPlayback();
     int StartPlayback(char *szFilename, int offset);
+    
+    NSString *initializeStr;
+    int       nP2pLanSearch;
+    int       m_nP2pVer;      //使用哪家P2P库
     
     static void PlaybackAudioBuffer_Callback(void *inUserData,AudioQueueRef inAQ,
                                              AudioQueueBufferRef buffer);
@@ -151,6 +155,7 @@ public:
     void SetPlayViewParamNotifyDelegate(id<ParamNotifyProtocol> delegate);
     void SetPlayViewImageNotifyDelegate(id<ImageNotifyProtocol> delegate);
     id<PPPPSensorStatusProtocol> m_SensorStatusDelegate;
+    
     //这个用来通知报警状态
     id<PPPPSensorAlarmProtocol> m_SensorAlarmDelegate;
     
@@ -372,7 +377,7 @@ private:
     BOOL         m_bResetCoder;
     long long    m_nLastPlayFrameTime;  //最近播放设备时间
     long long    m_nLastPlayMobileTime; //最近播放手机时间
-    int          m_nP2pVer;             //使用哪家P2P库
+    //int          m_nP2pVer;             //使用哪家P2P库
     BOOL playbackEnd;
 };
 

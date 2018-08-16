@@ -2,6 +2,7 @@
 
 #include "PPPPChannelManagement.h"
 //#include "libH264Dec.h"
+#import "MagPPPPStrand.h"
 
 CPPPPChannelManagement::CPPPPChannelManagement()
 {
@@ -34,46 +35,99 @@ CPPPPChannelManagement::~CPPPPChannelManagement()
     
 }
 
-int CPPPPChannelManagement::Start(const char * szDID, const char *user, const char *pwd)
+int CPPPPChannelManagement::Start(const char * szDID, const char *user, const char *pwd, NSString * initializeStr,int LanSearch)
 {
-    [m_Lock lock];
+    if (NULL == szDID){
+        return 0;
+    }
+    
+//    if (g_IsAppEnterBackground) {
+//        NSLog(@"CPPPPChannelManagement::Start APP进入后台 Start失效");
+//        return 0;
+//    }
+    
+#ifdef RICKY_PRINT_LOG
+    NSLog(@"CPPPPChannelManagement::%s beg:%s.......%s....\n",__FUNCTION__,szDID,pwd);
+#endif
     
     int i;
     for(i = 0; i < MAX_PPPP_CHANNEL_NUM; i++)
     {
         if(m_PPPPChannel[i].bValid == 1 && strcmp(m_PPPPChannel[i].szDID, szDID) == 0)
         {
+            [m_Lock lock];
             m_PPPPChannel[i].pPPPPChannel->ReconnectImmediately();
             [m_Lock unlock];
+            
+#ifdef RICKY_PRINT_LOG
+            NSLog(@"CPPPPChannelManagement::%s END1:%s.......%s....\n",__FUNCTION__,szDID,pwd);
+#endif
+            return 1;
+        }
+    }
+    
+    NSString *subStr = [ [NSString stringWithUTF8String:szDID] substringWithRange:NSMakeRange(0, 4)];
+    NSString* strP2PStrand  = [[MagPPPPStrand sharedInstance] getP2PStrand:[subStr uppercaseString]];
+    if (strP2PStrand == nil || [strP2PStrand length] == 0) {
+        NSLog(@"CPPPPChannelManagement::%s uid:%s P2PStrand not find Strand\n",__FUNCTION__,szDID);
+        strP2PStrand = initializeStr;
+        
+        if (strP2PStrand == nil || [strP2PStrand length] == 0) {
+            NSLog(@"CPPPPChannelManagement::%s uid:%s initializeStr not find Strand\n",__FUNCTION__,szDID);
+            NSLog(@"CPPPPChannelManagement::%s END2:%s.......%s....\n",__FUNCTION__,szDID,pwd);
             return 0;
         }
     }
     
+    if ([strP2PStrand length] == 0 ) {
+        return 0;
+    }
+    
+    int np2plib = USE_P2PVER_XQP2P;
+    if ([strP2PStrand rangeOfString:@"-"].location == NSNotFound )
+        np2plib =  USE_P2PVER_PPPP;
+    else
+        np2plib =  USE_P2PVER_XQP2P;
+    
+    NSLog(@"use P2PStrand UID:%@ PVer:%d Strand:%@ ",subStr,np2plib,strP2PStrand);
+    
+    [m_Lock lock];
     for(i = 0; i < MAX_PPPP_CHANNEL_NUM; i++)
     {
         if(m_PPPPChannel[i].bValid == 0)
         {
+            NSLog(@"CPPPPChannelManagement::%s new:%s.......%s....\n",__FUNCTION__,szDID,pwd);
             m_PPPPChannel[i].bValid = 1;
             strcpy(m_PPPPChannel[i].szDID, szDID);
             CCircleBuf *pVideoBuf = new CCircleBuf();
-            //pVideoBuf->Create(VBUF_SIZE);
             m_PPPPChannel[i].pVideoBuf = pVideoBuf;
-            //m_PPPPChannel[i].pEglDisplay = NULL;
             
             CCircleBuf *pPlaybackVideoBuf = new CCircleBuf();
             m_PPPPChannel[i].pPlaybackVideoBuf = pPlaybackVideoBuf;
-            
-            m_PPPPChannel[i].pPPPPChannel = new CPPPPChannel(pVideoBuf, pPlaybackVideoBuf, szDID, user, pwd);
+            m_PPPPChannel[i].pPPPPChannel = new CPPPPChannel(pVideoBuf, pPlaybackVideoBuf, szDID, user, pwd, strP2PStrand);
             m_PPPPChannel[i].pPPPPChannel->m_PPPPStatusDelegate = pCameraViewController;
             m_PPPPChannel[i].pPPPPChannel->m_CameraViewSnapshotDelegate = pCameraViewController;
+            m_PPPPChannel[i].pPPPPChannel->m_SensorStatusDelegate = pCameraViewController;
+            m_PPPPChannel[i].pPPPPChannel->m_SensorAlarmDelegate = pCameraViewController;
+            //m_PPPPChannel[i].pPPPPChannel->m_CameraDeviceTypeDelegate = pCameraViewController;
+            //m_PPPPChannel[i].pPPPPChannel->m_CameraSensorListDelegate = pCameraViewController;
+            m_PPPPChannel[i].pPPPPChannel->initializeStr = strP2PStrand;
+            m_PPPPChannel[i].pPPPPChannel->nP2pLanSearch = LanSearch;
+            m_PPPPChannel[i].pPPPPChannel->m_nP2pVer    = np2plib;
             m_PPPPChannel[i].pPPPPChannel->Start();
             [m_Lock unlock];
+            
+#ifdef RICKY_PRINT_LOG
+            NSLog(@"CPPPPChannelManagement::%s END2:%s.......%s....\n",__FUNCTION__,szDID,pwd);
+#endif
             return 1;
         }
     }
     
     [m_Lock unlock];
-    
+#ifdef RICKY_PRINT_LOG
+    NSLog(@"CPPPPChannelManagement::%s END:%s.......%s....\n",__FUNCTION__,szDID,pwd);
+#endif
     return 0;
 }
 

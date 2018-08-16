@@ -1012,8 +1012,28 @@
         }
         
         usleep(100000);
-        pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String]);
-                
+        
+        NSString *uid = [NSString stringWithUTF8String:[strDID UTF8String]];
+        if ([[uid uppercaseString] rangeOfString:@"VSTA"].location != NSNotFound) {
+            pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String],@"EFGFFBBOKAIEGHJAEDHJFEEOHMNGDCNJCDFKAKHLEBJHKEKMCAFCDLLLHAOCJPPMBHMNOMCJKGJEBGGHJHIOMFBDNPKNFEGCEGCBGCALMFOHBCGMFK",0);
+        }else if ([[uid uppercaseString] rangeOfString:@"VSTG"].location != NSNotFound) {
+            pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String],@"EEGDFHBOKCIGGFJPECHIFNEBGJNLHOMIHEFJBADPAGJELNKJDKANCBPJGHLAIALAADMDKPDGOENEBECCIK:vstarcam2018",0);
+        }else if ([[uid uppercaseString] rangeOfString:@"VSTE"].location != NSNotFound) {
+            pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String],@"EEGDFHBAKKIOGNJHEGHMFEEDGLNOHJMPHAFPBEDLADILKEKPDLBDDNPOHKKCIFKJBNNNKLCPPPNDBFDL",0);
+        }else if ([[uid uppercaseString] rangeOfString:@"VSTB"].location != NSNotFound ) {
+            pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String],@"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL",0);
+        }else if ([[uid uppercaseString] rangeOfString:@"VSTC"].location != NSNotFound ) {
+            pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String],@"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL",0);
+        }else if ([[uid uppercaseString] rangeOfString:@"VSTD"].location != NSNotFound ) {
+            pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String],@"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$",1);
+        }else if ([[uid uppercaseString] rangeOfString:@"VSTF"].location != NSNotFound ) {
+            pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String],@"HZLXEJIALKHYATPCHULNSVLMEELSHWIHPFIBAOHXIDICSQEHENEKPAARSTELERPDLNEPLKEILPHUHXHZEJEEEHEGEM-$$",1);
+        }
+        else
+        {
+             pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String],@"",0);
+        }
+       
     }
 }
 
@@ -1225,10 +1245,48 @@
     if (bRet == YES) {
 
         if (bAdd) {//添加成功，增加P2P连接
-            pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String]);
+            NSString *uid = [NSString stringWithUTF8String:[did UTF8String]];
+            if ([[uid uppercaseString] rangeOfString:@"VSTA"].location != NSNotFound) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EFGFFBBOKAIEGHJAEDHJFEEOHMNGDCNJCDFKAKHLEBJHKEKMCAFCDLLLHAOCJPPMBHMNOMCJKGJEBGGHJHIOMFBDNPKNFEGCEGCBGCALMFOHBCGMFK",0);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTG"].location != NSNotFound) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EEGDFHBOKCIGGFJPECHIFNEBGJNLHOMIHEFJBADPAGJELNKJDKANCBPJGHLAIALAADMDKPDGOENEBECCIK:vstarcam2018",0);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTE"].location != NSNotFound) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EEGDFHBAKKIOGNJHEGHMFEEDGLNOHJMPHAFPBEDLADILKEKPDLBDDNPOHKKCIFKJBNNNKLCPPPNDBFDL",0);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTB"].location != NSNotFound ) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL",0);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTC"].location != NSNotFound ) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL",0);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTD"].location != NSNotFound ) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$",1);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTF"].location != NSNotFound ) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"HZLXEJIALKHYATPCHULNSVLMEELSHWIHPFIBAOHXIDICSQEHENEKPAARSTELERPDLNEPLKEILPHUHXHZEJEEEHEGEM-$$",1);
+            }
+            else
+            {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"",0);
+            }
         }else {//修改成功，重新启动P2P连接
             pPPPPChannelMgt->Stop([did UTF8String]);
-            pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String]);
+            NSString *uid = [NSString stringWithUTF8String:[did UTF8String]];
+            if ([[uid uppercaseString] rangeOfString:@"VSTA"].location != NSNotFound) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EFGFFBBOKAIEGHJAEDHJFEEOHMNGDCNJCDFKAKHLEBJHKEKMCAFCDLLLHAOCJPPMBHMNOMCJKGJEBGGHJHIOMFBDNPKNFEGCEGCBGCALMFOHBCGMFK",0);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTG"].location != NSNotFound) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EEGDFHBOKCIGGFJPECHIFNEBGJNLHOMIHEFJBADPAGJELNKJDKANCBPJGHLAIALAADMDKPDGOENEBECCIK:vstarcam2018",0);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTE"].location != NSNotFound) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EEGDFHBAKKIOGNJHEGHMFEEDGLNOHJMPHAFPBEDLADILKEKPDLBDDNPOHKKCIFKJBNNNKLCPPPNDBFDL",0);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTB"].location != NSNotFound ) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL",0);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTC"].location != NSNotFound ) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL",0);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTD"].location != NSNotFound ) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$",1);
+            }else if ([[uid uppercaseString] rangeOfString:@"VSTF"].location != NSNotFound ) {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"HZLXEJIALKHYATPCHULNSVLMEELSHWIHPFIBAOHXIDICSQEHENEKPAARSTELERPDLNEPLKEILPHUHXHZEJEEEHEGEM-$$",1);
+            }
+            else
+            {
+                pPPPPChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"",0);
+            }
             [self btnEdit:nil];
         }
         

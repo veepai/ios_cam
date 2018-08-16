@@ -88,7 +88,27 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         //修改成功，重新启动P2P连接
         sleep(3.0f);
         m_pChannelMgt->Stop([did UTF8String]);
-        m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String]);
+		
+		 if ([[did uppercaseString] rangeOfString:@"VSTA"].location != NSNotFound) {
+            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EFGFFBBOKAIEGHJAEDHJFEEOHMNGDCNJCDFKAKHLEBJHKEKMCAFCDLLLHAOCJPPMBHMNOMCJKGJEBGGHJHIOMFBDNPKNFEGCEGCBGCALMFOHBCGMFK",0);
+        }else if ([[did uppercaseString] rangeOfString:@"VSTG"].location != NSNotFound) {
+            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EEGDFHBOKCIGGFJPECHIFNEBGJNLHOMIHEFJBADPAGJELNKJDKANCBPJGHLAIALAADMDKPDGOENEBECCIK:vstarcam2018",0);
+        }else if ([[did uppercaseString] rangeOfString:@"VSTE"].location != NSNotFound) {
+            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EEGDFHBAKKIOGNJHEGHMFEEDGLNOHJMPHAFPBEDLADILKEKPDLBDDNPOHKKCIFKJBNNNKLCPPPNDBFDL",0);
+        }else if ([[did uppercaseString] rangeOfString:@"VSTB"].location != NSNotFound ) {
+            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL",0);
+        }else if ([[did uppercaseString] rangeOfString:@"VSTC"].location != NSNotFound ) {
+            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL",0);
+        }else if ([[did uppercaseString] rangeOfString:@"VSTD"].location != NSNotFound ) {
+            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$",1);
+        }else if ([[did uppercaseString] rangeOfString:@"VSTF"].location != NSNotFound ) {
+            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"HZLXEJIALKHYATPCHULNSVLMEELSHWIHPFIBAOHXIDICSQEHENEKPAARSTELERPDLNEPLKEILPHUHXHZEJEEEHEGEM-$$",1);
+        }
+        else
+        {
+             m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"",0);
+        }
+        
         
         [loadHUD hide:YES];
         
