@@ -214,7 +214,9 @@ static MagPPPPStrand *gMagPPPPStrand = nil;
 -(void) addUIDFromDic:(NSString*) strPPPP UID:(NSString*) strUID
 {
     //[m_Lock lock];
-    [m_dicPPPStrand setObject:strPPPP forKey:strUID];
+    if ([strPPPP length] > 10 && [strUID length] > 3 ) {
+        [m_dicPPPStrand setObject:strPPPP forKey:strUID];
+    }
     //[m_Lock unlock];
 }
 
@@ -225,7 +227,8 @@ static MagPPPPStrand *gMagPPPPStrand = nil;
         NSString* sKey = [strUID objectAtIndex:i];
         NSString* sValue = [strPPPP objectAtIndex:i];
         NSLog(@"getP2PStrand timerGetp2p UID:%@ ret:%@",sKey,sValue);
-        [m_dicPPPStrand setObject:sValue forKey:sKey];
+        //[m_dicPPPStrand setObject:sValue forKey:sKey];
+        [self addUIDFromDic:sValue UID:sKey];
     }
     
     [self P2PStrandSynchronize];
