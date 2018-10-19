@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SdcardScheduleProtocol.h"
 #import "SelectWeekCustomView.h"
 @interface LookCurrentRecordScheduleViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,SelectWeekCustomViewDelegate>{
     NSMutableArray* select;//4*24*7

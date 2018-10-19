@@ -216,8 +216,6 @@
         
         self.view.alpha = 1.0;
     }];
-    
-    //[[NSNotificationCenter defaultCenter] postNotificationName:@"FPNewPopoverPresented" object:self];
 }
 
 -(CGPoint)originFromView:(UIView*)fromView
@@ -521,9 +519,6 @@
         r.size.height = [self parentHeight] - r.origin.y;
     }
     
-    
-    
-
     _contentView.arrowDirection = bestDirection;
     //CGRectMake(r.origin.x, r.origin.y, 300, 290);//r;
     if ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationLandscapeLeft || [[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationLandscapeRight) {

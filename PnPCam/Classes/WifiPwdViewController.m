@@ -11,6 +11,7 @@
 #import "obj_common.h"
 
 #include "CameraViewController.h"
+#import "VSNet.h"
 
 @interface WifiPwdViewController ()
 @property (nonatomic, retain) UISwipeGestureRecognizer* swipeGes;
@@ -18,7 +19,6 @@
 
 @implementation WifiPwdViewController
 
-@synthesize m_pChannelMgt;
 @synthesize m_strSSID;
 @synthesize m_channel;
 @synthesize m_security;
@@ -44,18 +44,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-    
-    //UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
-    //[self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
-    //self.navigationBar.delegate = self;
-   // self.navigationBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
-    
+
     self.textPassword = nil;
     NSString *strTitle = NSLocalizedStringFromTable(@"EnterPwd", @STR_LOCALIZED_FILE_NAME, nil);
-    //UINavigationItem *back = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
-    //UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:strTitle];
-    self.navigationItem.title = strTitle;
+      self.navigationItem.title = strTitle;
     
     //创建一个右边按钮  
     UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Done", @STR_LOCALIZED_FILE_NAME, nil)      
@@ -63,18 +55,10 @@
                                                                    target:self     
                                                                    action:@selector(btnSetWifi:)];
     self.navigationItem.rightBarButtonItem = rightButton;
-    //item.rightBarButtonItem = rightButton;
-    
     _swipeGes = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGes)];
     _swipeGes.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:_swipeGes];
-    
-    //NSArray *array = [NSArray arrayWithObjects:back, item, nil];
-    //[self.navigationBar setItems:array];
     [rightButton release];
-    //[item release];
-    ///[back release];
-    
 }
 
 - (void) handleSwipeGes{
@@ -84,8 +68,6 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -98,7 +80,6 @@
     [self.view removeGestureRecognizer:_swipeGes];
     [_swipeGes release],_swipeGes = nil;
     
-    self.m_pChannelMgt = nil;
     self.textPassword = nil;
     self.m_strSSID = nil;
     self.m_strDID = nil;
@@ -109,14 +90,12 @@
 
 - (void) btnSetWifi:(id)sender
 {
-    //(char *szDID, int enable, char *szSSID, int channel, int mode, int authtype, int encrypt, int keyformat, int defkey, char *strKey1, char *strKey2, char *strKey3, char *strKey4, int key1_bits, int key2_bits, int key3_bits, int key4_bits, char *wpa_psk)
     if (textPassword != nil) {
         [textPassword resignFirstResponder];
     }
     
     char *pkey = NULL;
     char *pwpa_psk = NULL;
-    
     switch (m_security) {
         case 0: //none
             pkey = (char*)"";
@@ -137,14 +116,16 @@
             break;
     }
     
-    m_pChannelMgt->SetWifi((char*)[m_strDID UTF8String], 1, (char*)[m_strSSID UTF8String], m_channel, 0, m_security, 0, 0, 0, pkey, (char*)"", (char*)"", (char*)"", 0, 0, 0, 0, pwpa_psk);
+    NSString *cmd = [NSString stringWithFormat:@"set_wifi.cgi?enable=1&ssid=%@&encrypt=0&defkey=0&key1=%s&key2=&key3=&key4=&authtype=%d&keyformat=0&key1_bits=0&key2_bits=0&key3_bits=0&key4_bits=0&channel=%d&mode=0&wpa_psk=%s&",m_strSSID,pkey,m_security,m_channel,pwpa_psk];
     
-    m_pChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_REBOOT_DEVICE, NULL, 0);
+    NSString *sendSSID = [cmd stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    
+    [[VSNet shareinstance] sendCgiCommand:sendSSID withIdentity:m_strDID];
+    [[VSNet shareinstance] setControlDelegate:m_strDID withDelegate:self];
     
     alertView = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedStringFromTable(@"WIFISetSucInfomation", @STR_LOCALIZED_FILE_NAME, nil) delegate:self cancelButtonTitle:NSLocalizedStringFromTable(@"OK", @STR_LOCALIZED_FILE_NAME, nil) otherButtonTitles:nil];
     alertView.delegate = self;
     [alertView show];
-    //[self performSelector:@selector(rebootPrompt:) withObject:nil afterDelay:3.f];
 }
 
 - (void)rebootPrompt:(id)sender{
@@ -203,15 +184,12 @@
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
-    //NSLog(@"textFieldShouldBeginEditing");
     self.textPassword = textField;    
     return YES;
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-	//NSLog(@"textFieldDidEndEditing");
-    
     self.m_strPwd = textField.text;
 }
 
@@ -239,5 +217,9 @@
     return NO;
 }
 
-
+#pragma mark -  VSNetControlProtocol
+- (void) VSNetControl: (NSString*) deviceIdentity commandType:(NSInteger) comType buffer:(NSString*)retString length:(int)length charBuffer:(char *)buffer
+{
+    NSLog(@"WifiPwdViewController VSNet返回数据 UID:%@ comtype %ld",deviceIdentity,(long)comType);
+}
 @end

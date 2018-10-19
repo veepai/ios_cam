@@ -45,6 +45,8 @@
 	<string>MainWindow-iPad</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Are you allowed to use your microphone?</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Are you allowed to access your album?</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Are you allowed to access your album?</string>
 	<key>UIRequiresFullScreen</key>

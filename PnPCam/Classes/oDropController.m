@@ -109,11 +109,7 @@
     return UIInterfaceOrientationMaskPortrait;
 }
 
-
-
-#pragma mark -
 #pragma mark TableViewDelegate
-
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)aTableView
 {
     return 1;
@@ -124,7 +120,7 @@
     if (m_nIndexDrop == 1) {return 3;}
     if (m_nIndexDrop == 3) {return 2;}
     if (m_nIndexDrop == 6) {return 2;}
-    if (m_nIndexDrop == 4) {return 17;}
+    if (m_nIndexDrop == 4) {return 16;}
     if (m_nIndexDrop == 9) {return 15;}
     if (m_nIndexDrop == 101) {return 4;}
     if (m_nIndexDrop == 102) {return 29;}
@@ -137,9 +133,6 @@
 {
     NSString *cellIdentifier = @"droplistcell";
     UITableViewCell *cell1 =  [aTableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    //disable selected cell
-    //cell1.selectionStyle = UITableViewCellSelectionStyleNone;
-    
     if (cell1 == nil)
     {
         NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"oDropListCell" owner:self options:nil];
@@ -148,37 +141,33 @@
     
     
     if (m_nIndexDrop == 1) { //motion level
-        
         oDropListCell * cell = (oDropListCell*)cell1;
-        cell.keyLable.text = [NSString stringWithFormat:@"%@", _motion_level[anIndexPath.row].strTitle];
-        cell.keyLable.textAlignment = UITextAlignmentCenter;
+        cell.keyLable.text = [[[[data_param_value sharedInstance] motion_level] objectAtIndex:anIndexPath.row] strTitle];
+        cell.keyLable.textAlignment = NSTextAlignmentCenter;
         cell.keyLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         return cell1;
     }
     
     if (m_nIndexDrop == 3) { //trigger level -- output level
-        
-        
         oDropListCell * cell = (oDropListCell*)cell1;
-        cell.keyLable.text = extern_mode[anIndexPath.row].strTitle;
-        cell.keyLable.textAlignment = UITextAlignmentCenter;
+        cell.keyLable.text = [[[[data_param_value sharedInstance] extern_mode] objectAtIndex:anIndexPath.row] strTitle];
+        cell.keyLable.textAlignment = NSTextAlignmentCenter;
         cell.keyLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         return cell1;
     }
     
     if (m_nIndexDrop == 6) {
         oDropListCell * cell = (oDropListCell*)cell1;
-        cell.keyLable.text = extern_level[anIndexPath.row].strTitle;
-        cell.keyLable.textAlignment = UITextAlignmentCenter;
+        cell.keyLable.text = [[[[data_param_value sharedInstance] extern_level] objectAtIndex:anIndexPath.row] strTitle];
+        cell.keyLable.textAlignment = NSTextAlignmentCenter;
         cell.keyLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         return cell1;
     }
     
     if (m_nIndexDrop == 4) { //preset
-        
         oDropListCell * cell = (oDropListCell*)cell1;
-        cell.keyLable.text = [[[NSString alloc] initWithUTF8String:motion_preset[anIndexPath.row].szName] autorelease];;
-        cell.keyLable.textAlignment = UITextAlignmentCenter;
+        cell.keyLable.text =  [[[[data_param_value sharedInstance] motion_preset] objectAtIndex:anIndexPath.row] strName];
+        cell.keyLable.textAlignment = NSTextAlignmentCenter;
         cell.keyLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         return cell1;
     }
@@ -186,8 +175,8 @@
     if (m_nIndexDrop == 9) { //ftp upload interval
         
         oDropListCell * cell = (oDropListCell*)cell1;
-        cell.keyLable.text = [[[NSString alloc] initWithUTF8String:pic_timer[anIndexPath.row].szName] autorelease];;
-        cell.keyLable.textAlignment = UITextAlignmentCenter;
+        cell.keyLable.text = [[[[data_param_value sharedInstance] pic_timer] objectAtIndex:anIndexPath.row] strName];
+        cell.keyLable.textAlignment = NSTextAlignmentCenter;
         cell.keyLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         return cell1;
     }
@@ -196,7 +185,7 @@
     if (m_nIndexDrop == 101) { //ntp server
         
         oDropListCell * cell = (oDropListCell*)cell1;
-        cell.keyLable.text = ntp_server[anIndexPath.row].strValue;
+        cell.keyLable.text = [[[[data_param_value sharedInstance] ntp_server] objectAtIndex:anIndexPath.row] strValue];
         cell.keyLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         return cell1;
     }
@@ -204,21 +193,23 @@
     if (m_nIndexDrop == 102) { //time zone
         
         oDropListCell * cell = (oDropListCell*)cell1;
-        cell.keyLable.text = time_zone[anIndexPath.row].strTitle;
+        
+        cell.keyLable.text = [[[[data_param_value sharedInstance] time_zone] objectAtIndex:anIndexPath.row] strTitle];
         cell.keyLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         return cell1;
     }
     
     if (m_nIndexDrop == 103) { // ssl
+        
         oDropListCell * cell = (oDropListCell*)cell1;
-        cell.keyLable.text = [NSString stringWithFormat:@"%s",ssl[anIndexPath.row].szName];
+        cell.keyLable.text = [[[[data_param_value sharedInstance] ssl] objectAtIndex:anIndexPath.row] strName];
         cell.keyLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         return cell1;
     }
     
     if (m_nIndexDrop == 104) { //smtp server
-        oDropListCell * cell = (oDropListCell*)cell1;
-        cell.keyLable.text = [NSString stringWithFormat:@"%s",smtp_svr[anIndexPath.row].szName];
+         oDropListCell * cell = (oDropListCell*)cell1;
+        cell.keyLable.text = [[[[data_param_value sharedInstance] smtp_svr] objectAtIndex:anIndexPath.row] strName];
         cell.keyLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         return cell1;
     }
@@ -229,14 +220,14 @@
 
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
-    //    [currentTextField resignFirstResponder];
     [aTableView deselectRowAtIndexPath:anIndexPath animated:YES];
     
     if (m_nIndexDrop == 1)
     {
         if (m_DropListProtocolDelegate != nil) {
-            [m_DropListProtocolDelegate DropListResult:_motion_level[anIndexPath.row].strValue
-                                                   nID:_motion_level[anIndexPath.row].index
+            
+            [m_DropListProtocolDelegate DropListResult:[[[[data_param_value sharedInstance] motion_level] objectAtIndex:anIndexPath.row] strValue]
+                                                   nID:[[[[data_param_value sharedInstance] motion_level] objectAtIndex:anIndexPath.row] index]
                                                  nType:1 param1:0 param2:0]
             ;
         }
@@ -244,8 +235,8 @@
     if (m_nIndexDrop == 3)
     {
         if (m_DropListProtocolDelegate != nil) {
-            [m_DropListProtocolDelegate DropListResult:extern_level[anIndexPath.row].strTitle
-                                                   nID:extern_level[anIndexPath.row].index
+            [m_DropListProtocolDelegate DropListResult: [[[[data_param_value sharedInstance] extern_level] objectAtIndex:anIndexPath.row] strTitle]
+                                                   nID:[[[[data_param_value sharedInstance] extern_level] objectAtIndex:anIndexPath.row] index]
                                                  nType:3 param1:0 param2:0]
             ;
         }
@@ -253,8 +244,8 @@
     if (m_nIndexDrop == 4)
     {
         if (m_DropListProtocolDelegate != nil) {
-            [m_DropListProtocolDelegate DropListResult:motion_preset[anIndexPath.row].strTitle
-                                                   nID:motion_preset[anIndexPath.row].index
+            [m_DropListProtocolDelegate DropListResult:[[[[data_param_value sharedInstance] motion_preset] objectAtIndex:anIndexPath.row] strTitle]
+                                                   nID:[[[[data_param_value sharedInstance] motion_preset] objectAtIndex:anIndexPath.row] index]
                                                  nType:4 param1:0 param2:0]
             ;
         }
@@ -262,8 +253,8 @@
     if (m_nIndexDrop == 6)
     {
         if (m_DropListProtocolDelegate != nil) {
-            [m_DropListProtocolDelegate DropListResult:extern_level[anIndexPath.row].strTitle
-                                                   nID:extern_level[anIndexPath.row].index
+            [m_DropListProtocolDelegate DropListResult:[[[[data_param_value sharedInstance] extern_level] objectAtIndex:anIndexPath.row] strTitle]
+                                                   nID:[[[[data_param_value sharedInstance] extern_level] objectAtIndex:anIndexPath.row] index]
                                                  nType:6 param1:0 param2:0]
             ;
         }
@@ -271,8 +262,8 @@
     if (m_nIndexDrop == 9)
     {
         if (m_DropListProtocolDelegate != nil) {
-            [m_DropListProtocolDelegate DropListResult:pic_timer[anIndexPath.row].strValue
-                                                   nID:pic_timer[anIndexPath.row].index
+            [m_DropListProtocolDelegate DropListResult:[[[[data_param_value sharedInstance] pic_timer] objectAtIndex:anIndexPath.row] strValue]
+                                                   nID:[[[[data_param_value sharedInstance] pic_timer] objectAtIndex:anIndexPath.row] index]
                                                  nType:9 param1:0 param2:0]
             ;
         }
@@ -281,7 +272,7 @@
     if (m_nIndexDrop == 101)
     {
         if (m_DropListProtocolDelegate != nil) {
-            [m_DropListProtocolDelegate DropListResult:ntp_server[anIndexPath.row].strValue
+            [m_DropListProtocolDelegate DropListResult:[[[[data_param_value sharedInstance] ntp_server] objectAtIndex:anIndexPath.row] strValue]
                                                    nID:0
                                                  nType:101 param1:0 param2:0]
             ;
@@ -290,8 +281,8 @@
     if (m_nIndexDrop == 102)
     {
         if (m_DropListProtocolDelegate != nil) {
-            [m_DropListProtocolDelegate DropListResult:time_zone[anIndexPath.row].strTitle
-                                                   nID:time_zone[anIndexPath.row].index
+            [m_DropListProtocolDelegate DropListResult:[[[[data_param_value sharedInstance] time_zone] objectAtIndex:anIndexPath.row] strTitle]
+                                                   nID:[[[[data_param_value sharedInstance] time_zone] objectAtIndex:anIndexPath.row] index]
                                                  nType:102 param1:0 param2:0]
             ;
         }
@@ -299,8 +290,8 @@
     if (m_nIndexDrop == 103) //ssl
     {
         if (m_DropListProtocolDelegate != nil) {
-            [m_DropListProtocolDelegate DropListResult:[NSString stringWithFormat:@"%s",ssl[anIndexPath.row].szName]
-                                                   nID:ssl[anIndexPath.row].index
+            [m_DropListProtocolDelegate DropListResult:[[[[data_param_value sharedInstance] ssl] objectAtIndex:anIndexPath.row] strName]
+                                                   nID:[[[[data_param_value sharedInstance] ssl] objectAtIndex:anIndexPath.row] index]
                                                  nType:m_nIndexDrop
                                                 param1:0
                                                 param2:0]
@@ -310,12 +301,12 @@
     if (m_nIndexDrop == 104) //smtp server
     {
         if (m_DropListProtocolDelegate != nil) {
-            [m_DropListProtocolDelegate DropListResult:[NSString stringWithFormat:@"%s",smtp_svr[anIndexPath.row].szName]
-                                                   nID:smtp_svr[anIndexPath.row].index
+            [m_DropListProtocolDelegate DropListResult:[[[[data_param_value sharedInstance] smtp_svr] objectAtIndex:anIndexPath.row] strName]
+                                                   nID:[[[[data_param_value sharedInstance] smtp_svr] objectAtIndex:anIndexPath.row] index]
                                                  nType:m_nIndexDrop
-                                                param1:smtp_svr[anIndexPath.row].param1
-                                                param2:smtp_svr[anIndexPath.row].param2]
-            ;
+                                                param1:[[[[data_param_value sharedInstance] smtp_svr] objectAtIndex:anIndexPath.row] param1]
+                                                param2:[[[[data_param_value sharedInstance] smtp_svr] objectAtIndex:anIndexPath.row] param2]
+            ];
         }
     }
     
@@ -324,7 +315,8 @@
 
 - (void) dealloc{
     [super dealloc];
-    [_swipeGes release],_swipeGes = nil;
+    //[_swipeGes release];
+    _swipeGes = nil;
 }
 
 #pragma mark -

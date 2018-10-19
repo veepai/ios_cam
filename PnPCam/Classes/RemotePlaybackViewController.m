@@ -10,7 +10,10 @@
 #import "obj_common.h"
 #import "IpCameraClientAppDelegate.h"
 
-@interface RemotePlaybackViewController ()
+#import "VSNet.h"
+#import "VSNetProtocol.h"
+
+@interface RemotePlaybackViewController ()<TFCardProtocol>
 {
     BOOL changeSliderValue;
 }
@@ -23,11 +26,9 @@
 @synthesize imageView;
 @synthesize strDID;
 @synthesize m_strFileName;
-@synthesize m_pPPPPMgnt;
 @synthesize m_strName;
 @synthesize progressView;
 @synthesize LblProgress;
-
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -42,13 +43,9 @@
 - (void) StopPlayback
 {
     [m_playbackstoplock lock];
-    
-    m_pPPPPMgnt->PPPPStopPlayback((char*)[strDID UTF8String]);
-    m_pPPPPMgnt->SetPlaybackDelegate((char*)[strDID UTF8String], nil);
-    
+    [[VSNet shareinstance] stopPlayBack:strDID];
     IpCameraClientAppDelegate *IPCamDelegate = (IpCameraClientAppDelegate*)[[UIApplication sharedApplication] delegate];
     [IPCamDelegate switchBack];
-    
     [m_playbackstoplock unlock];
 }
 
@@ -56,7 +53,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
     CGSize winsize = [[UIScreen mainScreen] bounds].size;
     CGPoint center = CGPointMake(winsize.height/2, winsize.width/2);
     progressView.center = center;
@@ -66,10 +62,8 @@
     myGLViewController = nil;
     
     self.imageView.backgroundColor = [UIColor grayColor];
-    
     m_playbackstoplock = [[NSCondition alloc] init];
-    
-    
+
     CGRect getFrame = [[UIScreen mainScreen]applicationFrame];
     m_nScreenHeight = getFrame.size.width;
     m_nScreenWidth = getFrame.size.height;
@@ -108,8 +102,6 @@
     float bottomViewY = screenRect.size.width - bottomViewHeight ;
     float bottomViewWidth = screenRect.size.height;
     
-    //NSLog(@"bottomViewX: %f, bottomViewY: %f, bottomViewWidth: %f, bottomViewHeight: %f", bottomViewX, bottomViewY, bottomViewWidth, bottomViewHeight);
-    
     bottomView = [[UIView alloc] initWithFrame:CGRectMake(bottomViewX, bottomViewY, bottomViewWidth, bottomViewHeight)];
     bottomView.backgroundColor = [UIColor colorWithRed:80/255.0f green:80/255.0f blue:80/255.0f alpha:1.0f];
     bottomView.alpha = 0.6f ;
@@ -139,53 +131,27 @@
     self.playLength = 0;
     //=====================================================================
     
-    m_pPPPPMgnt->SetPlaybackDelegate((char*)[strDID UTF8String], self);
-    if (!m_pPPPPMgnt->PPPPStartPlayback((char*)[strDID UTF8String],(char*)[m_strFileName UTF8String], 0)) {
-        [self performSelectorOnMainThread:@selector(StopPlayback) withObject:nil waitUntilDone:NO];
-    }
-    
+    [[VSNet shareinstance] startPlayBack:strDID fileName:m_strFileName withOffset:0 fileSize:_record_Size delegate:self SupportHD:1];
 }
 
 - (void)begindragVideoPress:(UISlider *)slider {
     changeSliderValue = YES;
-    
 }
 
 - (void) dragVideoProgress:(UISlider*) slider{
-    changeSliderValue = NO;
-    NSInteger value = self.slider.value;
-    self.playLength = value;
     
-    if(value >= self.record_Size - 1024*500)
-    {
-        [self stopPlaybackLiveStream];
-        [self PlayEnd:nil];
-    }
-    else
-    {
-        self.progressView.hidden = NO;
-        [self.view bringSubviewToFront:self.progressView];
-        
-        [self startPlayBackLiveStream];
-    }
 }
 
 - (void) startPlayBackLiveStream
 {
-    
-    if (!m_pPPPPMgnt->PPPPStartPlayback((char*)[strDID UTF8String],(char*)[m_strFileName UTF8String], (int)self.playLength))
-    {
-        [self performSelectorOnMainThread:@selector(StopPlayback) withObject:nil waitUntilDone:NO];
-    }
+     [[VSNet shareinstance] startPlayBack:strDID fileName:m_strFileName withOffset:0 fileSize:_record_Size delegate:self SupportHD:1];
 }
 
 - (void) stopPlaybackLiveStream{
     
     [m_playbackstoplock lock];
     
-    m_pPPPPMgnt->PPPPStopPlayback((char*)[strDID UTF8String]);
-    m_pPPPPMgnt->SetPlaybackDelegate((char*)[strDID UTF8String], nil);
-    
+    [[VSNet shareinstance] stopPlayBack:strDID];
     [m_playbackstoplock unlock];
     
 }
@@ -200,7 +166,6 @@
 - (void) imageTouched: (UITapGestureRecognizer*)sender
 {
     m_bHideToolBar = !m_bHideToolBar ;
-    
     [navigationBar setHidden:m_bHideToolBar];
     [bottomView setHidden:m_bHideToolBar];
     
@@ -211,9 +176,7 @@
     float version = [[[UIDevice currentDevice] systemVersion] floatValue];
     if (version >= 6.0) {//ios6
         [self.view setTransform:CGAffineTransformMakeRotation(M_PI / 2)];
-        
         CGRect rectScreen = [[UIScreen mainScreen] applicationFrame];
-        
         self.view.frame = rectScreen;//CGRectMake(0,0,480,320);
     }
 }
@@ -221,8 +184,6 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
     if (bottomView != nil) {
         [bottomView release];
         bottomView = nil;
@@ -280,7 +241,6 @@
     [super dealloc];
 }
 
-#pragma mark -
 #pragma mark performOnMainThread
 - (void) updateImage: (UIImage*) image
 {
@@ -294,40 +254,18 @@
     [self.LblProgress setHidden:YES];
 }
 
-#pragma mark -
 #pragma mark navigationBarDelegate
-
 - (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item
 {
     [self StopPlayback];
     return NO;
 }
 
-#pragma mark -
-#pragma mark- p2p回调
-- (void) VideoDataLength:(int) length AvheadType:(int)type szdid:(NSString*)szdid
-{
-    if (![strDID isEqualToString:szdid]) {
-        return;
-    }
-    dispatch_async(dispatch_get_main_queue(), ^
-                   {
-                       self.playLength += length;
-                       if (type == 100)
-                       {
-                           [self performSelector:@selector(PlayEnd:) withObject:nil afterDelay:10];
-                       }
-                       if (!changeSliderValue) {
-                           [self.slider setValue:self.playLength animated:YES];
-                       }
-                       
-                   });
-}
 
-- (void)YUVNotify:(Byte *)yuv length:(int)length width:(int)width height:(int)height timestamp:(unsigned int)timestamp
+#pragma mark - TFCardProtocol(TF卡视频播放回调)
+- (void) TFYUVNotify: (Byte*) yuv length:(int)length width: (int) width height:(int)height timestamp:(unsigned int)timestamp szdid:(NSString*)szdid pos:(float)fpos cachePos:(float)fCachePospos VType:(int)nType
 {
     [self performSelectorOnMainThread:@selector(hideView) withObject:nil waitUntilDone:NO];
-    
     [self performSelectorOnMainThread:@selector(CreateGLView) withObject:nil waitUntilDone:NO];
     
     SDL_VoutOverlay stOverlay;
@@ -339,30 +277,18 @@
     stOverlay.pixels[0] = yuv;
     stOverlay.pixels[1] = yuv + width*height;
     stOverlay.pixels[2] = yuv + width*height*5/4;
-    
     [myGLViewController display:&stOverlay];
 }
 
-- (void)ImageNotify:(UIImage *)image timestamp:(NSInteger)timestamp
+- (void) TFImageNotify: (id)image timestamp: (NSInteger)timestamp szdid:(NSString*)szdid pos:(float)fpos cachePos:(float)fCachePospos
 {
     [self performSelectorOnMainThread:@selector(hideView) withObject:nil waitUntilDone:NO];
-    
     [self performSelectorOnMainThread:@selector(updateImage:) withObject:image waitUntilDone:NO];
 }
 
-- (void)H264Data:(Byte *)h264Frame length:(int)length type:(int)type timestamp:(NSInteger)timestamp
+//ret 1 &&fpos == 1成功;  -1 失败
+- (void) TFRECORDNotify:(int)ret  pos:(float)fpos szdid:(NSString*)szdid
 {
     
 }
-
-- (void) ImageNotify: (UIImage *)image timestamp: (NSInteger)timestamp szdid:(NSString*)szdid{
-    
-}
-- (void) YUVNotify: (Byte*) yuv length:(int)length width: (int) width height:(int)height timestamp:(unsigned int)timestamp szdid:(NSString*)szdid{
-    
-}
-- (void) H264Data: (Byte*) h264Frame length: (int) length type: (int) type timestamp: (NSInteger) timestamp szdid:(NSString*)szdid{
-    
-}
-
 @end

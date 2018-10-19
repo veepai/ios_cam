@@ -11,13 +11,10 @@
 #import "MyGLViewController.h"
 #import "PlayViewController.h"
 #import "CameraListMgt.h"
-#import "PPPPChannelManagement.h"
-#import "PPPPStatusProtocol.h"
-#import "ParamNotifyProtocol.h"
-#import "ImageNotifyProtocol.h"
-@interface Split_screenViewController : UIViewController<PPPPStatusProtocol,ParamNotifyProtocol,ImageNotifyProtocol,UIScrollViewDelegate,UINavigationBarDelegate,UIAlertViewDelegate>
+
+@interface Split_screenViewController : UIViewController<UIScrollViewDelegate,UINavigationBarDelegate,UIAlertViewDelegate>
 @property (nonatomic, retain) CameraListMgt* cameraListMgt;
-@property (nonatomic, assign) CPPPPChannelManagement* ppppChannelMgt;
+
 @property (nonatomic, retain) NSDictionary* camdic;
 @property (nonatomic, retain) NSString* str_uid;
 //@property (nonatomic, retain) IBOutlet UIImageView* imageView;

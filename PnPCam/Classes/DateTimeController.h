@@ -7,15 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PPPPChannelManagement.h"
 #import "DropListProtocol.h"
 
+#import "VSNetProtocol.h"
 
-@interface DateTimeController : UIViewController<UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate,DropListProtocol, UINavigationBarDelegate>{
+@interface DateTimeController : UIViewController<UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate,DropListProtocol, UINavigationBarDelegate,VSNetControlProtocol>{
     
     NSString *m_strDID;
-    CPPPPChannelManagement *m_pChannelMgt;
-    
     CGFloat textFieldAnimatedDistance;
 
     int m_dateTime;
@@ -27,16 +25,13 @@
     UILabel *timeZone;
     UISwitch *timing;
     UILabel *timingServer;
-    
-    
+
     IBOutlet UITableView *tableView;
     IBOutlet UINavigationBar *navigationBar;
 }
 
 
 @property (copy,nonatomic) NSString *m_strDID;
-@property (nonatomic, assign) CPPPPChannelManagement *m_pChannelMgt;
-
 @property (copy,nonatomic) NSString *m_timingSever;
 
 

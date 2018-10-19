@@ -48,25 +48,7 @@
         
         self.SelectIndex = 0;
         self.weekArray = [[NSMutableArray alloc] initWithObjects:NSLocalizedStringFromTable(@"Sunday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Monday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Tuesday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Wednesday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Thursday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Friday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Saturday", @STR_LOCALIZED_FILE_NAME, nil), nil];
-        /*self.SelectWeekSegment = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:NSLocalizedStringFromTable(@"Sunday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Monday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Tuesday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Wednesday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Thursday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Friday", @STR_LOCALIZED_FILE_NAME, nil), NSLocalizedStringFromTable(@"Saturday", @STR_LOCALIZED_FILE_NAME, nil), nil]];
-        self.SelectWeekSegment.segmentedControlStyle = UISegmentedControlStyleBezeled;
-        CGSize winsize = [UIScreen mainScreen].bounds.size;
-        int seletSegmentWidth = self.SelectWeekSegment.frame.size.width;
-        seletSegmentWidth = seletSegmentWidth > winsize.width ? winsize.width : seletSegmentWidth;
-        self.SelectWeekSegment.frame = CGRectMake(self.center.x - seletSegmentWidth/2, 5.f, seletSegmentWidth, self.SelectWeekSegment.frame.size.height);
-        [self addSubview:self.SelectWeekSegment];*/
         
-        /*self.selectAllDay = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.selectAllDay setBackgroundImage:[[UIImage imageNamed:@"custom-cancel-normal"] stretchableImageWithLeftCapWidth:9 topCapHeight:0] forState:UIControlStateNormal];
-        self.selectAllDay.frame = CGRectMake(self.SelectWeekSegment.frame.origin.x + 3.f, self.SelectWeekSegment.frame.origin.y + self.SelectWeekSegment.frame.size.height + 5.f, 150.f, 40.f);
-        [self.selectAllDay setTitle:NSLocalizedStringFromTable(@"selectAllDay", @STR_LOCALIZED_FILE_NAME, nil) forState:UIControlStateNormal];
-        [self addSubview:self.selectAllDay];
-        
-        self.selectAllWeek = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.selectAllWeek setBackgroundImage:[[UIImage imageNamed:@"custom-cancel-normal"] stretchableImageWithLeftCapWidth:9 topCapHeight:0] forState:UIControlStateNormal];
-        self.selectAllWeek.frame = CGRectMake(self.SelectWeekSegment.frame.origin.x + self.SelectWeekSegment.frame.size.width - 150.f - 3.f, self.selectAllDay.frame.origin.y, 150.f, 40.f);
-        [self.selectAllWeek setTitle:NSLocalizedStringFromTable(@"selectAllWeek", @STR_LOCALIZED_FILE_NAME, nil) forState:UIControlStateNormal];
-        [self addSubview:self.selectAllWeek];*/
     }
     return self;
 }

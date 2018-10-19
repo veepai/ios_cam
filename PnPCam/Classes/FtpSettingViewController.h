@@ -7,11 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PPPPChannelManagement.h"
-#import "FtpParamProtocol.h"
+#import "VSNetProtocol.h"
 
 @interface FtpSettingViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,
-UITextFieldDelegate, UINavigationBarDelegate, FtpParamProtocol>{
+UITextFieldDelegate, UINavigationBarDelegate, VSNetControlProtocol>{
     IBOutlet UINavigationBar *navigationBar;
     IBOutlet UITableView *tableView;
     
@@ -24,9 +23,7 @@ UITextFieldDelegate, UINavigationBarDelegate, FtpParamProtocol>{
     int m_nFTPPort;
     int m_nUploadInterval;
     
-    CPPPPChannelManagement *m_pChannelMgt;
     NSString *m_strDID;
-    
 }
 
 @property (nonatomic, retain) UINavigationBar *navigationBar;
@@ -35,7 +32,6 @@ UITextFieldDelegate, UINavigationBarDelegate, FtpParamProtocol>{
 @property (nonatomic, copy) NSString *m_strFTPSvr;
 @property (nonatomic, copy) NSString *m_strUser;
 @property (nonatomic, copy) NSString *m_strPwd;
-@property (nonatomic,assign) CPPPPChannelManagement *m_pChannelMgt;
 @property (nonatomic, copy) NSString *m_strDID;
 
 

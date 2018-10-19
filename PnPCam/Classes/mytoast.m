@@ -65,7 +65,7 @@
     
     UILabel *textLabel = [[UILabel alloc] init];
     textLabel.backgroundColor = [UIColor clearColor];
-    textLabel.textAlignment = UITextAlignmentCenter;
+    textLabel.textAlignment = NSTextAlignmentCenter;
     textLabel.font = [UIFont systemFontOfSize:14];
     textLabel.textColor = RGB(255, 255, 255);
     textLabel.numberOfLines = 0;

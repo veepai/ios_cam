@@ -27,7 +27,6 @@
 @synthesize imageDefault;
 @synthesize tableView;
 @synthesize RecReloadDelegate;
-@synthesize m_PpppchannelMgt;
 @synthesize camListMgt;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -42,21 +41,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-    
-    //NSLog(@"RecordDateViewController viewDidLoad....");
+  
     recDataArray = nil;
     recDataArray = [m_pRecPathMgt GetTotalDataArray:strDID] ;
 
-    
-    //UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
-    //[self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
-    //self.navigationBar.delegate = self;
-    //self.navigationBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
-    
-    //UINavigationItem *back = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
-    //back.leftBarButtonItem.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
-   // UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:strName];
     self.navigationItem.title = strName;
     UIImage* recordImg = [UIImage imageNamed:@"Camera"];
     UIImage* newrecordImg = [self fitImage:recordImg tofitHeight:35];
@@ -71,18 +59,9 @@
     UIBarButtonItem* rightBar = [[UIBarButtonItem alloc] initWithCustomView:recordBtn];
     self.navigationItem.rightBarButtonItem = rightBar;
     [rightBar release];
-    //UIBarButtonItem* rightitem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Record", @STR_LOCALIZED_FILE_NAME, nil) style:UIBarButtonItemStylePlain target:self action:@selector(Record:)];
-    //item.rightBarButtonItem = rightitem;
-   // NSArray *array = [NSArray arrayWithObjects:back, item, nil];
-    //[self.navigationBar setItems:array];
-    
-    //[item release];
-    //[back release];
-    
+
     self.imagePlay = [UIImage imageNamed:@"play_video.png"];
     self.imageDefault = [UIImage imageNamed:@"videobk.png"];
-    
-    //self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     _swipeGes = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGes)];
     _swipeGes.direction = UISwipeGestureRecognizerDirectionRight;
@@ -123,7 +102,7 @@
     self.fppopoverCtr = [fppView retain];
     [fppView release];
 }
-#pragma  mark -
+
 #pragma mark AlbumTableViewControllerDelegate
 - (void)reloadData:(NSString*)strUID{
     if (self.fppopoverCtr != nil) {
@@ -135,7 +114,6 @@
     [self.tableView reloadData];
 }
 
-#pragma mark -
 #pragma mark FPPopoverControllerDelegate
 - (void)popoverControllerDidDismissPopover:(FPPopoverController *)popoverController{
     if (popoverController != nil) {
@@ -152,8 +130,6 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
 }
 
 - (void) dealloc
@@ -178,9 +154,7 @@
 }
 
 
-#pragma mark -
 #pragma mark TableViewDelegate
-
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
     //NSLog(@"numberOfRowsInSection11111");
@@ -191,7 +165,6 @@
         for (NSDictionary* dic in recDataArray){
             NSString* strDate = [[dic allKeys] objectAtIndex:0];
             int nRecCount = [m_pRecPathMgt GetTotalNumByIDAndDate:strDID Date:strDate];
-            
             if (nRecCount == 0) {
                 i++;
             }
@@ -204,8 +177,6 @@
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
-    //NSLog(@"cellForRowAtIndexPath11111");  
-    
     NSDictionary *datePicDic = [recDataArray objectAtIndex:anIndexPath.row];
     NSString *strDate = [[datePicDic allKeys] objectAtIndex:0];
     
@@ -289,9 +260,7 @@
     
 }
 
-#pragma mark -
 #pragma mark uinavigationbardelegate
-
 - (BOOL) navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item
 {
     [self.navigationController popViewControllerAnimated:YES];
@@ -299,7 +268,6 @@
     return NO;
 }
 
-#pragma mark -
 #pragma mark performOnMainThread
 - (void) ReloadTableViewData
 {
@@ -308,9 +276,7 @@
 }
 
 
-#pragma mark -
 #pragma mark NotifyReloadDelegate
-
 - (void) NotifyReloadData
 {
     [self performSelectorOnMainThread:@selector(ReloadTableViewData) withObject:nil waitUntilDone:NO];

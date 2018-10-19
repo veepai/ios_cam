@@ -14,4 +14,10 @@
 @property (nonatomic, strong) NSMutableArray *MotiondPushRecordPlanArray;
 @property (nonatomic, strong) NSMutableArray *AlarmPlanArray;
 +(PlanManagement *)shareManagement;
+
++ (void)detailMotionPushPlanData:(NSString *)DataStr;
+
++ (void)detailRecordPlanData:(NSString *)DataStr;
+
++ (void)detailMotionRecordPlanData:(NSString *)DataStr;
 @end

@@ -94,7 +94,6 @@
 		BOOL userInitiatedDismissal = [(NSNumber *)theContext boolValue];
 		
 		if (userInitiatedDismissal) {
-			//Only send message to delegate in case the user initiated this event, which is if he touched outside the view
 			[delegate popoverControllerDidDismissPopover:self];
 		}
 	}

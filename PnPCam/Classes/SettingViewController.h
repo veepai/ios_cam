@@ -7,12 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PPPPChannelManagement.h"
 #import "CameraEditViewController.h"
 #import "CameraListMgt.h"
 #import "mytoast.h"
 #import "obj_common.h"
 #import "EditCameraProtocol.h"
+#import "VSNetProtocol.h"
+
 @protocol SettingViewControllerDelegate <NSObject>
 
 - (void) deletecam:(int) camIndex;
@@ -20,9 +21,8 @@
 
 @end
 
-@interface SettingViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UINavigationBarDelegate,UIAlertViewDelegate,UITextFieldDelegate,ParamNotifyProtocol>{
-    CPPPPChannelManagement *m_pPPPPChannelMgt;
-    
+@interface SettingViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UINavigationBarDelegate,UIAlertViewDelegate,UITextFieldDelegate,VSNetControlProtocol>{
+
     NSString *m_strDID;
     NSString *m_strPWD;
     IBOutlet UINavigationBar *navigationBar;
@@ -33,7 +33,6 @@
     id<EditCameraProtocol> editCamerDelegate;
 }
 
-@property (nonatomic, assign) CPPPPChannelManagement *m_pPPPPChannelMgt;
 @property (copy, nonatomic) NSString *m_strDID;
 @property (copy, nonatomic) NSString *m_strPWD;
 @property (nonatomic, retain) UINavigationBar *navigationBar;

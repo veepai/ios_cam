@@ -7,14 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "WifiParamsProtocol.h"
-#import "PPPPChannelManagement.h"
+#import "VSNetProtocol.h"
 
 @interface WifiSettingViewController : UIViewController <UITableViewDataSource, 
-UITableViewDelegate, WifiParamsProtocol, UIAlertViewDelegate, UINavigationBarDelegate>
+UITableViewDelegate, VSNetControlProtocol, UIAlertViewDelegate, UINavigationBarDelegate>
 {
-    CPPPPChannelManagement *m_pPPPPChannelMgt;   
-    
     //wifi参数需要保存的
     NSString *m_strSSID;
     int m_authtype;
@@ -34,7 +31,6 @@ UITableViewDelegate, WifiParamsProtocol, UIAlertViewDelegate, UINavigationBarDel
     NSCondition *m_timerLock;
 }
 
-@property (nonatomic, assign) CPPPPChannelManagement *m_pPPPPChannelMgt;
 @property (copy,nonatomic) NSString *m_strSSID;
 @property (copy,nonatomic) NSString *m_strWEPKey;
 @property (copy,nonatomic) NSString *m_strWPA_PSK;

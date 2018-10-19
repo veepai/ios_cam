@@ -11,6 +11,10 @@
 #import "obj_common.h"
 #import "CameraViewController.h"
 
+#import "VSNet.h"
+#import "cmdhead.h"
+#import "APICommon.h"
+#import "NSString+subValueFromRetString.h"
 
 @interface WifiSettingViewController ()
 @property (nonatomic, retain) UISwipeGestureRecognizer* swipeGes;
@@ -18,7 +22,6 @@
 
 @implementation WifiSettingViewController
 
-@synthesize m_pPPPPChannelMgt;
 @synthesize m_strSSID;
 @synthesize m_strWEPKey;
 @synthesize m_strWPA_PSK;
@@ -61,14 +64,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-    
-    ///UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
-//[self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
-   // self.navigationBar.delegate = self;
-   // self.navigationBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
-    
-    //NSLog(@"WifiSettingViewController viewDidLoad");
+
     m_timerLock = [[NSCondition alloc] init];
    
     m_bFinished = NO;
@@ -81,9 +77,11 @@
     _swipeGes.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:_swipeGes];
     
-    m_pPPPPChannelMgt->SetWifiParamDelegate((char*)[m_strDID UTF8String], self);
-    m_pPPPPChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_GET_PARAMS, NULL, 0);
-    m_pPPPPChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_WIFI_SCAN, NULL, 0);
+    NSString *cmd1 = @"get_params.cgi?";
+    NSString *cmd2 = @"wifi_scan.cgi?";
+    [[VSNet shareinstance] sendCgiCommand:cmd1 withIdentity:self.m_strDID];
+    [[VSNet shareinstance] sendCgiCommand:cmd2 withIdentity:self.m_strDID];
+    [[VSNet shareinstance] setControlDelegate:self.m_strDID withDelegate:self];
 }
 
 - (void) handleSwipeGes{
@@ -93,9 +91,6 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-    m_pPPPPChannelMgt->SetWifiParamDelegate((char*)[m_strDID UTF8String], nil);
     if (m_wifiScanResult != nil) {
         [m_wifiScanResult release];
     }
@@ -110,9 +105,6 @@
 {
     [self.view removeGestureRecognizer:_swipeGes];
     [_swipeGes release],_swipeGes = nil;
-    
-    m_pPPPPChannelMgt->SetWifiParamDelegate((char*)[m_strDID UTF8String], nil);
-    self.m_pPPPPChannelMgt = nil;
     wifiTableView = nil;
     if (m_wifiScanResult != nil) {
         [m_wifiScanResult release];
@@ -135,8 +127,12 @@
     [m_wifiScanResult removeAllObjects];
     [self showLoadingIndicator];
     m_timer = [NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(handleTimer:) userInfo:nil repeats:NO];
-    m_pPPPPChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_GET_PARAMS, NULL, 0);
-    m_pPPPPChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_WIFI_SCAN, NULL, 0);
+
+    NSString *cmd1 = @"get_params.cgi?";
+    NSString *cmd2 = @"wifi_scan.cgi?";
+    
+    [[VSNet shareinstance] sendCgiCommand:cmd1 withIdentity:self.m_strDID];
+    [[VSNet shareinstance] sendCgiCommand:cmd2 withIdentity:self.m_strDID];
     
     m_bFinished = NO;
     [self reloadTableView:nil];
@@ -145,8 +141,6 @@
 - (void)showLoadingIndicator
 {
     NSString *strTitle = NSLocalizedStringFromTable(@"WifiSetting", @STR_LOCALIZED_FILE_NAME, nil);
-   // UINavigationItem *back = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
-   // UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:strTitle];
     self.navigationItem.title = strTitle;
     //创建一个右边按钮  
     UIActivityIndicatorView *indicator =
@@ -157,24 +151,12 @@
 	[indicator startAnimating];
 	UIBarButtonItem *progress =
     [[[UIBarButtonItem alloc] initWithCustomView:indicator] autorelease];
-
-    //item.rightBarButtonItem = progress;
     self.navigationItem.rightBarButtonItem = progress;
-   // NSArray *array = [NSArray arrayWithObjects:back, item, nil];
-    //[self.navigationBar setItems:array];
-	
-    //[item release];
-    //[back release];
 }
 
 - (void)hideLoadingIndicator
 {
-    NSString *strTitle = NSLocalizedStringFromTable(@"WifiSetting", @STR_LOCALIZED_FILE_NAME, nil);
-    UINavigationItem *back = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
-    UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:strTitle];
- 
-    //创建一个右边按钮  
-   
+    //创建一个右边按钮
 	UIBarButtonItem *refreshButton =
     [[UIBarButtonItem alloc]
       initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
@@ -183,21 +165,10 @@
 
     self.navigationItem.rightBarButtonItem = refreshButton;
     return;
-    
-    item.rightBarButtonItem = refreshButton;
-    
-    NSArray *array = [NSArray arrayWithObjects:back, item, nil];    
-    [self.navigationBar setItems:array];
-	
-    [refreshButton release];
-    [item release];
-    [back release];
-    
 }
 
-#pragma mark -
-#pragma mark TableViewDelegate
 
+#pragma mark TableViewDelegate
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)aTableView
 {
     if (m_bFinished == NO) {
@@ -292,68 +263,23 @@
         return;
     }
     WifiPwdViewController *wifipwdView = [[WifiPwdViewController alloc] init];
-    wifipwdView.m_pChannelMgt = m_pPPPPChannelMgt;
     wifipwdView.m_strDID = m_strDID;
     wifipwdView.m_strSSID = strSSID;
     wifipwdView.m_channel = [[wifiInfor objectForKey:@STR_CHANNEL] intValue];
     wifipwdView.m_security = security;
     [self.navigationController pushViewController:wifipwdView animated:YES];
     [wifipwdView release];
-    
 }
 
-#pragma mark -
-#pragma mark WifiParamsProtocol
-
-- (void) WifiParams:(NSString *)strDID enable:(NSInteger)enable ssid:(NSString *)strSSID channel:(NSInteger)channel mode:(NSInteger)mode authtype:(NSInteger)authtype encryp:(NSInteger)encryp keyformat:(NSInteger)keyformat defkey:(NSInteger)defkey strKey1:(NSString *)strKey1 strKey2:(NSString *)strKey2 strKey3:(NSString *)strKey3 strKey4:(NSString *)strKey4 key1_bits:(NSInteger)key1_bits key2_bits:(NSInteger)key2_bits key3_bits:(NSInteger)key3_bits key4_bits:(NSInteger)key4_bits wpa_psk:(NSString *)wpa_psk
-{
-    //NSLog(@"WifiParams.....strDID: %@, enable:%d, ssid:%@, channel:%d, mode:%d, authtype:%d, encryp:%d, keyformat:%d, defkey:%d, strKey1:%@, strKey2:%@, strKey3:%@, strKey4:%@, key1_bits:%d, key2_bits:%d, key3_bits:%d, key4_bits:%d, wap_psk:%@", strDID, enable, strSSID, channel, mode, authtype, encryp, keyformat, defkey, strKey1, strKey2, strKey3, strKey4, key1_bits, key2_bits, key3_bits, key4_bits, wpa_psk);
-    
-    m_strSSID = strSSID;
-    m_channel = channel;
-    m_authtype = authtype;
-    m_strWEPKey = strKey1;
-    m_strWPA_PSK = wpa_psk;
-            
-}
-
-- (void) WifiScanResult:(NSString *)strDID ssid:(NSString *)strSSID mac:(NSString *)strMac security:(NSInteger)security db0:(NSInteger)db0 db1:(NSInteger)db1 mode:(NSInteger)mode channel:(NSInteger)channel bEnd:(NSInteger)bEnd
-{
-    //NSLog(@"WifiScanResult.....strDID:%@, ssid:%@, mac:%@, security:%d, db0:%d, db1:%d, mode:%d, channel:%d, bEnd:%d", strDID, strSSID, strMac, security, db0, db1, mode, channel, bEnd);
-    
-    if (m_bFinished == YES) {
-        return;
-    }
-    
-    NSNumber *nSecurity = [NSNumber numberWithInt:security];
-    NSNumber *nDB0 = [NSNumber numberWithInt:db0];
-    NSNumber *nChannel = [NSNumber numberWithInt:channel];
-    NSDictionary *wifiscan = [NSDictionary dictionaryWithObjectsAndKeys:strSSID, @STR_SSID, nSecurity, @STR_SECURITY, nDB0, @STR_DB0, nChannel, @STR_CHANNEL, nil];
-    
-    [m_wifiScanResult addObject:wifiscan];
-    
-    if (bEnd == 1) {
-        m_bFinished = YES;
-        [self performSelectorOnMainThread:@selector(StopTimer) withObject:nil waitUntilDone:NO];
-        [self performSelectorOnMainThread:@selector(hideLoadingIndicator) withObject:nil waitUntilDone:NO];
-        [self performSelectorOnMainThread:@selector(reloadTableView:) withObject:nil waitUntilDone:NO];
-        
-    }    
-}
-
-#pragma mark -
 #pragma mark PerformInMainThread
-
 - (void) reloadTableView:(id) param
 {
     [wifiTableView reloadData];
 }
 
-#pragma mark -
 #pragma mark UIAlertViewDelegate
 - (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    //NSLog(@"buttonIndex: %d", buttonIndex);
     if (buttonIndex != 1) {
         return;
     }
@@ -363,16 +289,80 @@
     NSString *strSSID = [wifiInfor objectForKey:@STR_SSID];
     int channel = [[wifiInfor objectForKey:@STR_CHANNEL] intValue];
     
-    m_pPPPPChannelMgt->SetWifi((char*)[m_strDID UTF8String], 1, (char*)[strSSID UTF8String], channel, 0, security, 0, 0, 0, (char*)"", (char*)"", (char*)"", (char*)"", 0, 0, 0, 0, (char*)"");
-    m_pPPPPChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_REBOOT_DEVICE, NULL, 0);
-
+    NSString *cmd = [NSString stringWithFormat:@"set_wifi.cgi?enable=1&ssid=%@&encrypt=0&defkey=0&key1=&key2=&key3=&key4=&authtype=%d&keyformat=0&key1_bits=0&key2_bits=0&key3_bits=0&key4_bits=0&channel=%d&mode=0&wpa_psk=&",strSSID,security,channel];
+    [[VSNet shareinstance] sendCgiCommand:cmd withIdentity:m_strDID];
+    
     CameraViewController *camereView = [self.navigationController.viewControllers objectAtIndex:0];
     [self.navigationController popToViewController:camereView animated:YES];
 }
 
-#pragma mark -
-#pragma mark navigationBarDelegate
+#pragma mark - VSNetControlProtocol
+- (void) VSNetControl: (NSString*) deviceIdentity commandType:(NSInteger) comType buffer:(NSString*)retString length:(int)length charBuffer:(char *)buffer
+{
+    NSLog(@"WifiSettingViewController：VSNet返回数据 UID:%@,comType:%ld",deviceIdentity,(long)comType);
+    NSString *string = [[NSString alloc] initWithCString:buffer encoding:NSUTF8StringEncoding];
+    if ([deviceIdentity isEqualToString:m_strDID] && comType == CGI_IEGET_PARAM)
+    {
+        NSInteger result = [[NSString subValueByKeyString:@"result=" fromRetString:string] integerValue];
+        if (result != 0) {
+            NSLog(@"数据异常!");
+            return;
+        }
+        
+        m_strSSID = [NSString subValueByKeyString:@"wifi_ssid=" fromRetString:string];
+        m_channel = [[NSString subValueByKeyString:@"wifi_channel=" fromRetString:string] intValue];
+        m_authtype = [[NSString subValueByKeyString:@"wifi_authtype=" fromRetString:string] intValue];
+        m_strWEPKey = [NSString subValueByKeyString:@"wifi_key1=" fromRetString:string];
+        m_strWPA_PSK = [NSString subValueByKeyString:@"wifi_wpa_psk=" fromRetString:string];
+    }
+    else if ([deviceIdentity isEqualToString:m_strDID] && comType == CGI_IESET_WIFISCAN) {
+        if (string == nil) {
+            if (retString != nil) {
+                string = retString;
+            } else {
+                string = [NSString stringWithFormat:@"%s",buffer];
+            }
+        }
+        NSLog(@"无线wifi返回数据：\nUID = %@,类型 = %ld,buff = %@",deviceIdentity,(long)comType,string);
+        NSInteger result = [[NSString subValueByKeyString:@"result=" fromRetString:string] integerValue];
+        if (result != 0) {
+            NSLog(@"数据异常!");
+            return;
+        }
+        
+        if (m_bFinished == YES) {
+            return;
+        }
+        
+        for (NSInteger i = 0; i < retString.length; i ++) {
+            NSString *strSSID = [APICommon stringAnalysisWithFormatStr:[NSString stringWithFormat:@"ap_ssid[%ld] =",(long)i] AndRetString:string];
+            NSInteger nSecurity = [[APICommon stringAnalysisWithFormatStr:[NSString stringWithFormat:@"ap_security[%ld]=",(long)i] AndRetString:string] integerValue];
+            NSInteger nChannel = [[APICommon stringAnalysisWithFormatStr:[NSString stringWithFormat:@"ap_channel[%ld]=",i] AndRetString:string] integerValue];
+            NSInteger nDB0 = [[APICommon stringAnalysisWithFormatStr:[NSString stringWithFormat:@"ap_dbm0[%ld]=",i] AndRetString:string] integerValue];
+            
+            NSLog(@"搜索到的第%ld个WiFi",i);
+            NSMutableDictionary *wifiscan = [NSMutableDictionary dictionaryWithObjectsAndKeys:strSSID, @STR_SSID, [NSNumber numberWithInteger:nSecurity], @STR_SECURITY,[NSNumber numberWithInteger:nDB0], @STR_DB0, [NSNumber numberWithInteger:nChannel], @STR_CHANNEL, nil];
+            
+            [m_wifiScanResult addObject:wifiscan];
+            if (strSSID.length == 0) {
+                [m_wifiScanResult removeLastObject];
+                break;
+            }
+        }
+        
+        m_bFinished = YES;
+        [self performSelectorOnMainThread:@selector(StopTimer) withObject:nil waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector(hideLoadingIndicator) withObject:nil waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector(reloadTableView:) withObject:nil waitUntilDone:NO];
+        
+    }else{
+        //        NSLog(@"获取WiFi数据失败!");
+    }
+}
 
+
+
+#pragma mark navigationBarDelegate
 - (BOOL) navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item
 {
     [self.navigationController popViewControllerAnimated:YES];

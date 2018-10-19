@@ -7,14 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PPPPChannelManagement.h"
-#import "SDCardRecordFileSearchProtocol.h"
 #import "CameraListMgt.h"
 #import "RecPathManagement.h"
 #import "RecordViewController.h"
 #import "RemoteRecordCell.h"
 #import "RemoteRecordGroupCell.h"
-@interface RemoteRecordFileListViewController : UIViewController<UITableViewDataSource,UITableViewDelegate, UINavigationBarDelegate, SDCardRecordFileSearchProtocol,UIActionSheetDelegate>
+
+@interface RemoteRecordFileListViewController : UIViewController<UITableViewDataSource,UITableViewDelegate, UINavigationBarDelegate,UIActionSheetDelegate>
 {
     IBOutlet UINavigationBar *navigationBar;
     IBOutlet UITableView *tableView;
@@ -24,10 +23,10 @@
     BOOL m_bFinished;
     CameraListMgt* cameraListMgt;
     RecPathManagement* recPathMgt;
-    CPPPPChannelManagement *m_pPPPPChannelMgt;
     RecordViewController* recViewCtr;
     NSString *m_strDID;
     NSString *m_strName;
+    NSString *m_strPWD;
     
     NSMutableArray *m_RecordFileList;
     
@@ -38,7 +37,6 @@
 
 @property (nonatomic, retain) UINavigationBar *navigationBar;
 @property (nonatomic, retain) UITableView *tableView;
-@property (nonatomic, assign) CPPPPChannelManagement *m_pPPPPChannelMgt;
 @property (nonatomic, copy) NSString *m_strDID;
 @property (nonatomic, copy) NSString *m_strName;
 @property (nonatomic, retain) CameraListMgt* cameraListMgt;
@@ -47,6 +45,8 @@
 @property (nonatomic, retain) NSMutableArray* m_RecordTypeparameter;
 @property (nonatomic, retain) NSMutableArray* m_RecordDate;
 @property (nonatomic, retain) NSString* dateStr;
+@property (nonatomic, retain) NSString*m_strPWD;
+
 @property int pageindex;
 @property int recordCount;
 - (void)refreshData:(NSIndexPath*)anIndexPath;

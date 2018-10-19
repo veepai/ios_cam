@@ -11,6 +11,9 @@
 #import "PlanManagement.h"
 #import "PlanModel.h"
 #import "obj_common.h"
+
+#import "VSNet.h"
+
 @interface AddPlanViewController ()<UIAlertViewDelegate>
 {
     PlanPickerView *pickerView;
@@ -61,7 +64,7 @@
     }
     
     pickerView = [[PlanPickerView alloc] initWithFrame:CGRectMake(0, 64, width, height - 44- 64) Str_DID:self.str_DID rowIndex:self.rowIndex IsEdit:self.isEdit Type:self.addPlanTyep];
-    pickerView.m_PPPPChannelMgt = _m_PPPPChannelMgt;
+    
     self.view.userInteractionEnabled = YES;
     [self.view addSubview:pickerView];
     
@@ -123,12 +126,10 @@
     }
     recordArry[self.rowIndex] = @"1";
     [[PlanManagement shareManagement].AlarmPlanArray removeObjectAtIndex:self.rowIndex];
-    if ([PlanManagement shareManagement].AlarmPlanArray.count == 0)
-    {
-        //[[NSNotificationCenter defaultCenter] postNotificationName:@"openRecordInTime" object:nil];
-    }
+  
     NSString *cgiStr = [NSString stringWithFormat:@"set_alarm.cgi?schedule_enable=1&schedule_sun_0=0&schedule_sun_1=0&schedule_sun_2=0&schedule_mon_0=0&schedule_mon_1=0&schedule_mon_2=0&schedule_tue_0=0&schedule_tue_1=0&schedule_tue_2=0&schedule_wed_0=0&schedule_wed_1=0&schedule_wed_2=0&schedule_thu_0=0&schedule_thu_1=0&schedule_thu_2=0&schedule_fri_0=0&schedule_fri_1=0&schedule_fri_2=0&schedule_sat_0=0&schedule_sat_1=0&schedule_sat_2=0&defense_plan1=%@&defense_plan2=%@&defense_plan3=%@&defense_plan4=%@&defense_plan5=%@&defense_plan6=%@&defense_plan7=%@&defense_plan8=%@&defense_plan9=%@&defense_plan10=%@&defense_plan11=%@&defense_plan12=%@&defense_plan13=%@&defense_plan14=%@&defense_plan15=%@&defense_plan16=%@&defense_plan17=%@&defense_plan18=%@&defense_plan19=%@&defense_plan20=%@&defense_plan21=%@&", recordArry[0], recordArry[1], recordArry[2], recordArry[3], recordArry[4], recordArry[5], recordArry[6], recordArry[7], recordArry[8], recordArry[9], recordArry[10], recordArry[11], recordArry[12], recordArry[13], recordArry[14], recordArry[15], recordArry[16], recordArry[17], recordArry[18], recordArry[19], recordArry[20]];
-    _m_PPPPChannelMgt->GetJsonCGI([self.str_DID UTF8String], 2017, (char *)[cgiStr UTF8String]);
+    
+    [[VSNet shareinstance] sendCgiCommand:cgiStr withIdentity:self.str_DID];
 }
 
 - (void)deleteRecordPlan
@@ -164,7 +165,8 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:@"openRecordInTime" object:nil];
     }
     NSString *cgiStr = [NSString stringWithFormat:@"trans_cmd_string.cgi?cmd=2017&command=3&mark=212&record_plan1=%@&record_plan2=%@&record_plan3=%@&record_plan4=%@&record_plan5=%@&record_plan6=%@&record_plan7=%@&record_plan8=%@&record_plan9=%@&record_plan10=%@&record_plan11=%@&record_plan12=%@&record_plan13=%@&record_plan14=%@&record_plan15=%@&record_plan16=%@&record_plan17=%@&record_plan18=%@&record_plan19=%@&record_plan20=%@&record_plan21=%@&record_plan_enable=%@&", recordArry[0], recordArry[1], recordArry[2], recordArry[3], recordArry[4], recordArry[5], recordArry[6], recordArry[7], recordArry[8], recordArry[9], recordArry[10], recordArry[11], recordArry[12], recordArry[13], recordArry[14], recordArry[15], recordArry[16], recordArry[17], recordArry[18], recordArry[19], recordArry[20], record_plan_enable];
-    _m_PPPPChannelMgt->GetJsonCGI([self.str_DID UTF8String], 2017, (char *)[cgiStr UTF8String]);
+    
+    [[VSNet shareinstance] sendCgiCommand:cgiStr withIdentity:self.str_DID];
 }
 
 - (void)deleteMotionPlan
@@ -189,16 +191,10 @@
     recordArry[self.rowIndex] = @"-1";
     NSString *record_plan_enable;
     [[PlanManagement shareManagement].MotionRecordPlanArray removeObjectAtIndex:self.rowIndex];
-//    if ([RecordPlanDatabase shareDatabase].MotionRecordPlanArray.count == 0)
-//    {
-//        record_plan_enable = @"0";
-//    }
-//    else
-//        record_plan_enable = @"1";
     record_plan_enable = @"1";
     NSString *cgiStr = [NSString stringWithFormat:@"trans_cmd_string.cgi?cmd=2017&command=1&mark=212&motion_record_plan1=%@&motion_record_plan2=%@&motion_record_plan3=%@&motion_record_plan4=%@&motion_record_plan5=%@&motion_record_plan6=%@&motion_record_plan7=%@&motion_record_plan8=%@&motion_record_plan9=%@&motion_record_plan10=%@&motion_record_plan11=%@&motion_record_plan12=%@&motion_record_plan13=%@&motion_record_plan14=%@&motion_record_plan15=%@&motion_record_plan16=%@&motion_record_plan17=%@&motion_record_plan18=%@&motion_record_plan19=%@&motion_record_plan20=%@&motion_record_plan21=%@&motion_record_plan_enable=%@&", recordArry[0], recordArry[1], recordArry[2], recordArry[3], recordArry[4], recordArry[5], recordArry[6], recordArry[7], recordArry[8], recordArry[9], recordArry[10], recordArry[11], recordArry[12], recordArry[13], recordArry[14], recordArry[15], recordArry[16], recordArry[17], recordArry[18], recordArry[19], recordArry[20], record_plan_enable];
-    _m_PPPPChannelMgt->GetJsonCGI([self.str_DID UTF8String], 2017, (char *)[cgiStr UTF8String]);
-    
+   
+    [[VSNet shareinstance] sendCgiCommand:cgiStr withIdentity:self.str_DID];
 }
 
 - (void)deletePushPlan
@@ -222,15 +218,10 @@
     }
     recordArry[self.rowIndex] = @"-1";
     NSString *record_plan_enable;
-//    if ([RecordPlanDatabase shareDatabase].MotiondPushRecordPlanArray.count == 0)
-//    {
-//        record_plan_enable = @"0";
-//    }
-//    else
-//        record_plan_enable = @"1";
     record_plan_enable = @"1";
     NSString *cgiStr = [NSString stringWithFormat:@"trans_cmd_string.cgi?cmd=2017&command=2&mark=212&motion_push_plan1=%@&motion_push_plan2=%@&motion_push_plan3=%@&motion_push_plan4=%@&motion_push_plan5=%@&motion_push_plan6=%@&motion_push_plan7=%@&motion_push_plan8=%@&motion_push_plan9=%@&motion_push_plan10=%@&motion_push_plan11=%@&motion_push_plan12=%@&motion_push_plan13=%@&motion_push_plan14=%@&motion_push_plan15=%@&motion_push_plan16=%@&motion_push_plan17=%@&motion_push_plan18=%@&motion_push_plan19=%@&motion_push_plan20=%@&motion_push_plan21=%@&motion_push_plan_enable=%@&", recordArry[0], recordArry[1], recordArry[2], recordArry[3], recordArry[4], recordArry[5], recordArry[6], recordArry[7], recordArry[8], recordArry[9], recordArry[10], recordArry[11], recordArry[12], recordArry[13], recordArry[14], recordArry[15], recordArry[16], recordArry[17], recordArry[18], recordArry[19], recordArry[20], record_plan_enable];
-    _m_PPPPChannelMgt->GetJsonCGI([self.str_DID UTF8String], 2017, (char *)[cgiStr UTF8String]);
+    
+    [[VSNet shareinstance] sendCgiCommand:cgiStr withIdentity:self.str_DID];
     [[PlanManagement shareManagement].MotiondPushRecordPlanArray removeObjectAtIndex:self.rowIndex];
 }
 
@@ -284,15 +275,5 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
 
 @end

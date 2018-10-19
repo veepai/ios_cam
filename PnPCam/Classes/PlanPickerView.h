@@ -8,13 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "MXSCycleScrollView.h"
-#import "PPPPChannelManagement.h"
+
 @interface PlanPickerView : UIView<MXSCycleScrollViewDatasource,MXSCycleScrollViewDelegate,UIAlertViewDelegate>
 {
     int tmp[32];
     NSMutableArray *RecordTime;//用于存储设置的时间参数
 }
-@property (nonatomic) CPPPPChannelManagement* m_PPPPChannelMgt;
+
 @property(nonatomic,assign) NSInteger ID;
 @property(nonatomic,assign) NSInteger rowIndex;
 @property(nonatomic,retain) NSString *str_DID;

@@ -50,39 +50,14 @@
     self.selectImgTagArr = [[NSMutableArray alloc] init];
     navigationBar.delegate = self;
     self.navigationItem.title = strDate;
-    //UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:strDate];
-    //UINavigationItem *back = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
     
-    //NSArray *array = [NSArray arrayWithObjects:back, item, nil];
-    //[self.navigationBar setItems:array];
-    //[item release];
-    //[back release];
     m_tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.wantsFullScreenLayout = YES;
     UIBarButtonItem* rightBar = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Edit", @STR_LOCALIZED_FILE_NAME, nil) style:UIBarButtonItemStyleBordered target:self action:@selector(showTooleBar:)];
     self.navigationItem.rightBarButtonItem = rightBar;
     [rightBar release];
     rightBar = nil;
-       /*self.navigationBar.translucent = YES;
-    self.navigationBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
-    CGRect navigationBarFrame = self.navigationBar.frame;
-    navigationBarFrame.origin.y += 20;
-    self.navigationBar.frame = navigationBarFrame;
-    //self.navigationBar.alpha = 0.5f;
- 
-    CGRect tableViewFrame ;
-    tableViewFrame.size.height = 480 - 20;
-    tableViewFrame.size.width = 320;
-    tableViewFrame.origin.x = 0;
-    tableViewFrame.origin.y = 0;
-    
-    m_tableView.frame = tableViewFrame;
-    
-    
-    UIView *headerView = [[UIView alloc] initWithFrame: CGRectMake(0, 0, 320, 44 + 20 + 4)];
-    m_tableView.tableHeaderView = headerView;
-    [headerView release];*/
-    
+
     _swipeGes = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGes)];
     _swipeGes.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:_swipeGes];
@@ -266,12 +241,6 @@
         }
     }
     if (b_reloadData) {
-        //[picPathArray removeAllObjects];
-        //NSMutableArray* tempArray = [m_pPicPathMgt GetTotalPathArray:strDID date:strDate];
-        //for (NSString *strPath in tempArray) {
-           // [picPathArray addObject:strPath];
-        //}
-       /// NSLog(@"picPath %d   %d",[picPathArray count],[tempArray count]);
         [self.NotifyReloadDataDelegate  NotifyReloadData];
         [self reloadTableViewData];
         
@@ -282,10 +251,6 @@
     }
     
     [self.selectImgTagArr removeAllObjects];
-   // NSMutableArray* tempArray = [m_pPicPathMgt GetTotalPathArray:strDID date:strDate];
-    //[self reloadTableViewData];
-    //NSLog(@"tempArray  %@",tempArray);
- 
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -294,8 +259,6 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -369,9 +332,7 @@
     NSLog(@"selectImgTagArr %@",self.selectImgTagArr);
 }
 
-#pragma mark -
 #pragma mark TableViewDelegate
-
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
     //NSLog(@" numberOfRowsInSection");
@@ -388,9 +349,6 @@
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
-    //NSLog(@"cellForRowAtIndexPath");  
-    
-    //UITableViewCell* cell;
     NSString *cellIdentifier = @"PicListCell";
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
         PicListCell *cell =  (PicListCell*)[aTableView dequeueReusableCellWithIdentifier:cellIdentifier];
@@ -602,12 +560,8 @@
         singleTap.numberOfTapsRequired = 1;
         [cell.imageView4 addGestureRecognizer:singleTap];
         [singleTap release];
-        
-        
         return cell;
-
     }
-    
 }
 
 - (CGFloat)tableView:(UITableView*)tableview heightForRowAtIndexPath:(NSIndexPath*)indexpath
@@ -625,17 +579,13 @@
 }
 
 
-#pragma mark -
 #pragma mark performInMainThread
-
 - (void)reloadTableViewData
 {
     [m_tableView reloadData];
 }
 
-#pragma mark -
 #pragma mark NotifyReloadData
-
 - (void) NotifyReloadData
 {
     //[self.NotifyReloadDataDelegate NotifyReloadData];
@@ -643,15 +593,12 @@
     [self performSelectorOnMainThread:@selector(reloadTableViewData) withObject:nil waitUntilDone:NO];
 }
 
-#pragma mark -
-#pragma mark navigationBardelegate
 
+#pragma mark navigationBardelegate
 - (BOOL) navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item
 {
-    
     [self.navigationController popViewControllerAnimated:YES];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque];
-    
     return NO;
 }
 

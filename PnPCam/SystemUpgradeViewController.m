@@ -12,11 +12,17 @@
 #import "cmdhead.h"
 #import "DownloadFile.h"
 #import "MBProgressHUD.h"
+#import "VSNetProtocol.h"
+#import "VSNet.h"
+#import "APICommon.h"
+#import "CameraViewController.h"
 
 #define mAppDelegate ((IpCameraClientAppDelegate*)[UIApplication sharedApplication].delegate)
 #define FIRMWARE_URL @"http://api4.eye4.cn:808/firmware/%@/CN"
 
-@interface SystemUpgradeViewController ()
+
+
+@interface SystemUpgradeViewController ()<VSNetSearchCameraResultProtocol,VSNetControlProtocol>
 {
     NSTimer *startTimer;
     NSMutableData *firmwareData;
@@ -63,7 +69,6 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
         firmwareData = [[NSMutableData alloc] init];
         bodyData = [[NSMutableData alloc] init];
     }
@@ -77,12 +82,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    //  获取ip的前提
-    m_pSearchDVS = new CSearchDVS();
-    m_pSearchDVS->searchResultDelegate = self;
-    m_pSearchDVS->Open();   //  开启了就要关闭【m_pSearchDVS->Close();】
-    //  获取ip结束
+    [[VSNet shareinstance] StartSearchDVS:self];
     
     self.numberofSections = 0;
     self.numofRows = 0;
@@ -105,8 +105,8 @@
     [footView release],footView = nil;
     self.aTabelView.scrollEnabled = NO;
     
-    _m_pPPPPChannelMgt->SetCameraStatusDelegate((char*)[self.str_uid UTF8String], self);
-    _m_pPPPPChannelMgt->GetCGI([self.str_uid UTF8String], CGI_IEGET_STATUS);
+    [[VSNet shareinstance] setControlDelegate:self.str_uid withDelegate:self];
+    [[VSNet shareinstance] sendCgiCommand:@"get_status.cgi?" withIdentity:self.str_uid];
     
     startTimer = [NSTimer scheduledTimerWithTimeInterval:0.5f target:self selector:@selector(startNetworkRequest) userInfo:nil repeats:YES];
     
@@ -124,7 +124,7 @@
 }
 
 //  获取ip的代理
-- (void) SearchCameraResult:(NSString *)mac Name:(NSString *)name Addr:(NSString *)addr Port:(NSString *)port DID:(NSString*)did{
+- (void) VSNetSearchCameraResult:(NSString *)mac Name:(NSString *)name Addr:(NSString *)addr Port:(NSString *)port DID:(NSString*)did{
     if ([did length] == 0) {
         return;
     }
@@ -133,7 +133,7 @@
         self.str_ipaddr = addr;
         self.str_port = port;
         NSLog(@" 对应 ip %@,%@,%@",did,addr,port);
-        m_pSearchDVS->Close();
+        [[VSNet shareinstance] StopSearchDVS];
     }
     
 }
@@ -236,12 +236,9 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     if (alertView.tag == 100 || alertView.tag == 101) {
         if (buttonIndex == 1) {
-            
-            //  mAppDelegate->m_pPPPPChannelMgt
-            
             NSLog(@"%@=+++%@",self.firmware_server,self.firmware_file);
-            _m_pPPPPChannelMgt->FirmwareUpgrade([self.str_uid UTF8String], (char*)[self.firmware_server UTF8String], (char*)[self.firmware_file UTF8String], 0);
-            
+            NSString *cmd = [NSString stringWithFormat:@"auto_download_file.cgi?server=%@&file=%@&type=%d&resevered1=&resevered2=&resevered3=&resevered4=&",self.firmware_server,self.firmware_file,0];
+            [[VSNet shareinstance] sendCgiCommand:cmd withIdentity:self.str_uid];
             NSLog(@"gujianshengji %@--- %@ --- %@",self.str_uid,self.firmware_server,self.firmware_file);
             
             UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"UpgradeTimeDes", @STR_LOCALIZED_FILE_NAME, nil) message:nil delegate:self cancelButtonTitle:nil otherButtonTitles:NSLocalizedStringFromTable(@"OK", @STR_LOCALIZED_FILE_NAME, nil), nil];
@@ -255,6 +252,25 @@
         }
     }
 }
+
+
+- (void) VSNetControl: (NSString*) deviceIdentity commandType:(NSInteger) comType buffer:(NSString*)retString length:(int)length charBuffer:(char *)buffer
+{
+    NSLog(@"SystemUpgradeViewController VSNet返回数据:%@ comtype %ld",deviceIdentity,(long)comType);
+    if ([deviceIdentity isEqualToString:self.str_uid] && comType == CGI_IEGET_STATUS)
+    {
+        self.cam_sysver = [APICommon stringAnalysisWithFormatStr:@"sys_ver=" AndRetString:retString];
+        self.cam_appver = [APICommon stringAnalysisWithFormatStr:@"app_version=" AndRetString:retString];
+        self.oem_id = [APICommon stringAnalysisWithFormatStr:@"oem_id=" AndRetString:retString];
+        self.numberofSections = 2;
+        self.numofRows = 1;
+        
+        if ([_timer isValid]) {
+            [_timer invalidate];
+        }
+    }
+}
+
 #pragma mark CameraStatusProtocol
 - (void) PPPPCameraStatusSysver:(char*) sysv appver:(char*) appv oemid:(char*) oemid{
     self.cam_appver = [NSString stringWithUTF8String:appv];
@@ -396,17 +412,18 @@
 
 - (void) dealloc{
     
-    _m_pPPPPChannelMgt->SetCameraStatusDelegate((char*)[self.str_uid UTF8String], nil);
+    //_m_pPPPPChannelMgt->SetCameraStatusDelegate((char*)[self.str_uid UTF8String], nil);
     if (_timer != nil) {
         [_timer invalidate];
         self.timer = nil;
     }
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"downloadSuccess" object:nil];
-    
+    CameraViewController *camereView = [self.navigationController.viewControllers objectAtIndex:0];
+    [[VSNet shareinstance] setControlDelegate:self.str_uid withDelegate:camereView];
     //  关闭
-    m_pSearchDVS->Close();
-
+    //m_pSearchDVS->Close();
+    [[VSNet shareinstance] StopSearchDVS];
     self.str_uid = nil;
     self.str_pwd = nil;
     self.str_port = nil;

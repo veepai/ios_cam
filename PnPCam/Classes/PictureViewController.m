@@ -39,32 +39,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
     
-    
-    //UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
-    //[self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
-    //self.navigationBar.delegate = self;
-    //self.navigationBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
-    
-    //UINavigationItem *navigationItem1 = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"LocalPic", @STR_LOCALIZED_FILE_NAME, nil)];
     self.navigationItem.title = NSLocalizedStringFromTable(@"LocalPic", @STR_LOCALIZED_FILE_NAME, nil);
-    //UINavigationItem* navigationItem2 = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
-//    UIBarButtonItem* leftBar = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil) style:UIBarButtonItemStylePlain target:self action:@selector(Back:)];
-//    leftBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1.0];
-//    
-//    navigationItem1.leftBarButtonItem = leftBar;
-//    [leftBar release];
-    //NSArray *array = [NSArray arrayWithObjects:navigationItem2,navigationItem1, nil];
-    //[self.navigationBar setItems:array];
-    
-    //[navigationItem1 release];
-    //[navigationItem2 release];
-    
-    //self.m_tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    
-    self.imageBkDefault = [UIImage imageNamed:@"picbk.png"];
 
+    self.imageBkDefault = [UIImage imageNamed:@"picbk.png"];
 }
 
 -(void)Back:(id)sender
@@ -190,17 +168,13 @@
    
 }
 
-#pragma mark -
 #pragma mark performInMainThread
-
 - (void) reloadTableView
 {
     [m_tableView reloadData];
 }
 
-#pragma mark -
 #pragma mark NotifyReloadDataDelegate
-
 - (void) NotifyReloadData
 {
     

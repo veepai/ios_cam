@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import "EditCameraProtocol.h"
-#import "ZXingWidgetController.h"
+//#import "ZXingWidgetController.h"
 #import "SearchAddCameraInfoProtocol.h"
 #import "CustomAddCameraCell.h"
 #import "ScanStringDelegate.h"
@@ -20,7 +20,7 @@
 #define STR_DEFAULT_CAMERA_NAME "P2PCam"
 #define STR_DEFAULT_USER_NAME "admin"
 
-@interface CameraEditViewController : UIViewController <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource,ZXingDelegate, SearchAddCameraInfoProtocol, UINavigationBarDelegate,ScanStringDelegate> {
+@interface CameraEditViewController : UIViewController <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, SearchAddCameraInfoProtocol, UINavigationBarDelegate,ScanStringDelegate> {
            
     //---------------------------------
     

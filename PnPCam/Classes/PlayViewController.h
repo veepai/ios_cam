@@ -8,12 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
-#import "PPPPStatusProtocol.h"
-#import "PPPPChannelManagement.h"
-#import "ParamNotifyProtocol.h"
-#import "ImageNotifyProtocol.h"
+//#import "PPPPStatusProtocol.h"
+//#import "PPPPChannelManagement.h"
+//#import "ParamNotifyProtocol.h"
+//#import "ImageNotifyProtocol.h"
 #import "PicPathManagement.h"
-#import "CustomAVRecorder.h"
+
 #import "RecPathManagement.h"
 #import "NotifyEventProtocol.h"
 #import "MyGLViewController.h"
@@ -22,9 +22,10 @@
 #import "DemoTableController.h"
 #import "Split-screenViewController.h"
 #import "CameraListMgt.h"
-#import "SnapshotProtocol.h"
 #import "CustomToolBar.h"
-@interface PlayViewController : UIViewController <UINavigationBarDelegate, PPPPStatusProtocol, ParamNotifyProtocol,ImageNotifyProtocol,FPPopoverControllerDelegate,PopupListComponentDelegate,UIScrollViewDelegate,CustomToolBarItemDelegate>
+#import "VSNetProtocol.h"
+
+@interface PlayViewController : UIViewController <UINavigationBarDelegate,FPPopoverControllerDelegate,PopupListComponentDelegate,UIScrollViewDelegate,CustomToolBarItemDelegate,VSNetDataProtocol,VSNetStatueProtocol,VSNetControlProtocol>
 {
     IBOutlet UIImageView *imgView;
     IBOutlet UIActivityIndicatorView *progressView;
@@ -79,7 +80,7 @@
     BOOL bManualStop;
     BOOL bCameramark;
     UIImageView* _cameramarkimgView;
-    CPPPPChannelManagement *m_pPPPPChannelMgt;
+    //CPPPPChannelManagement *m_pPPPPChannelMgt;
     int nResolution;
     UILabel *OSDLabel;
     UILabel *TimeStampLabel;
@@ -111,7 +112,7 @@
     PicPathManagement *m_pPicPathMgt;
     RecPathManagement *m_pRecPathMgt;
     
-    CCustomAVRecorder *m_pCustomRecorder;
+    //CCustomAVRecorder *m_pCustomRecorder;
     NSCondition *m_RecordLock;
     
     id<NotifyEventProtocol> PicNotifyDelegate;
@@ -145,7 +146,7 @@
 @property (nonatomic, retain) IBOutlet UIButton* resolutionbutton;
 @property (nonatomic, retain) NSArray* listitems;
 @property (nonatomic, retain) PopupListComponent* resolutionPopup;
-@property (nonatomic, assign) CPPPPChannelManagement *m_pPPPPChannelMgt;
+
 @property (nonatomic, retain) UIImageView *imgView;
 @property (nonatomic, copy) NSString *cameraName;
 @property (nonatomic, copy) NSString *strDID;

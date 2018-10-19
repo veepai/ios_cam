@@ -30,7 +30,6 @@
 @synthesize m_pRecPathMgt;
 @synthesize imageVideoDefault;
 @synthesize imagePlay;
-@synthesize m_pPPPPChannelMgt;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -70,27 +69,6 @@
     // Do any additional setup after loading the view from its nib.
     
     m_bLocal = YES;
-    
-    //UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
-    //[self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
-    
-    //self.navigationBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
-    
-
-    
-    //self.navigationBar.delegate = self;
-    
-    //UINavigationItem *navigationItem1 = [[UINavigationItem alloc] init];
-   // UIBarButtonItem* leftBar = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil) style:UIBarButtonItemStyleBordered target:self action:@selector(Back:)];
-   // leftBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1.0];
-   // navigationItem1.leftBarButtonItem = leftBar;
-    //UINavigationItem* navigationItem2 = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
-    
-   // NSArray *array = [NSArray arrayWithObjects:navigationItem2,navigationItem1, nil];
-    //[self.navigationBar setItems:array];
-    
-    //[navigationItem2 release];
-    
     self.segmentedControl = [[UISegmentedControl alloc] init];
     self.segmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
     self.segmentedControl.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1.0f];
@@ -140,11 +118,7 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-
-#pragma mark -
 #pragma mark TableViewDelegate
-
-
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
     //NSLog(@"numberOfRowsInSection");    
@@ -288,6 +262,7 @@
     NSString *name = [cameraDic objectForKey:@STR_NAME];
     NSString *did = [cameraDic objectForKey:@STR_DID];
     NSNumber *nPPPPStatus = [cameraDic objectForKey:@STR_PPPP_STATUS];
+    NSString* strPwd = [cameraDic objectForKey:@STR_PWD];
     
     if (m_bLocal) {
         RecordDateViewController *recDateViewController = [[RecordDateViewController alloc] init];
@@ -296,7 +271,6 @@
         recDateViewController.m_pRecPathMgt = m_pRecPathMgt;
         recDateViewController.RecReloadDelegate = self;
         recDateViewController.camListMgt = m_pCameraListMgt;
-        recDateViewController.m_PpppchannelMgt = m_pPPPPChannelMgt;
         [self.navigationController pushViewController:recDateViewController animated:YES];
         [recDateViewController release];
     }else{
@@ -307,28 +281,24 @@
             return;
         }
         RemoteRecordFileListViewController *remoteFileView = [[RemoteRecordFileListViewController alloc] init];
-        remoteFileView.m_pPPPPChannelMgt = m_pPPPPChannelMgt;
         remoteFileView.m_strName = name;
         remoteFileView.m_strDID = did;
         remoteFileView.cameraListMgt =m_pCameraListMgt;
         remoteFileView.recPathMgt = m_pRecPathMgt;
+        remoteFileView.m_strPWD = strPwd;
         [self.navigationController pushViewController:remoteFileView animated:YES];
         [remoteFileView release];
     }    
     
 }
 
-#pragma mark -
 #pragma mark performOnMainThread
-
 - (void) reloadTableView
 {
     [m_tableView reloadData];
 }
 
-#pragma mark -
 #pragma mark NotifyReloadData
-
 - (void) NotifyReloadData
 {
     [self performSelectorOnMainThread:@selector(reloadTableView) withObject:nil waitUntilDone:NO];

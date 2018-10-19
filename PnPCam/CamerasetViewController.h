@@ -13,13 +13,14 @@
 #import "PPPPDefine.h"
 #import "mytoast.h"
 #import "SettingViewController.h"
-#import "PPPPChannelManagement.h"
+
 #import "PicPathManagement.h"
 #import "RecPathManagement.h"
 #import "NotifyEventProtocol.h"
 #import "PictrueDateViewController.h"
 #import "RecordDateViewController.h"
 #import "RemoteRecordFileListViewController.h"
+
 @protocol CamerasetViewControllerDelegate <NSObject>
 
 - (void)pushtoView:(UIViewController*)ViewCtr;
@@ -30,7 +31,6 @@
 @interface CamerasetViewController : UITableViewController
 @property (nonatomic, retain) FPPopoverController* fppopoverCtr;
 @property (nonatomic, retain) CameraListMgt* cameraListMgt;
-@property (nonatomic, assign) CPPPPChannelManagement* m_nPPPPChannelMgt;
 @property (nonatomic, assign) id<CamerasetViewControllerDelegate>delegate;
 @property (nonatomic, assign) int selectRow;
 

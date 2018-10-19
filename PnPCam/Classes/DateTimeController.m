@@ -13,7 +13,11 @@
 #import "oLableCell.h"
 #import "oSwitchCell.h"
 
-
+#import "VSNetSendCommand.h"
+#import "cmdhead.h"
+#import "APICommon.h"
+#import "VSNet.h"
+#import "CameraViewController.h"
 
 @interface DateTimeController ()
 @property (nonatomic, retain) UISwipeGestureRecognizer* swipeGes;
@@ -24,7 +28,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 @implementation DateTimeController
 
 @synthesize m_strDID;
-@synthesize m_pChannelMgt;
+//@synthesize m_pChannelMgt;
 
 @synthesize m_timingSever;
 
@@ -58,7 +62,8 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 }
 - (void) btnSetDatetime:(id)sender
 {
-    m_pChannelMgt->SetDateTime((char*)[m_strDID UTF8String], 0, m_timeZone, m_Timing, (char*)[m_timingSever UTF8String]);
+    //m_pChannelMgt->SetDateTime((char*)[m_strDID UTF8String], 0, m_timeZone, m_Timing, (char*)[m_timingSever UTF8String]);
+    [VSNetSendCommand VSNetCommandSetDateTime:m_strDID isNow:0 timeZone:m_timeZone npt:m_Timing netServer:@"time.windows.com"];
     [self.navigationController popViewControllerAnimated:YES];
 }
 - (void)viewDidLoad
@@ -79,9 +84,12 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     _swipeGes = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGes)];
     _swipeGes.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:_swipeGes];
+    m_Timing = 1;
+    //m_pChannelMgt->SetDateTimeDelegate((char*)[m_strDID UTF8String], self);
+    //m_pChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_GET_PARAMS, NULL, 0);
     
-    m_pChannelMgt->SetDateTimeDelegate((char*)[m_strDID UTF8String], self);
-    m_pChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_GET_PARAMS, NULL, 0);
+    [[VSNet shareinstance] setControlDelegate:m_strDID withDelegate:self];
+    [[VSNet shareinstance] sendCgiCommand:@"get_params.cgi?" withIdentity:m_strDID];
 }
 
 - (void) handleSwipeGes{
@@ -93,14 +101,17 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     [super viewDidUnload];
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+   CameraViewController *camereView = [self.navigationController.viewControllers objectAtIndex:0];
+   [[VSNet shareinstance] setControlDelegate:m_strDID withDelegate:camereView];
+}
 
 - (void) dealloc
 {
     [self.view removeGestureRecognizer:_swipeGes];
-    m_pChannelMgt->SetDateTimeDelegate((char*)[m_strDID UTF8String], nil);
     self.m_strDID = nil;
     [_swipeGes release],_swipeGes = nil;
-    self.m_pChannelMgt = nil;
     self.m_timingSever = nil;
     self.dateTime = nil;
     self.timing = nil;
@@ -288,8 +299,9 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 - (NSString *) get_time_zone_des:(int) nID
 {
     for (int i=0; i<29; i++) {
-        if (time_zone[i].index == nID) {
-            return time_zone[i].strTitle;
+        
+        if ([[[[data_param_value sharedInstance] time_zone] objectAtIndex:i] index] == nID) {
+            return [[[[data_param_value sharedInstance] time_zone] objectAtIndex:i] strTitle];
         }
     }
     return  @"";
@@ -312,133 +324,117 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         NSInteger interval = [zone secondsFromGMTForDate:[NSDate date]];//以秒为单位返回当前应用程序与世界标准时间（格林威尼时间）的时差
         NSInteger IntervalSince1970 = [[NSDate date] timeIntervalSince1970];
         
-        m_pChannelMgt->SetDateTime((char*)[m_strDID UTF8String], /*time(0)/1000*/IntervalSince1970, (-1)*interval, m_Timing, (char*)[m_timingSever UTF8String]);
+        //m_pChannelMgt->SetDateTime((char*)[m_strDID UTF8String], /*time(0)/1000*/IntervalSince1970, (-1)*interval, m_Timing, (char*)[m_timingSever UTF8String]);
         //返回
         //[self.navigationController popViewControllerAnimated:YES];
-        m_pChannelMgt->PPPPSetSystemParams((char*)[self.m_strDID UTF8String], MSG_TYPE_GET_PARAMS, NULL, 0);
+        //m_pChannelMgt->PPPPSetSystemParams((char*)[self.m_strDID UTF8String], MSG_TYPE_GET_PARAMS, NULL, 0);
+        [VSNetSendCommand VSNetCommandSetDateTime:m_strDID isNow:IntervalSince1970 timeZone:interval npt:m_Timing netServer:@"time.windows.com"];
     }
 }
 
-
-- (void) DateTimeProtocolResult:(int)now tz:(int)tz ntp_enable:(int)ntp_enable net_svr:(NSString*)ntp_svr
+#pragma mark - VSNetControlProtocol
+- (void) VSNetControl: (NSString*) deviceIdentity commandType:(NSInteger) comType buffer:(NSString*)retString length:(int)length charBuffer:(char *)buffer
 {
-    NSLog(@"now  %d  tz  %d   ntp_enable    %d    ntp_svr   %@",now,tz,ntp_enable,ntp_svr);
-    m_timeZone = tz;
-    m_dateTime = now;
-    m_Timing = ntp_enable;
-    self.m_timingSever = ntp_svr;
-    
-    NSTimeZone *tmz=[NSTimeZone timeZoneForSecondsFromGMT:m_timeZone];
-    NSCalendar *ca=[NSCalendar currentCalendar];
-    
-    //    NSUInteger unitFlags =NSHourCalendarUnit | NSMinuteCalendarUnit |
-    //
-    //    NSSecondCalendarUnit | NSDayCalendarUnit
-    //
-    //    | NSMonthCalendarUnit | NSYearCalendarUnit|NSWeekdayCalendarUnit;
-    
-    NSTimeInterval se=(long)m_dateTime;
-    NSDate *date=[NSDate dateWithTimeIntervalSince1970:se];
-    NSDate *dd=[date dateByAddingTimeInterval:-m_timeZone];
-    NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
-    [formatter setTimeZone:tmz];
-    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    //    NSString *strDate=[formatter stringFromDate:dd];
-    NSString *strD=[dd description];
-    NSRange yR=NSMakeRange(0, 4);
-    NSString *strYear=[strD substringWithRange:yR];
-    NSRange mR=NSMakeRange(5, 2);
-    NSString *month=[strD substringWithRange:mR];
-    NSRange dR=NSMakeRange(8, 2);
-    NSString *day=[strD substringWithRange:dR];
-    NSRange tR=NSMakeRange(10, 9);
-    NSString *strTime=[strD substringWithRange:tR];
-    int m=[month intValue];
-    int d=[day intValue];
-    NSString *strMon=nil;
-    switch (m) {
-        case 1:
-            strMon=@"Jan";
-            break;
-        case 2:
-            strMon=@"Feb";
-            break;
-        case 3:
-            strMon=@"Mar";
-            break;
-        case 4:
-            strMon=@"Apr";
-            break;
-        case 5:
-            strMon=@"May";
-            break;
-        case 6:
-            strMon=@"Jun";
-            break;
-        case 7:
-            strMon=@"Jun";
-            break;
-        case 8:
-            strMon=@"Aug";
-            break;
-        case 9:
-            strMon=@"Sept";
-            break;
-        case 10:
-            strMon=@"Oct";
-            break;
-        case 11:
-            strMon=@"Nov";
-            break;
-        case 12:
-            strMon=@"Dec";
-            break;
-            
+    NSLog(@"DateTimeController VSNet返回数据 UID:%@ comtype %ld",deviceIdentity,(long)comType);
+    if ( [deviceIdentity isEqualToString:m_strDID] && comType == CGI_IEGET_PARAM) {
+        m_timeZone = -[[APICommon stringAnalysisWithFormatStr:@"tz=" AndRetString:retString] integerValue];
+        m_dateTime = [[APICommon stringAnalysisWithFormatStr:@"now=" AndRetString:retString] integerValue];
+        m_Timing = [[APICommon stringAnalysisWithFormatStr:@"ntp_enable=" AndRetString:retString] integerValue];
+        m_timingSever = [APICommon stringAnalysisWithFormatStr:@"ntp_svr=" AndRetString:retString];
+        
+        NSTimeZone *tmz=[NSTimeZone timeZoneForSecondsFromGMT:m_timeZone];
+        NSCalendar *ca=[NSCalendar currentCalendar];
+        
+        NSTimeInterval se=(long)m_dateTime;
+        NSDate *date=[NSDate dateWithTimeIntervalSince1970:se];
+        NSDate *dd=[date dateByAddingTimeInterval:-m_timeZone];
+        NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
+        [formatter setTimeZone:tmz];
+        [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+        //    NSString *strDate=[formatter stringFromDate:dd];
+        NSString *strD=[dd description];
+        NSRange yR=NSMakeRange(0, 4);
+        NSString *strYear=[strD substringWithRange:yR];
+        NSRange mR=NSMakeRange(5, 2);
+        NSString *month=[strD substringWithRange:mR];
+        NSRange dR=NSMakeRange(8, 2);
+        NSString *day=[strD substringWithRange:dR];
+        NSRange tR=NSMakeRange(10, 9);
+        NSString *strTime=[strD substringWithRange:tR];
+        int m=[month intValue];
+        int d=[day intValue];
+        NSString *strMon=nil;
+        switch (m) {
+            case 1:
+                strMon=@"Jan";
+                break;
+            case 2:
+                strMon=@"Feb";
+                break;
+            case 3:
+                strMon=@"Mar";
+                break;
+            case 4:
+                strMon=@"Apr";
+                break;
+            case 5:
+                strMon=@"May";
+                break;
+            case 6:
+                strMon=@"Jun";
+                break;
+            case 7:
+                strMon=@"Jun";
+                break;
+            case 8:
+                strMon=@"Aug";
+                break;
+            case 9:
+                strMon=@"Sept";
+                break;
+            case 10:
+                strMon=@"Oct";
+                break;
+            case 11:
+                strMon=@"Nov";
+                break;
+            case 12:
+                strMon=@"Dec";
+                break;
+                
+        }
+        
+        NSDateComponents *dateComp=[ca components:NSWeekdayCalendarUnit fromDate:date];
+        int week=[dateComp weekday];
+        NSString *strW=nil;
+        switch (week) {
+            case 1:
+                strW=@"Sun";
+                break;
+            case 2:
+                strW=@"Mon";
+                break;
+            case 3:
+                strW=@"Tue";
+                break;
+            case 4:
+                strW=@"Wed";
+                break;
+            case 5:
+                strW=@"Thur";
+                break;
+            case 6:
+                strW=@"Fri";
+                break;
+            case 7:
+                strW=@"Sat";
+                break;
+                
+        }
+        
+        self.dateStr = [NSString stringWithFormat:@"%@ %d %@ %@ %@",strW,d,strMon,strYear,strTime];
+        [self performSelectorOnMainThread:@selector(reloadTableView:) withObject:nil waitUntilDone:NO];
     }
-    
-    //    NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
-    //    [formatter setTimeZone:tz];
-    //    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    //    NSString *sd=[formatter stringFromDate:date];
-    //    NSLog(@"sd=%@",sd);
-    
-    NSDateComponents *dateComp=[ca components:NSWeekdayCalendarUnit fromDate:date];
-    //    int year=[dateComp year];
-    //    int month=[dateComp month];
-    //    int day=[dateComp day];
-    //    int hour=[dateComp hour];
-    //    int minute=[dateComp minute];
-    //    int second=[dateComp second];
-    int week=[dateComp weekday];
-    NSString *strW=nil;
-    switch (week) {
-        case 1:
-            strW=@"Sun";
-            break;
-        case 2:
-            strW=@"Mon";
-            break;
-        case 3:
-            strW=@"Tue";
-            break;
-        case 4:
-            strW=@"Wed";
-            break;
-        case 5:
-            strW=@"Thur";
-            break;
-        case 6:
-            strW=@"Fri";
-            break;
-        case 7:
-            strW=@"Sat";
-            break;
-            
-    }
-    
-    self.dateStr = [NSString stringWithFormat:@"%@ %d %@ %@ %@",strW,d,strMon,strYear,strTime];
-    
-    [self performSelectorOnMainThread:@selector(reloadTableView:) withObject:nil waitUntilDone:NO];
 }
 
 #pragma mark -

@@ -13,7 +13,7 @@
 #import "AlarmController.h"
 #import "DateTimeController.h"
 #import "FtpSettingViewController.h"
-#import "MailSettingViewController.h"
+//#import "MailSettingViewController.h"
 #import "IpCameraClientAppDelegate.h"
 #import "CameraInfoCell.h"
 #import "cellSelectBtnCell.h"
@@ -21,10 +21,13 @@
 #import "cmdhead.h"
 #import "RecordScheduleSettingViewController.h"
 #import "SystemUpgradeViewController.h"
+
 #import "MotionPushPlanViewController.h"
 #define TalkMark @"IsTalking"//用于记录上次是监听还是对讲
 #define AudioMark @"IsAudioing"
 
+#import "APICommon.h"
+#import "VSNet.h"
 
 @interface SettingViewController ()
 @property (nonatomic, assign) BOOL isReboot;
@@ -36,7 +39,7 @@
 
 @implementation SettingViewController
 
-@synthesize m_pPPPPChannelMgt;
+//@synthesize m_pPPPPChannelMgt;
 @synthesize m_strDID;
 @synthesize navigationBar;
 @synthesize cameraDic;
@@ -94,8 +97,9 @@
     
     self.m_strPWD = [cameraDic objectForKey:@STR_PWD];
     
-    m_pPPPPChannelMgt->SetSettingViewControllerParamsDelegate((char* )[self.m_strDID UTF8String], self);
-    self.m_pPPPPChannelMgt->GetCGI((char*) [self.m_strDID UTF8String], CGI_IEGET_CAM_PARAMS);
+    [[VSNet shareinstance] setControlDelegate:m_strDID withDelegate:self];
+    NSString *cmd2 = @"get_camera_params.cgi?";
+    [[VSNet shareinstance] sendCgiCommand:cmd2 withIdentity:m_strDID];
 }
 
 - (void) responesSwipGes:(id) sender{
@@ -109,7 +113,6 @@
 
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
-    self.m_pPPPPChannelMgt->SetCameraSDCardStatusDelegate((char* )[self.m_strDID UTF8String], nil);
     if (!_isReboot && _isEdited) {
         [self.editCamerDelegate EditP2PCameraInfo:NO Name:self.camNameTF.text DID:[cameraDic objectForKey:@STR_DID] User:[cameraDic objectForKey:@STR_USER] Pwd:self.camPwdTF.text OldDID:[cameraDic objectForKey:@STR_DID]];
     }
@@ -119,8 +122,6 @@
 {
     [super viewDidUnload];
     [self.view removeGestureRecognizer:_swipGes];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
 }
 
 // Override to allow orientations other than the default portrait orientation.
@@ -140,7 +141,7 @@
     cameraDic = nil;
     m_strDID = nil;
     self.navigationBar = nil;
-    self.m_pPPPPChannelMgt = nil;
+    //self.m_pPPPPChannelMgt = nil;
     [super dealloc];
 }
 
@@ -159,9 +160,9 @@
         return 3;
     }else if (section == 1){
         if (self.isDisplayRow) {
-            return 8;
+            return 6;
         }else{
-            return 7;
+            return 6;
         }
         
     }else{
@@ -347,7 +348,6 @@
         
         return cell;
     }
-	
 }
 
 #pragma mark -
@@ -398,7 +398,6 @@
             case 0: //WIFI
             {
                 WifiSettingViewController *wifiSettingView = [[WifiSettingViewController alloc] init];
-                wifiSettingView.m_pPPPPChannelMgt = m_pPPPPChannelMgt;
                 wifiSettingView.m_strDID = m_strDID;
                 [self.navigationController pushViewController:wifiSettingView animated:YES];
                 [wifiSettingView release];
@@ -407,7 +406,6 @@
             case 1: //密码设置
             {
                 UserPwdSetViewController *UserPwdSettingView = [[UserPwdSetViewController alloc] init];
-                UserPwdSettingView.m_pChannelMgt = m_pPPPPChannelMgt;
                 UserPwdSettingView.cameraListMgt = cameraListMgt;
                 UserPwdSettingView.m_strDID = m_strDID;
                 UserPwdSettingView.cameraName = [self.cameraDic objectForKey:@"name"];
@@ -418,7 +416,6 @@
             case 2: //时间
             {
                 DateTimeController *DateTimeSettingView = [[DateTimeController alloc] init];
-                DateTimeSettingView.m_pChannelMgt = m_pPPPPChannelMgt;
                 DateTimeSettingView.m_strDID = m_strDID;
                 [self.navigationController pushViewController:DateTimeSettingView animated:YES];
                 [DateTimeSettingView release];
@@ -427,7 +424,6 @@
             case 3: //报警设置
             {
                 AlarmController *AlarmSettingView = [[AlarmController alloc] init];
-                AlarmSettingView.m_pChannelMgt = m_pPPPPChannelMgt;
                 AlarmSettingView.m_strDID = m_strDID;
                 [self.navigationController pushViewController:AlarmSettingView animated:YES];
                 [AlarmSettingView release];
@@ -436,22 +432,15 @@
             case 4:
             {
                 RecordScheduleSettingViewController* sdcardSet = [[RecordScheduleSettingViewController alloc] initWithNibName:@"RecordScheduleSettingViewController" bundle:nil];
-                sdcardSet.m_PPPPChannelMgt = self.m_pPPPPChannelMgt;
                 sdcardSet.m_strDID = self.m_strDID;
                 sdcardSet.navigationItem.title = NSLocalizedStringFromTable(@"SDSetting", @STR_LOCALIZED_FILE_NAME, nil);
                 [self.navigationController pushViewController:sdcardSet animated:YES];
                 [sdcardSet release];
-                /* SDCardSettingViewController* sd = [[SDCardSettingViewController alloc] initWithNibName:@"SDCardSettingViewController" bundle:nil];
-                 sd.m_PPPPChannelMgt = self.m_pPPPPChannelMgt;
-                 sd.m_strDID = self.m_strDID;
-                 [self.navigationController pushViewController:sd animated:YES];
-                 [sd release];*/
             }
                 break;
                 case 5://移动侦测报警计划设置
             {
                 MotionPushPlanViewController *motionPushPlan = [[MotionPushPlanViewController alloc] init];
-                motionPushPlan.m_PPPPChannelMgt = self.m_pPPPPChannelMgt;
                 motionPushPlan.m_strDID = self.m_strDID;
                 motionPushPlan.navigationItem.title = @"移动侦测报警计划";
                 [self.navigationController pushViewController:motionPushPlan animated:YES];
@@ -480,7 +469,6 @@
             case 7: //ftp setting
             {
                 FtpSettingViewController *ftpSettingView = [[FtpSettingViewController alloc] init];
-                ftpSettingView.m_pChannelMgt = m_pPPPPChannelMgt;
                 ftpSettingView.m_strDID = m_strDID;
                 [self.navigationController pushViewController:ftpSettingView animated:YES];
                 [ftpSettingView release];
@@ -488,11 +476,11 @@
                 break;
             case 8://mail setting
             {
-                MailSettingViewController *mailSettingView = [[MailSettingViewController alloc] init];
-                mailSettingView.m_pChannelMgt = m_pPPPPChannelMgt;
+                /*MailSettingViewController *mailSettingView = [[MailSettingViewController alloc] init];
+                //mailSettingView.m_pChannelMgt = m_pPPPPChannelMgt;
                 mailSettingView.m_strDID = m_strDID;
                 [self.navigationController pushViewController:mailSettingView animated:YES];
-                [mailSettingView release];
+                [mailSettingView release];*/
             }
                 break;
                 
@@ -507,13 +495,13 @@
         
         SystemUpgradeViewController* sysUpgrade = [[SystemUpgradeViewController alloc] initWithNibName:@"SystemUpgradeViewController" bundle:nil];
         sysUpgrade.navigationItem.title = NSLocalizedStringFromTable(@"FirmwareUpgrade", @STR_LOCALIZED_FILE_NAME, nil);
-        sysUpgrade.m_pPPPPChannelMgt = self.m_pPPPPChannelMgt;
         sysUpgrade.str_uid = self.m_strDID;
         sysUpgrade.str_pwd = self.m_strPWD;
         [self.navigationController pushViewController:sysUpgrade animated:YES];
-        [sysUpgrade release],sysUpgrade = nil;
+        [sysUpgrade release],
+        sysUpgrade = nil;
     }
-
+    
 }
 
 #pragma mark setPlayMode
@@ -521,12 +509,14 @@
     if (senderBtn.tag == 50) {
         [senderBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
         [(UIButton* )[self.view viewWithTag:60] setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        m_pPPPPChannelMgt->CameraControl((char* )[self.m_strDID UTF8String], 3, 0);
+         NSString *cmd = @"camera_control.cgi?param=3&value=0&";
+        [[VSNet shareinstance] sendCgiCommand:cmd withIdentity:self.m_strDID];
         _m_PlayMode = 0;
     }else if (senderBtn.tag == 60){
         [senderBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
         [(UIButton* )[self.view viewWithTag:50] setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        m_pPPPPChannelMgt->CameraControl((char* )[self.m_strDID UTF8String], 3, 1);
+        NSString *cmd = @"camera_control.cgi?param=3&value=1&";
+        [[VSNet shareinstance] sendCgiCommand:cmd withIdentity:self.m_strDID];
         _m_PlayMode = 1;
     }
 }
@@ -557,13 +547,12 @@
     return NO;
 }
 
-#pragma mark ParamNotifyProtocol
-
-- (void) ParamNotify: (int) paramType params:(void*) params{
-    if (paramType == CGI_IEGET_CAM_PARAMS) {
-        PSTRU_CAMERA_PARAM pCameraParam = (PSTRU_CAMERA_PARAM)params;
-        _m_PlayMode = pCameraParam->mode;
+#pragma mark - VSNetControlProtocol --一般参数返回获取方法
+- (void) VSNetControl: (NSString*) deviceIdentity commandType:(NSInteger) comType buffer:(NSString*)retString length:(int)length charBuffer:(char *)buffer
+{
+    NSLog(@"settingview VSNet返回数据 UID:%@ comtype %ld",deviceIdentity,(long)comType);
+    if ([deviceIdentity isEqualToString:self.m_strDID] && comType == CGI_IEGET_CAM_PARAMS) {
+        _m_PlayMode = [[APICommon stringAnalysisWithFormatStr:@"mode=" AndRetString:retString] intValue];
     }
 }
-
 @end

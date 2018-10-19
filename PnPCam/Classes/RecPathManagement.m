@@ -42,9 +42,7 @@
 
 - (BOOL)InsertPath:(NSString *)did Date:(NSString *)strDate Path:(NSString *)strPath
 {
-    //NSLog(@"InsertPicPath  did: %@, strDate: %@, strPath: %@", did, strDate, strPath);
-    
-    for (NSDictionary *IDDic in IDArray) {
+   for (NSDictionary *IDDic in IDArray) {
         //查找是否有改ID号对应的日期数组
         NSMutableArray *dateArray = [IDDic objectForKey:did];
         //如果ID存在
@@ -56,7 +54,6 @@
                     for(NSString *_path in recArray){
                         //图片路径在路径数组中已经存在
                         if ([_path caseInsensitiveCompare:strPath] == NSOrderedSame) {
-                       
                             return NO;
                         }
                     }
@@ -65,7 +62,6 @@
                     [recArray addObject:strPath];
                     return [recPathDBUtil InsertPath:did Date:strDate Path:strPath];
                 }
-                
             }
             
             //如果日期数组中不存在该日期
@@ -75,9 +71,7 @@
             [dateArray addObject:_dateDic];
             [_recArray release];
             return [recPathDBUtil InsertPath:did Date:strDate Path:strPath];
-            
         }
-        
     }
     
     //如果ID数组中不存在该ID号
@@ -89,18 +83,13 @@
     
     NSDictionary *_idDic = [NSDictionary dictionaryWithObject:_dateArray forKey:did];
     [IDArray addObject:_idDic];
-    
     [_recArray release];
     [_dateArray release];
-    
     return [recPathDBUtil InsertPath:did Date:strDate Path:strPath];
-    
 }
 
 - (BOOL)InitInsertPath:(NSString *)did Date:(NSString *)strDate Path:(NSString *)strPath
 {
-    //NSLog(@"InsertPicPath  did: %@, strDate: %@, strPath: %@", did, strDate, strPath);
-    
     for (NSDictionary *IDDic in IDArray) {
         //查找是否有改ID号对应的日期数组
         NSMutableArray *dateArray = [IDDic objectForKey:did];
@@ -133,9 +122,7 @@
             [dateArray addObject:_dateDic];
             [_recArray release];
             return TRUE;
-            
         }
-        
     }
     
     //如果ID数组中不存在该ID号
@@ -144,21 +131,15 @@
     [_recArray addObject:strPath];
     NSDictionary *_dateDic = [NSDictionary dictionaryWithObject:_recArray forKey:strDate];
     [_dateArray addObject:_dateDic];
-    
     NSDictionary *_idDic = [NSDictionary dictionaryWithObject:_dateArray forKey:did];
     [IDArray addObject:_idDic];
-    
     [_recArray release];
     [_dateArray release];
-    
     return TRUE;
-    
 }
 
 - (NSMutableArray*) GetTotalDataArray:(NSString *)did
 {
-    //NSLog(@"GetTotalPicDataArray %@", did);
-    
     for(NSDictionary *idDic in IDArray){
         NSMutableArray *_dateArray = [idDic objectForKey:did];
         if (_dateArray != nil) {
@@ -171,8 +152,6 @@
 
 - (NSMutableArray*) GetTotalPathArray: (NSString*)did date:(NSString*)date
 {
-    //NSLog(@"GetTotalPathArray did:%@, date: %@", did, date);
-    
     NSMutableArray *dateArray = [self GetTotalDataArray:did];
     if (dateArray == nil) {
         return nil;
@@ -180,9 +159,7 @@
     
     for (NSDictionary *dateDic in dateArray)
     {
-        //NSArray *arr = [dateDic allKeys];
-        //NSLog(@"arr: %@", [arr objectAtIndex:0]);
-        
+   
         NSMutableArray *recArray = [dateDic objectForKey:date];
         if (recArray != nil) {
             return recArray;
@@ -196,19 +173,14 @@
 {
     @try {
         //创建文件管理器
-        NSFileManager *fileManager = [NSFileManager defaultManager];    
-        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];//去处需要的路径
-        
         NSString *strPath = [documentsDirectory stringByAppendingPathComponent:did];
 
         //更改到待操作的目录下
         [fileManager changeCurrentDirectoryPath: strPath];
-        
-        //删除
         [fileManager removeItemAtPath:fileName error:nil];
-
     }
     @catch (NSException *exception) {
         return NO;
@@ -239,16 +211,11 @@
                         {                            
                             //delete file
                             [self DeleteFileByName:did fileName:fileName];
-                            
                             //dalete info in database
                             [recPathDBUtil RemovePath: fileName];
-                            
                             //find the file
                             [pathArray removeObject:fileName];
-                  
-                            
                             return YES;
-                            
                         }
                     }
                 }
@@ -268,13 +235,8 @@
         
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];//去处需要的路径
-        
-        //NSString *strPath = [documentsDirectory stringByAppendingPathComponent:did];
-        
         //更改到待操作的目录下
         [fileManager changeCurrentDirectoryPath: documentsDirectory];
-        
-        //删除
         [fileManager removeItemAtPath:did error:nil];
         
     }
@@ -291,8 +253,6 @@
 
 - (BOOL) RemovePathByID:(NSString *)did
 {
-    //NSLog(@"RemovePathByID did: %@", did);
-    
     [recPathDBUtil RemovePathByID:did];
     [self DeleteFileByID:did];
     
@@ -300,10 +260,7 @@
     {
         NSMutableArray *dateArray = [idDic objectForKey:did];
         if (dateArray != nil) {
-            //NSLog(@"111111");
             [IDArray removeObject:idDic];
-            //[picPathDBUtil RemovePathByID:did];
-            //[self DeleteFileByID:did];
             return YES;
         }
         
@@ -374,7 +331,6 @@
 
 - (NSInteger) GetTotalNumByIDAndDate:(NSString *)strDID Date:(NSString *)strDate
 {
-    //NSLog(@"GetTotalNumByIDAndDate...");
     for (NSDictionary *idDic in IDArray)
     {
         NSMutableArray *dateArray = [idDic objectForKey:strDID];
@@ -418,8 +374,6 @@
             }
             
             return nil;
-            
-            
         }
     }
     

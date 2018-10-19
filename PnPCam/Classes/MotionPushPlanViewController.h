@@ -7,8 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PPPPChannelManagement.h"
 @interface MotionPushPlanViewController : UIViewController
-@property (nonatomic) CPPPPChannelManagement* m_PPPPChannelMgt;
 @property (nonatomic, retain) NSString* m_strDID;
 @end

@@ -6,11 +6,10 @@
 //  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
 
 #import <UIKit/UIKit.h>
-#import "PPPPChannelManagement.h"
+#import "VSNetProtocol.h"
 
-@interface WifiPwdViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UINavigationBarDelegate,UIAlertViewDelegate>{
-    CPPPPChannelManagement *m_pChannelMgt;
-    
+@interface WifiPwdViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UINavigationBarDelegate,UIAlertViewDelegate,VSNetControlProtocol>{
+
     NSString *m_strSSID;
     int m_security;
     int m_channel;    
@@ -22,7 +21,6 @@
     UIAlertView* alertView;
 }
 
-@property (nonatomic, assign) CPPPPChannelManagement *m_pChannelMgt;
 @property (copy, nonatomic) NSString *m_strSSID;
 @property (copy, nonatomic) NSString *m_strDID;
 @property (copy, nonatomic) NSString *m_strPwd;
@@ -31,7 +29,5 @@
 @property int m_channel;
 @property (retain, nonatomic) UINavigationBar *navigationBar;
 
-
 - (void) btnSetWifi:(id) sender;
-
 @end

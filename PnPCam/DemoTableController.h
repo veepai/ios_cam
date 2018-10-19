@@ -8,10 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
-#import "PPPPChannelManagement.h"
 #import "FPPopoverController.h"
 @interface DemoTableController: UITableViewController <UIAlertViewDelegate>
-@property (nonatomic, assign) CPPPPChannelManagement* cppppchannelMgt;
 @property (nonatomic, retain) NSString* strDID;
 @property (nonatomic, assign) int button_tag;
 @property (nonatomic, retain) UIImage* img;

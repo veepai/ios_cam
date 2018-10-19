@@ -7,13 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PlaybackProtocol.h"
 #import "IJKSDLGLView.h"
-#import "PPPPChannelManagement.h"
-#import "ImageNotifyProtocol.h"
 
-
-@interface RemotePlaybackViewController : UIViewController<UINavigationBarDelegate,ImageNotifyProtocol>{
+@interface RemotePlaybackViewController : UIViewController<UINavigationBarDelegate>{
     IBOutlet UIImageView *imageView;
     IBOutlet UINavigationBar *navigationBar;
     IBOutlet UIActivityIndicatorView *progressView;
@@ -40,7 +36,7 @@
     NSCondition *m_playbackstoplock;
     
     NSString *m_strFileName;
-    CPPPPChannelManagement *m_pPPPPMgnt;
+    //CPPPPChannelManagement *m_pPPPPMgnt;
     NSString *m_strName;
     
 }
@@ -52,7 +48,7 @@
 @property (nonatomic, retain) UIImageView *imageView;
 @property (nonatomic, copy) NSString *strDID;
 @property (nonatomic, retain) NSString *m_strFileName;
-@property (nonatomic, assign) CPPPPChannelManagement *m_pPPPPMgnt;
+//@property (nonatomic, assign) CPPPPChannelManagement *m_pPPPPMgnt;
 @property (nonatomic, copy) NSString *m_strName;
 @property (nonatomic, assign) int record_Size;
 @property (nonatomic, assign) NSInteger playLength;

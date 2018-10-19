@@ -9,9 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "EditCameraProtocol.h"
 #import "CameraListMgt.h"
-#import "PPPPChannelManagement.h"
-#import "PPPPStatusProtocol.h"
-#import "SnapshotProtocol.h"
 #import "PicPathManagement.h"
 #import "NotifyEventProtocol.h"
 #import "RecPathManagement.h"
@@ -24,14 +21,15 @@
 #import "FPPopoverController.h"
 #import "PlayViewController.h"
 #import "SettingViewController.h"
-@interface CameraViewController : UIViewController  
-<UITableViewDelegate, UITableViewDataSource, EditCameraProtocol, PPPPStatusProtocol, SnapshotProtocol,UIAlertViewDelegate,UIActionSheetDelegate,UINavigationBarDelegate,PopupListComponentDelegate,FPPopoverControllerDelegate,SettingViewControllerDelegate>{
+#import "VSNetProtocol.h"
+
+@interface CameraViewController : UIViewController
+<UITableViewDelegate, UITableViewDataSource, EditCameraProtocol, VSNetStatueProtocol, VSNetControlProtocol,UIAlertViewDelegate,UIActionSheetDelegate,UINavigationBarDelegate,PopupListComponentDelegate,FPPopoverControllerDelegate,SettingViewControllerDelegate>{
     
     BOOL bEditMode;
     CameraListMgt *cameraListMgt;   
     PicPathManagement *m_pPicPathMgt;
     RecPathManagement *m_pRecPathMgt;
-    CPPPPChannelManagement *pPPPPChannelMgt;
     NSCondition *ppppChannelMgntCondition;
     
     IBOutlet UITableView *cameraList;
@@ -59,7 +57,6 @@
 @property (nonatomic, assign) RecPathManagement *m_pRecPathMgt;
 @property (nonatomic, assign) id<NotifyEventProtocol> PicNotifyEventDelegate;
 @property (nonatomic, assign) id<NotifyEventProtocol> RecordNotifyEventDelegate;
-@property (nonatomic, assign) CPPPPChannelManagement *pPPPPChannelMgt;
 @property (nonatomic, assign) NSIndexPath* indPath;
 @property (nonatomic, retain) PlayViewController* playViewController;
 @property (nonatomic, assign) int setCamIndex;

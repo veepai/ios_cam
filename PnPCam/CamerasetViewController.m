@@ -26,18 +26,11 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
- 
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - Table view data source
@@ -51,9 +44,6 @@
 {
     return 5;
 }
-
-/*NSLocalizedStringFromTable(@"Picture", @STR_LOCALIZED_FILE_NAME, nil), [NSString stringWithFormat:@"%@%@",NSLocalizedStringFromTable(@"Remote", @STR_LOCALIZED_FILE_NAME, nil),NSLocalizedStringFromTable(@"Record", @STR_LOCALIZED_FILE_NAME, nil)], [NSString stringWithFormat:@"%@%@",NSLocalizedStringFromTable(@"Local", @STR_LOCALIZED_FILE_NAME, nil),NSLocalizedStringFromTable(@"Record", @STR_LOCALIZED_FILE_NAME, nil)],NSLocalizedStringFromTable(@"Delete", @STR_LOCALIZED_FILE_NAME, nil)*/
-
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -91,44 +81,6 @@
     return cell;
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
 
 #pragma mark - Table view delegate
 
@@ -146,14 +98,13 @@
     NSString* strDID = [cameraDic objectForKey:@STR_DID];
     NSString* strName = [cameraDic objectForKey:@STR_NAME];
     NSString* status = [cameraDic objectForKey:@STR_PPPP_STATUS];
-    
+    NSString* strPwd = [cameraDic objectForKey:@STR_PWD];
     NSLog(@"tableView   delegate");
     switch (indexPath.row) {
         case 0:
         {
             SettingViewController* settingViewCtr = [[SettingViewController alloc] init];
             settingViewCtr.cameraListMgt = _cameraListMgt;
-            settingViewCtr.m_pPPPPChannelMgt = _m_nPPPPChannelMgt;
             settingViewCtr.m_strDID = strDID;
             settingViewCtr.cameraDic = cameraDic;
             [_delegate pushtoView:settingViewCtr];
@@ -182,7 +133,6 @@
             recDateViewCtr.RecReloadDelegate = self.RecordNotifyEventDelegate;
             recDateViewCtr.strDID = strDID;
             recDateViewCtr.strName = strName;
-            recDateViewCtr.m_PpppchannelMgt = _m_nPPPPChannelMgt;
             recDateViewCtr.camListMgt = _cameraListMgt;
             recDateViewCtr.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
             [_delegate pushtoView:recDateViewCtr];
@@ -197,11 +147,12 @@
                 return;
             }
             RemoteRecordFileListViewController* remoterecFileListViewCtr = [[RemoteRecordFileListViewController alloc] init];
-            remoterecFileListViewCtr.m_pPPPPChannelMgt = self.m_nPPPPChannelMgt;
+
             remoterecFileListViewCtr.m_strDID = strDID;
             remoterecFileListViewCtr.m_strName = strName;
             remoterecFileListViewCtr.cameraListMgt = _cameraListMgt;
             remoterecFileListViewCtr.recPathMgt = _m_pRecPathMgt;
+            remoterecFileListViewCtr.m_strPWD = strPwd;
             [_delegate pushtoView:remoterecFileListViewCtr];
             [remoterecFileListViewCtr release];
             remoterecFileListViewCtr = nil;
@@ -220,7 +171,6 @@
     [super dealloc];
     _fppopoverCtr = nil;
     _cameraListMgt = nil;
-    _m_nPPPPChannelMgt = nil;
     _delegate = nil;
     _picDataViewCtr = nil;
     _picPathMgt = nil;

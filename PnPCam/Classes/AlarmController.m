@@ -16,6 +16,12 @@
 #import "oDropController.h"
 #import "oDropListStruct.h"
 
+#import "VSNet.h"
+#import "cmdhead.h"
+#import "CameraViewController.h"
+#import "APICommon.h"
+#import "NSString+subValueFromRetString.h"
+
 @interface AlarmController ()
 @property (nonatomic, retain) UISwipeGestureRecognizer* swipeGes;
 @end
@@ -26,7 +32,6 @@
 @synthesize navigationBar;
 
 @synthesize m_strDID;
-@synthesize m_pChannelMgt;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -43,7 +48,8 @@
 }
 - (void) btnSetAlarm:(id)sender
 {
-    m_pChannelMgt->SetAlarm((char*)[m_strDID UTF8String], m_motion_armed, m_motion_sensitivity, m_input_armed, m_ioin_level, m_alarmpresetsit, m_iolinkage, m_ioout_level, m_mail, m_upload_interval,m_record);
+    NSString *cmd = [NSString stringWithFormat:@"set_alarm.cgi?enable_alarm_audio=%d&motion_armed=%d&motion_sensitivity=%d&input_armed=%d&ioin_level=%d&preset=%d&iolinkage=%d&ioout_level=%d&mail=%d&record=%d&upload_interval=%d&schedule_enable=1&schedule_sun_0=-1&schedule_sun_1=-1&schedule_sun_2=-1&schedule_mon_0=-1&schedule_mon_1=-1&schedule_mon_2=-1&schedule_tue_0=-1&schedule_tue_1=-1&schedule_tue_2=-1&schedule_wed_0=-1&schedule_wed_1=-1&schedule_wed_2=-1&schedule_thu_0=-1&schedule_thu_1=-1&schedule_thu_2=-1&schedule_fri_0=-1&schedule_fri_1=-1&schedule_fri_2=-1&schedule_sat_0=-1&schedule_sat_1=-1&schedule_sat_2=-1&",0,m_motion_armed,m_motion_sensitivity,m_input_armed,m_ioin_level,m_alarmpresetsit,m_iolinkage,m_ioout_level,m_mail,1,m_upload_interval];
+    [[VSNet shareinstance] sendCgiCommand:cmd withIdentity:self.m_strDID];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -67,9 +73,14 @@
     _swipeGes.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:_swipeGes];
     
-    m_pChannelMgt->SetAlarmDelegate((char*)[m_strDID UTF8String], self);
-    m_pChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_GET_PARAMS, NULL, 0);
+    [[VSNet shareinstance] setControlDelegate:m_strDID withDelegate:self];
+    [[VSNet shareinstance] sendCgiCommand:@"get_params.cgi?" withIdentity:m_strDID];
     
+}
+- (void)viewWillDisappear:(BOOL)animated
+{
+    CameraViewController *camereView = [self.navigationController.viewControllers objectAtIndex:0];
+    [[VSNet shareinstance] setControlDelegate:m_strDID withDelegate:camereView];
 }
 
 - (void) handleSwipeGes{
@@ -80,16 +91,12 @@
 {
     [super viewDidUnload];
     [self.view removeGestureRecognizer:_swipeGes];
-    m_pChannelMgt->SetAlarmDelegate((char*)[m_strDID UTF8String], nil);
-    
 }
 
 - (void)dealloc
 {
-    m_pChannelMgt->SetAlarmDelegate((char*)[m_strDID UTF8String], nil);
     self.m_strDID = nil;
     [_swipeGes release],_swipeGes = nil;
-    self.m_pChannelMgt = nil;
     self.tableView = nil;
     self.navigationBar = nil;
     [super dealloc];
@@ -106,10 +113,7 @@
     return UIInterfaceOrientationMaskPortrait;
 }
 
-
-#pragma mark -
 #pragma mark TableViewDelegate
-
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)aTableView
 {
     return 1;
@@ -191,7 +195,8 @@
             oLableCell * cell = (oLableCell*)cell1;
             cell.DescriptionLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
             cell.keyLable.text = NSLocalizedStringFromTable(@"alarmExternMode", @STR_LOCALIZED_FILE_NAME, nil);
-            cell.DescriptionLable.text = extern_mode[m_ioin_level].strTitle;
+            
+            cell.DescriptionLable.text = [[[[data_param_value sharedInstance] extern_mode] objectAtIndex:m_ioin_level] strTitle];
             //[NSString stringWithFormat:@"%d", m_ioin_level];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }
@@ -206,7 +211,8 @@
             oLableCell * cell = (oLableCell*)cell1;
             cell.DescriptionLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
             cell.keyLable.text = NSLocalizedStringFromTable(@"alarmMotionPreset", @STR_LOCALIZED_FILE_NAME, nil);
-            cell.DescriptionLable.text = [NSString stringWithUTF8String:motion_preset[m_alarmpresetsit].szName];
+            
+            cell.DescriptionLable.text = [[[[data_param_value sharedInstance] motion_preset] objectAtIndex:m_alarmpresetsit] strName];
             //(m_alarmpresetsit == 0)?@"No":[NSString stringWithFormat:@"%d", m_alarmpresetsit];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }
@@ -237,39 +243,12 @@
             oLableCell * cell = (oLableCell*)cell1;
             cell.DescriptionLable.autoresizingMask = UIViewAutoresizingFlexibleWidth;
             cell.keyLable.text = NSLocalizedStringFromTable(@"alarmMotionIOLevel", @STR_LOCALIZED_FILE_NAME, nil);
-            cell.DescriptionLable.text = extern_level[m_ioout_level].strTitle;
+            
+            cell.DescriptionLable.text = [[[[data_param_value sharedInstance] extern_level] objectAtIndex:m_ioout_level] strTitle];
             //NSString stringWithUTF8String:motion_preset[m_alarmpresetsit].szName];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }
             break;
-            
-            //        case 7: //邮件通知
-            //        {
-            //            if (cell1 == nil)
-            //            {
-            //                NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"oSwitchCell" owner:self options:nil];
-            //                cell1 = [nib objectAtIndex:0];
-            //            }
-            //            oSwitchCell * cell = (oSwitchCell*)cell1;
-            //            cell.keyLable.text = NSLocalizedStringFromTable(@"alarmMail", @STR_LOCALIZED_FILE_NAME, nil);
-            //            [cell.keySwitch setOn:(m_mail>0)?YES:NO];
-            //            [cell.keySwitch addTarget:self action:@selector(switchActionMail:) forControlEvents:UIControlEventValueChanged];
-            //            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            //        }
-            //            break;
-            //        case 8://上传图片间隔
-            //        {
-            //            if (cell1 == nil)
-            //            {
-            //                NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"oLableCell" owner:self options:nil];
-            //                cell1 = [nib objectAtIndex:0];
-            //            }
-            //            oLableCell * cell = (oLableCell*)cell1;
-            //            cell.keyLable.text = NSLocalizedStringFromTable(@"alarmPicTimer", @STR_LOCALIZED_FILE_NAME, nil);
-            //            cell.DescriptionLable.text = [NSString stringWithFormat:@"%d", m_upload_interval];
-            //            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-            //        }
-            //            break;
         case 7://alarm record
         {
             if (cell1 == nil)
@@ -295,10 +274,7 @@
 
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
-    //[currentTextField resignFirstResponder];
     [aTableView deselectRowAtIndexPath:anIndexPath animated:YES];
-    
-    
     switch (anIndexPath.row) {
         case 1:
         {
@@ -370,9 +346,8 @@
     
     [self performSelectorOnMainThread:@selector(reloadTableView:) withObject:nil waitUntilDone:NO];
 }
-#pragma mark -
-#pragma mark PerformInMainThread
 
+#pragma mark PerformInMainThread
 - (void) reloadTableView:(id) param
 {
     [tableView reloadData];
@@ -410,7 +385,6 @@
     
 }
 
-
 - (void)switchActionMotion_armed:(id)sender {
     UISwitch *switchButton = (UISwitch*)sender;
     BOOL isButtonOn = [switchButton isOn];
@@ -445,17 +419,34 @@
     
 }
 
-
-#pragma mark -
 #pragma mark navigationBarDelegate
-
 - (BOOL) navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item
 {
     [self.navigationController popViewControllerAnimated:YES];
     return NO;
 }
 
-
+#pragma mark - VSNetControlProtocol
+- (void) VSNetControl: (NSString*) deviceIdentity commandType:(NSInteger) comType buffer:(NSString*)retString length:(int)length charBuffer:(char *)buffer
+{
+    NSLog(@"AlarmController VSNet返回数据 UID:%@ comtype %ld",deviceIdentity,(long)comType);
+    if ( [deviceIdentity isEqualToString:m_strDID] && comType == CGI_IEGET_PARAM)
+    {
+        m_motion_armed = [[NSString subValueByKeyString:@"alarm_motion_armed=" fromRetString:retString] intValue];
+        m_motion_sensitivity = [[NSString subValueByKeyString:@"alarm_motion_sensitivity=" fromRetString:retString] intValue];
+        m_input_armed = [[NSString subValueByKeyString:@"alarm_input_armed=" fromRetString:retString] intValue];
+        m_ioin_level = [[NSString subValueByKeyString:@"alarm_ioin_level=" fromRetString:retString] intValue];
+        m_alarmpresetsit= [[NSString subValueByKeyString:@"alarm_presetsit=" fromRetString:retString] intValue];
+        m_iolinkage= [[NSString subValueByKeyString:@"alarm_iolinkage=" fromRetString:retString] intValue];
+        m_ioout_level= [[NSString subValueByKeyString:@"alarm_ioout_level=" fromRetString:retString] intValue];
+        m_mail = [[NSString subValueByKeyString:@"alarm_mail=" fromRetString:retString] intValue];
+        m_snapshot = [[NSString subValueByKeyString:@"alarm_snapshot=" fromRetString:retString] intValue];
+        m_upload_interval = [[NSString subValueByKeyString:@"alarm_upload_interval=" fromRetString:retString] intValue];
+        m_record = [[NSString subValueByKeyString:@"alarm_record=" fromRetString:retString] intValue];
+        m_enable_alarm_audio = [[NSString subValueByKeyString:@"enable_alarm_audio=" fromRetString:retString] intValue];
+        [self performSelectorOnMainThread:@selector(reloadTableView:) withObject:nil waitUntilDone:NO];
+    }
+}
 
 
 @end

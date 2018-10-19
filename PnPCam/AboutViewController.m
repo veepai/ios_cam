@@ -9,7 +9,7 @@
 #import "AboutViewController.h"
 #import "obj_common.h"
 #import "AboutCell.h"
-#import "PPPP_API.h"
+
 
 #define ProductName @"VStarcam Camera"
 @interface AboutViewController ()
@@ -68,7 +68,7 @@
     }
     
     productname.text = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
-    productname.textAlignment = UITextAlignmentCenter;
+    productname.textAlignment = NSTextAlignmentCenter;
     productname.textColor = [UIColor blackColor];
     productname.font = [UIFont fontWithName:@"System Bold" size:20];
     productname.shadowColor = [UIColor blackColor];
@@ -85,7 +85,7 @@
         verLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.f, productname.frame.origin.y + productname.frame.size.height + 20.f+64, winsize.width, 40.f)];
     }
     verLabel.text = [NSString stringWithFormat:@"%@  %@",NSLocalizedStringFromTable(@"Version", @STR_LOCALIZED_FILE_NAME, nil),[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
-    verLabel.textAlignment = UITextAlignmentCenter;
+    verLabel.textAlignment = NSTextAlignmentCenter;
     verLabel.textColor = [UIColor blackColor];
     verLabel.font = [UIFont fontWithName:@"System Bold" size:20];
     verLabel.backgroundColor = [UIColor clearColor];
@@ -100,7 +100,7 @@
     }
     downLabel.text = NSLocalizedStringFromTable(@"OnlineCD-ROM", @STR_LOCALIZED_FILE_NAME, nil);
     downLabel.textColor = [UIColor blackColor];
-    downLabel.textAlignment = UITextAlignmentCenter;
+    downLabel.textAlignment = NSTextAlignmentCenter;
     downLabel.font = [UIFont fontWithName:@"System" size:18];
     downLabel.backgroundColor = [UIColor clearColor];
     
@@ -112,7 +112,7 @@
     }
     downTextView.editable = NO;
     downTextView.text = [NSString stringWithFormat:@"http://cd.ipcam.so"];
-    downTextView.textAlignment = UITextAlignmentCenter;
+    downTextView.textAlignment = NSTextAlignmentCenter;
     downTextView.dataDetectorTypes = UIDataDetectorTypeAll;
     downTextView.backgroundColor = [UIColor clearColor];
     downTextView.font = [UIFont fontWithName:@"System" size:18];
@@ -126,7 +126,7 @@
     
     informationLabel.text = NSLocalizedStringFromTable(@"Information", @STR_LOCALIZED_FILE_NAME, nil);
     informationLabel.textColor = [UIColor blackColor];
-    informationLabel.textAlignment = UITextAlignmentCenter;
+    informationLabel.textAlignment = NSTextAlignmentCenter;
     informationLabel.backgroundColor = [UIColor clearColor];
     informationLabel.font = [UIFont fontWithName:@"System" size:18];
     
@@ -138,7 +138,7 @@
     }
     informationText.text = [NSString stringWithFormat:@"http://www.vstarcam.com"];
     informationText.textColor = [UIColor blackColor];
-    informationText.textAlignment = UITextAlignmentCenter;
+    informationText.textAlignment = NSTextAlignmentCenter;
     informationText.editable = NO;
     informationText.backgroundColor = [UIColor clearColor];
     informationText.font = [UIFont fontWithName:@"System" size:18];
@@ -147,7 +147,7 @@
     UILabel* copyright = [[UILabel alloc] initWithFrame:CGRectMake(0, winsize.height - 110.0f, winsize.width, 40)];
     copyright.text = [NSString stringWithFormat:@"Copyright © 2015. All rights reserved."];
     copyright.textColor = [UIColor blackColor];
-    copyright.textAlignment = UITextAlignmentCenter;
+    copyright.textAlignment = NSTextAlignmentCenter;
     copyright.backgroundColor = [UIColor clearColor];
     
     [self.view addSubview:copyright];

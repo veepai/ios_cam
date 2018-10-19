@@ -7,19 +7,21 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SearchDVS.h"
+
 #import "SearchListMgt.h"
 #import "SearchCameraResultProtocol.h"
 #import "CameraViewController.h"
 #import "SearchAddCameraInfoProtocol.h"
 
-@interface CameraSearchViewController : UIViewController<SearchCameraResultProtocol,
+#import "VSNetProtocol.h"
+#import "VSNet.h"
+
+@interface CameraSearchViewController : UIViewController<VSNetSearchCameraResultProtocol,
 UITableViewDelegate, UITableViewDataSource, UINavigationBarDelegate>{
     IBOutlet UITableView *SearchListView;
     IBOutlet UINavigationBar *navigationBar;
     
     SearchListMgt *searchListMgt;
-    CSearchDVS *m_pSearchDVS;
     NSTimer *searchTimer;
     
     BOOL bSearchFinished;

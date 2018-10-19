@@ -7,15 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PPPPChannelManagement.h"
 #import "CameraStatusProtocol.h"
-#import "SearchDVS.h"
 
-@interface SystemUpgradeViewController : UIViewController<CameraStatusProtocol, NSXMLParserDelegate, UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate,NSURLConnectionDelegate,NSURLConnectionDataDelegate,SearchCameraResultProtocol>
+@interface SystemUpgradeViewController : UIViewController< NSXMLParserDelegate, UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate,NSURLConnectionDelegate,NSURLConnectionDataDelegate>
 {
-    CSearchDVS *m_pSearchDVS;
 }
-@property (nonatomic, assign) CPPPPChannelManagement* m_pPPPPChannelMgt;
+
 @property (nonatomic, retain) NSString* str_uid;
 @property (nonatomic, retain) NSString* str_ipaddr;
 @property (nonatomic, retain) NSString* str_pwd;

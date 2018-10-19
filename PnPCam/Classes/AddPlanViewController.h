@@ -7,10 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PPPPChannelManagement.h"
 @interface AddPlanViewController : UIViewController
 
-@property (nonatomic) CPPPPChannelManagement* m_PPPPChannelMgt;
 @property(nonatomic,strong) NSString *ID;
 @property(nonatomic,strong) NSString *str_DID;
 @property(nonatomic,assign) NSInteger rowIndex;

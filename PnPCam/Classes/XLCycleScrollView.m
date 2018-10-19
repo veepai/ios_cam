@@ -36,20 +36,12 @@
         _scrollView.showsHorizontalScrollIndicator = NO;
         _scrollView.contentOffset = CGPointMake(self.bounds.size.width, 0);
         _scrollView.pagingEnabled = YES;
-        
-        //_scrollView.minimumZoomScale = 1;
-        //_scrollView.maximumZoomScale = 5;
-        
+   
         [self addSubview:_scrollView];
         
         CGRect rect = self.bounds;
         rect.origin.y = rect.size.height - 30;
         rect.size.height = 30;
-        //_pageControl = [[UIPageControl alloc] initWithFrame:rect];
-        //_pageControl.userInteractionEnabled = NO;
-        
-        //[self addSubview:_pageControl];
-        
         _curPage = 0;
     }
     return self;
@@ -78,8 +70,6 @@
 
 - (void)loadData
 {    
-    //_pageControl.currentPage = _curPage;
-    
     //从scrollView上移除所有的subview
     NSArray *subViews = [_scrollView subviews];
     if([subViews count] != 0) {
@@ -122,8 +112,7 @@
     
     if(value == -1) value = _totalPages - 1;
     if(value == _totalPages) value = 0;
-    
-    return value;
+     return value;
     
 }
 
@@ -134,23 +123,6 @@
     }
     
 }
-
-//- (void)setViewContent:(UIView *)view atIndex:(NSInteger)index
-//{
-//    if (index == _curPage) {
-//        [_curViews replaceObjectAtIndex:1 withObject:view];
-//        for (int i = 0; i < 3; i++) {
-//            UIView *v = [_curViews objectAtIndex:i];
-//            v.userInteractionEnabled = YES;
-//            UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self
-//                                                                                        action:@selector(handleTap:)];
-//            [v addGestureRecognizer:singleTap];
-//            [singleTap release];
-//            v.frame = CGRectOffset(v.frame, v.frame.size.width * i, 0);
-//            [_scrollView addSubview:v];
-//        }
-//    }
-//}
 
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewDidScroll:(UIScrollView *)aScrollView {
@@ -182,18 +154,5 @@
 //    [_scrollView setContentOffset:CGPointMake(_scrollView.frame.size.width, 0) animated:YES];
     
 }
-
-////设置放大缩小的视图，要是uiscrollview的subview
-//- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView;   
-//{
-//    NSLog(@"viewForZoomingInScrollView");
-//    return [_curViews objectAtIndex:1];
-//}
-////完成放大缩小时调用
-//- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale; 
-//{
-//    //testImageView.frame=CGRectMake(50,0,100,400);
-//    NSLog(@"scale between minimum and maximum. called after any 'bounce' animations");
-//}// scale between minimum and maximum. called after any 'bounce' animations
 
 @end

@@ -34,13 +34,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-    
-    //UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
-    //[self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
-    //self.navigationBar.delegate = self;
-    //self.navigationBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1.0f];
-    
+
     _swipeGes = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGes)];
     _swipeGes.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:_swipeGes];
@@ -49,7 +43,7 @@
     
     [self showLoadingIndicator];    
     searchListMgt = [[SearchListMgt alloc] init];    
-    m_pSearchDVS = NULL;
+
     [self startSearch];
 }
 
@@ -101,21 +95,14 @@
 
 - (void) startSearch
 {
-    [self stopSearch];
-    
-    m_pSearchDVS = new CSearchDVS();
-    m_pSearchDVS->searchResultDelegate = self;
-    m_pSearchDVS->Open();
-    
+    [[VSNet shareinstance] StartSearchDVS:self];
     //create the start timer
     searchTimer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(handleTimer:) userInfo:nil repeats:NO];    
 }
 
 - (void) stopSearch
 {    
-    if (m_pSearchDVS != NULL) {
-        SAFE_DELETE(m_pSearchDVS);
-    }
+    [[VSNet shareinstance] StopSearchDVS];
 }
 
 
@@ -130,8 +117,6 @@
 
 - (void)showLoadingIndicator
 {
-    //UINavigationItem *back = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
-    //UINavigationItem *navigationItem1 = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"SearchCamera", @STR_LOCALIZED_FILE_NAME, nil)];
     self.navigationItem.title = NSLocalizedStringFromTable(@"SearchCamera", @STR_LOCALIZED_FILE_NAME, nil);
 	UIActivityIndicatorView *indicator =
     [[[UIActivityIndicatorView alloc]
@@ -142,20 +127,11 @@
 	UIBarButtonItem *progress =
     [[UIBarButtonItem alloc] initWithCustomView:indicator];
     self.navigationItem.rightBarButtonItem = progress;
-    //navigationItem1.rightBarButtonItem = progress;
-    //NSArray *array = [NSArray arrayWithObjects:back, navigationItem1, nil];
     [progress release];
-    
-    //[self.navigationBar setItems:array];
-    
-    //[navigationItem1 release];
-    //[back release];
 }
 
 - (void)hideLoadingIndicator
-{    
-    //UINavigationItem *back = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
-    //UINavigationItem *navigationItem1 = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"SearchCamera", @STR_LOCALIZED_FILE_NAME, nil)];
+{
     self.navigationItem.title = NSLocalizedStringFromTable(@"SearchCamera", @STR_LOCALIZED_FILE_NAME, nil);
 	UIBarButtonItem *refreshButton =
     [[UIBarButtonItem alloc]
@@ -164,26 +140,17 @@
      action:@selector(btnRefresh:)];
 	//[self.navigationItem setRightBarButtonItem:refreshButton animated:YES];
     self.navigationItem.rightBarButtonItem = refreshButton;
-    //navigationItem1.rightBarButtonItem = refreshButton;
-   // NSArray *array = [NSArray arrayWithObjects:back, navigationItem1, nil];
-    
-    //[self.navigationBar setItems:array];
     [refreshButton release];
-    //[navigationItem1 release];
-    //[back release];
 }
 
-#pragma mark -
 #pragma mark TableViewDelegate
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)aTableView
 {
-    // NSLog(@"numberOfSectionsInTableView");
 	return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
-    // NSLog(@"numberOfRowsInSection");
     if (bSearchFinished == NO) {
         return 0;
     }
@@ -193,8 +160,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
-    //NSLog(@"cellForRowAtIndexPath");             
-    
+
     NSDictionary *cameraDic = [searchListMgt GetCameraAtIndex:anIndexPath.row];
     
     NSString *cellIdentifier = @"SearchListCell";	       
@@ -234,14 +200,8 @@
     
 }
 
-//- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-//{
-//    return NSLocalizedStringFromTable(@"Network", @STR_LOCALIZED_FILE_NAME, nil);
-//}
-
-#pragma mark -
 #pragma mark SearchCamereResultDelegate
-- (void) SearchCameraResult:(NSString *)mac Name:(NSString *)name Addr:(NSString *)addr Port:(NSString *)port DID:(NSString *)did
+- (void) VSNetSearchCameraResult:(NSString *)mac Name:(NSString *)name Addr:(NSString *)addr Port:(NSString *)port DID:(NSString*)did
 {
     if ([did length] == 0) {
         return;
@@ -249,7 +209,7 @@
     [searchListMgt AddCamera:mac Name:name Addr:addr Port:port DID:did];
 }
 
-#pragma mark -
+
 #pragma mark navigationbardelegate
 
 - (BOOL) navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item

@@ -14,6 +14,10 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 #import "CameraInfoCell.h"
 #import "mytoast.h"
 
+#import "VSNet.h"
+#import "cmdhead.h"
+#import "NSString+subValueFromRetString.h"
+#import "CameraViewController.h"
 
 @interface FtpSettingViewController ()
 
@@ -27,7 +31,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 @synthesize m_strFTPSvr;
 @synthesize m_strPwd;
 @synthesize m_strUser;
-@synthesize m_pChannelMgt;
 @synthesize m_strDID;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -43,16 +46,18 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 {
     [currentTextField resignFirstResponder];
     
-    //NSLog(@"ftpSvr: %@, ftpport: %d, ftpUser: %@, ftpPwd: %@", m_strFTPSvr, m_nFTPPort, m_strUser, m_strPwd);
-
-    m_pChannelMgt->SetFTP((char*)[m_strDID UTF8String],
-                          (char*)[m_strFTPSvr UTF8String],
-                          (char*)[m_strUser UTF8String],
-                          (char*)[m_strPwd UTF8String],
-                          (char*)"/", m_nFTPPort, m_nUploadInterval, 0);
+    //set_ftp.cgi?svr=%s&port=%d&user=%s&pwd=%s&mode=%d&dir=%s&interval=%d&
+    NSString* strCmd = [NSString stringWithFormat:@"set_ftp.cgi?svr=%s&port=%d&user=%s&pwd=%s&mode=0&dir=%s&interval=%d&",
+                        [m_strFTPSvr UTF8String],
+                        m_nFTPPort,
+                        [m_strUser UTF8String],
+                        [m_strPwd UTF8String],
+                        "/",
+                        m_nUploadInterval];
     
+    
+    [[VSNet shareinstance] sendCgiCommand:strCmd withIdentity:m_strDID];
     [self.navigationController popViewControllerAnimated:YES];
-    
 }
 
 - (void)viewDidLoad
@@ -66,16 +71,9 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     m_nFTPPort = 21;
     m_nUploadInterval = 0;
     
-   // UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
-   // [self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
-    //self.navigationBar.delegate = self;
-    //self.navigationBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
-    
     //self.textPassword = nil;
     NSString *strTitle = NSLocalizedStringFromTable(@"FTPSetting", @STR_LOCALIZED_FILE_NAME, nil);
-    //UINavigationItem *back = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
-    //UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:strTitle];
-    
+
     self.navigationItem.title = strTitle;
     //创建一个右边按钮
     UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Done", @STR_LOCALIZED_FILE_NAME, nil)
@@ -85,16 +83,11 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     
     //item.rightBarButtonItem = rightButton;
     self.navigationItem.rightBarButtonItem = rightButton;
-   // NSArray *array = [NSArray arrayWithObjects:back, item, nil];
-    //[self.navigationBar setItems:array];
     [rightButton release];
-    //[item release];
-    //[back release];
-    
-    
-    m_pChannelMgt->SetFTPDelegate((char*)[m_strDID UTF8String], self);
-    m_pChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_GET_PARAMS, NULL, 0);
 
+    NSString *cmd1 = @"get_params.cgi?";
+    [[VSNet shareinstance] setControlDelegate:m_strDID withDelegate:self];
+    [[VSNet shareinstance] sendCgiCommand:cmd1 withIdentity:m_strDID];
 }
 
 - (void)didReceiveMemoryWarning
@@ -124,18 +117,20 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     [super viewWillDisappear:animated];
     
     [[NSNotificationCenter defaultCenter]
-     removeObserver:self
-     name:UIKeyboardWillShowNotification
+    removeObserver:self
+    name:UIKeyboardWillShowNotification
      object:nil];
-	[[NSNotificationCenter defaultCenter]
+	 [[NSNotificationCenter defaultCenter]
      removeObserver:self
      name:UIKeyboardWillHideNotification
      object:nil];
+    
+    CameraViewController *camereView = [self.navigationController.viewControllers objectAtIndex:0];
+    [[VSNet shareinstance] setControlDelegate:m_strDID withDelegate:camereView];
 }
 
 - (void) dealloc
 {
-    m_pChannelMgt->SetFTPDelegate((char*)[m_strDID UTF8String], nil);
     self.navigationBar = nil;
     self.tableView = nil;
     self.currentTextField = nil;
@@ -228,7 +223,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
-    //[currentTextField resignFirstResponder];
 }
 
 #pragma mark -
@@ -236,15 +230,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void)keyboardWillShowNotification:(NSNotification *)aNotification
 {
-    //NSLog(@"keyboardWillShowNotification");
-    
     CGRect keyboardRect = CGRectZero;
-	
-	//
-	// Perform different work on iOS 4 and iOS 3.x. Note: This requires that
-	// UIKit is weak-linked. Failure to do so will cause a dylib error trying
-	// to resolve UIKeyboardFrameEndUserInfoKey on startup.
-	//
 	if (UIKeyboardFrameEndUserInfoKey != nil)
 	{
 		keyboardRect = [self.view.superview
@@ -260,11 +246,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 		}
 		
 		UIView *topLevelView = [[self.view.window subviews] objectAtIndex:0];
-		
-		//
-		// UIKeyboardBoundsUserInfoKey is used as an actual string to avoid
-		// deprecated warnings in the compiler.
-		//
 		keyboardRect = [[[aNotification userInfo] objectForKey:@"UIKeyboardBoundsUserInfoKey"] CGRectValue];
 		keyboardRect.origin.y = topLevelView.bounds.size.height - keyboardRect.size.height;
 		keyboardRect = [self.view.superview
@@ -286,20 +267,13 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 		[UIView commitAnimations];
 	}
     
-    //    NSLog(@"currentTextField: %f, %f, %f, %f",currentTextField.bounds.origin.x, currentTextField.bounds.origin.y, currentTextField.bounds.size.height, currentTextField.bounds.size.width);
-    
 	const CGFloat PageViewControllerTextFieldScrollSpacing = 10;
-    
-	CGRect textFieldRect =
-    [self.tableView convertRect:currentTextField.bounds fromView:currentTextField];
+	CGRect textFieldRect =[self.tableView convertRect:currentTextField.bounds fromView:currentTextField];
     
     NSArray *rectarray = [self.tableView indexPathsForRowsInRect:textFieldRect];
     if (rectarray.count <= 0) {
         return;
     }
-    
-    //    NSIndexPath * indexPath = [rectarray objectAtIndex:0];
-    //    NSLog(@"row: %d", indexPath.row);
     
 	textFieldRect = CGRectInset(textFieldRect, 0, -PageViewControllerTextFieldScrollSpacing);
 	[self.tableView scrollRectToVisible:textFieldRect animated:NO];
@@ -308,8 +282,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void)keyboardWillHideNotification:(NSNotification* )aNotification
 {
-    //NSLog(@"keyboardWillHideNotification");
-    
     if (textFieldAnimatedDistance == 0)
 	{
 		return;
@@ -339,7 +311,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-	//NSLog(@"textFieldDidEndEditing");
     switch (textField.tag) {
         case 0: // ftp server
             self.m_strFTPSvr = textField.text;
@@ -394,21 +365,24 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     [self.tableView reloadData];
 }
 
-#pragma mark -
-#pragma mark ftpParamDelegate
-- (void) FtpParam:(char *)svr user:(char *)user pwd:(char *)pwd dir:(char *)dir port:(int)port uploadinterval:(int)uploadinterval mode:(int)mode
+#pragma mark - VSNetControlProtocol
+- (void) VSNetControl: (NSString*) deviceIdentity commandType:(NSInteger) comType buffer:(NSString*)retString length:(int)length charBuffer:(char *)buffer
 {
-    //NSLog(@"svr: %s, user: %s, pwd: %s, dir: %s, port: %d, uploadinterval: %d, mode: %d", svr, user, pwd, dir, port, uploadinterval,mode);
-    
-    m_strFTPSvr = [NSString stringWithFormat:@"%s", svr];
-    m_strUser = [NSString stringWithFormat:@"%s",user];
-    m_strPwd = [NSString stringWithFormat:@"%s",pwd];
-    m_nFTPPort = port;
-    m_nUploadInterval = uploadinterval;
-    
-    [self performSelectorOnMainThread:@selector(reloadTableView) withObject:nil waitUntilDone:NO];
-    
+    NSLog(@"FtpSettingViewController:返回数据 UID:%@,comType:%ld",deviceIdentity,(long)comType);
+    if ([deviceIdentity isEqualToString:m_strDID] && comType == CGI_IEGET_PARAM)
+    {
+        NSInteger result = [[NSString subValueByKeyString:@"result=" fromRetString:retString] integerValue];
+        if (result != 0) {
+            NSLog(@"数据异常!");
+            return;
+        }
+        
+        m_strFTPSvr = [NSString subValueByKeyString:@"ftp_svr=" fromRetString:retString];
+        m_nFTPPort = [[NSString subValueByKeyString:@"ftp_port=" fromRetString:retString] integerValue];
+        m_strUser = [NSString subValueByKeyString:@"ftp_user=" fromRetString:retString];
+        m_strPwd = [NSString subValueByKeyString:@"ftp_pwd=" fromRetString:retString];
+        m_nUploadInterval = [[NSString subValueByKeyString:@"ftp_upload_interval=" fromRetString:retString] integerValue];
+        [self performSelectorOnMainThread:@selector(reloadTableView) withObject:nil waitUntilDone:NO];
+    }
 }
-
-
 @end

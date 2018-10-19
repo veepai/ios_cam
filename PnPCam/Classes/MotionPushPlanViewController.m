@@ -12,7 +12,14 @@
 #import "PlanManagement.h"
 #import "PlanModel.h"
 #import "AddScheduleTimeCell.h"
-@interface MotionPushPlanViewController ()<UITableViewDelegate, UITableViewDataSource,SdcardScheduleProtocol>
+
+#import "VSNet.h"
+#import "VSNetProtocol.h"
+#import "cmdhead.h"
+#import "APICommon.h"
+#import "CameraViewController.h"
+
+@interface MotionPushPlanViewController ()<UITableViewDelegate, UITableViewDataSource,VSNetControlProtocol>
 @property (nonatomic, retain) NSMutableArray *MotionPushPlan;
 @property (nonatomic, retain) UITableView *tableView;
 @end
@@ -38,136 +45,24 @@
     [self.tableView reloadData];
 }
 
-- (void)getPlanStatus
+- (void)viewWillDisappear:(BOOL)animated
 {
-    NSString *commandStr = [NSString stringWithFormat:@"trans_cmd_string.cgi?cmd=2017&command=11&mark=212&type=2&"];
-    _m_PPPPChannelMgt->GetJsonCGI((char*) [self.m_strDID UTF8String], 2017, (char *)[commandStr UTF8String]);
-    _m_PPPPChannelMgt->SetSDcardScheduleDelegate((char*)[self.m_strDID UTF8String], self);
-    
-    //移动侦测报警通知计划指令生效需把移动侦测功能打开
-    //获取移动侦测状态
-    _m_PPPPChannelMgt->SetAlarmDelegate((char*)[self.m_strDID UTF8String], self);
-    _m_PPPPChannelMgt->PPPPSetSystemParams((char*)[self.m_strDID UTF8String], MSG_TYPE_GET_PARAMS, NULL, 0);
+    CameraViewController *camereView = [self.navigationController.viewControllers objectAtIndex:0];
+    [[VSNet shareinstance] setControlDelegate:_m_strDID withDelegate:camereView];
 }
 
-//获取到的移动侦测状态结果
-- (void) AlarmProtocolResult:(int)motion_armed
-          motion_sensitivity:(int)motion_sensitivity
-                 input_armed:(int)input_armed
-                  ioin_level:(int)ioin_level
-              alarmpresetsit:(int)alarmpresetsit
-                   iolinkage:(int)iolinkage
-                 ioout_level:(int)ioout_level
-                        mail:(int)mail
-                    snapshot:(int)snapshot
-             upload_interval:(int)upload_interval
-                      record:(int)record
+- (void)getPlanStatus
 {
-    //默认打开移动侦测功能
-    _m_PPPPChannelMgt->SetAlarm((char*)[_m_strDID UTF8String], 1, motion_sensitivity, input_armed, ioin_level, alarmpresetsit, iolinkage, ioout_level, mail, upload_interval,1);
+    //移动侦测报警通知计划指令生效需把移动侦测功能打开
+    //获取移动侦测状态
+    [[VSNet shareinstance] setControlDelegate:self.m_strDID withDelegate:self];
+    NSString *commandStr = [NSString stringWithFormat:@"trans_cmd_string.cgi?cmd=2017&command=11&mark=212&type=2&"];
+    [[VSNet shareinstance] sendCgiCommand:commandStr withIdentity:self.m_strDID];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-- (void)motionPushSchedule:(NSString *)cameraUID motion_push_plan1:(int)motion_push_plan1 motion_push_plan2:(int)motion_push_plan2 motion_push_plan3:(int)motion_push_plan3 motion_push_plan4:(int)motion_push_plan4 motion_push_plan5:(int)motion_push_plan5 motion_push_plan6:(int)motion_push_plan6 motion_push_plan7:(int)motion_push_plan7 motion_push_plan8:(int)motion_push_plan8 motion_push_plan9:(int)motion_push_plan9 motion_push_plan10:(int)motion_push_plan10 motion_push_plan11:(int)motion_push_plan11 motion_push_plan12:(int)motion_push_plan12 motion_push_plan13:(int)motion_push_plan13 motion_push_plan14:(int)motion_push_plan14 motion_push_plan15:(int)motion_push_plan15 motion_push_plan16:(int)motion_push_plan16 motion_push_plan17:(int)motion_push_plan17 motion_push_plan18:(int)motion_push_plan18 motion_push_plan19:(int)motion_push_plan19 motion_push_plan20:(int)motion_push_plan20 motion_push_plan21:(int)motion_push_plan21 motion_push_enable:(int)motion_push_enable
-{
-    [[PlanManagement shareManagement].MotiondPushRecordPlanArray removeAllObjects];
-    if (motion_push_plan1)
-    {
-        [self TenAndTwoPush:motion_push_plan1 atIndex:0];
-    }
-    if (motion_push_plan2)
-    {
-        [self TenAndTwoPush:motion_push_plan2 atIndex:0];
-    }
-    if (motion_push_plan3)
-    {
-        [self TenAndTwoPush:motion_push_plan3 atIndex:0];
-    }
-    if (motion_push_plan4)
-    {
-        [self TenAndTwoPush:motion_push_plan4 atIndex:0];
-    }
-    if (motion_push_plan5)
-    {
-        [self TenAndTwoPush:motion_push_plan5 atIndex:0];
-    }
-    if (motion_push_plan6)
-    {
-        [self TenAndTwoPush:motion_push_plan6 atIndex:0];
-    }
-    if (motion_push_plan7)
-    {
-        [self TenAndTwoPush:motion_push_plan7 atIndex:0];
-    }
-    if (motion_push_plan8)
-    {
-        [self TenAndTwoPush:motion_push_plan8 atIndex:0];
-    }
-    if (motion_push_plan9)
-    {
-        [self TenAndTwoPush:motion_push_plan9 atIndex:0];
-    }
-    if (motion_push_plan10)
-    {
-        [self TenAndTwoPush:motion_push_plan10 atIndex:0];
-    }
-    if (motion_push_plan11)
-    {
-        [self TenAndTwoPush:motion_push_plan11 atIndex:0];
-    }
-    if (motion_push_plan12)
-    {
-        [self TenAndTwoPush:motion_push_plan12 atIndex:0];
-    }
-    if (motion_push_plan13)
-    {
-        [self TenAndTwoPush:motion_push_plan13 atIndex:0];
-    }
-    if (motion_push_plan14)
-    {
-        [self TenAndTwoPush:motion_push_plan14 atIndex:0];
-    }
-    if (motion_push_plan15)
-    {
-        [self TenAndTwoPush:motion_push_plan15 atIndex:0];
-    }
-    if (motion_push_plan16)
-    {
-        [self TenAndTwoPush:motion_push_plan16 atIndex:0];
-    }
-    if (motion_push_plan17)
-    {
-        [self TenAndTwoPush:motion_push_plan17 atIndex:0];
-    }
-    if (motion_push_plan18)
-    {
-        [self TenAndTwoPush:motion_push_plan18 atIndex:0];
-    }
-    if (motion_push_plan19)
-    {
-        [self TenAndTwoPush:motion_push_plan19 atIndex:0];
-    }
-    if (motion_push_plan20)
-    {
-        [self TenAndTwoPush:motion_push_plan20 atIndex:0];
-    }
-    if (motion_push_plan21)
-    {
-        [self TenAndTwoPush:motion_push_plan21 atIndex:0];
-    }
-    [_MotionPushPlan removeAllObjects];
-    [_MotionPushPlan addObjectsFromArray:[PlanManagement shareManagement].MotiondPushRecordPlanArray];
-    //__weak MotionPushPlanViewController *weakSelf = self;
-    __unsafe_unretained typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [weakSelf.tableView reloadData];
-    });
-    
-    
 }
 
 - (void) TenAndTwoPush:(int) num atIndex:(int)index{
@@ -419,7 +314,6 @@
         addPlanVC.navigationItem.title = NSLocalizedStringFromTable(@"移动侦测报警计划", @STR_LOCALIZED_FILE_NAME, nil);
         addPlanVC.addPlanTyep = @"AddMotionPushPlan";
         addPlanVC.str_DID = self.m_strDID;
-        addPlanVC.m_PPPPChannelMgt = _m_PPPPChannelMgt;
         [self.navigationController pushViewController:addPlanVC animated:YES];
         [addPlanVC release], addPlanVC = nil;
     }
@@ -438,22 +332,34 @@
         addPlanVC.navigationItem.title = NSLocalizedStringFromTable(@"移动侦测报警计划", @STR_LOCALIZED_FILE_NAME, nil);
         addPlanVC.addPlanTyep = @"AddMotionPushPlan";
         addPlanVC.str_DID = self.m_strDID;
-        addPlanVC.m_PPPPChannelMgt = _m_PPPPChannelMgt;
         [self.navigationController pushViewController:addPlanVC animated:YES];
         [addPlanVC release], addPlanVC = nil;
     }
 }
 
-
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+#pragma mark - VSNetControlProtocol
+- (void) VSNetControl: (NSString*) deviceIdentity commandType:(NSInteger) comType buffer:(NSString*)retString length:(int)length charBuffer:(char *)buffer
+{
+    NSLog(@"RecordScheduleSettingViewController VSNet返回数据 UID:%@ comtype %ld",deviceIdentity,(long)comType);
+    if ([deviceIdentity isEqualToString:self.m_strDID])
+    {
+        if(comType == CGI_MUSIC_OPERATION )
+        {
+            if ([retString rangeOfString:@"cmd"].location != NSNotFound && [[APICommon stringAnalysisWithFormatStr:@"cmd=" AndRetString:retString] isEqualToString:@"2017"]){
+                
+                if ([retString rangeOfString:@"motion_push_plan"].location != NSNotFound)
+                {
+                    [[PlanManagement shareManagement].MotiondPushRecordPlanArray removeAllObjects];
+                    [PlanManagement detailMotionPushPlanData:retString];
+                    [_MotionPushPlan removeAllObjects];
+                    [_MotionPushPlan addObjectsFromArray:[PlanManagement shareManagement].MotiondPushRecordPlanArray];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.tableView reloadData];
+                    });
+                }
+            }
+        }
+    }
 }
-*/
 
 @end

@@ -9,7 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "RecPathManagement.h"
 #import "NotifyEventProtocol.h"
-#import "PPPPChannelManagement.h"
 #import "CameraListMgt.h"
 #import "RecordViewController.h"
 #import "FPPopoverController.h"
@@ -30,7 +29,7 @@
     
     id<NotifyEventProtocol> RecReloadDelegate;
     
-    CPPPPChannelManagement* m_PpppchannelMgt;
+    //CPPPPChannelManagement* m_PpppchannelMgt;
     CameraListMgt* camListMgt;
 }
 @property (nonatomic, retain) FPPopoverController* fppopoverCtr;
@@ -42,7 +41,7 @@
 @property (nonatomic, retain) UIImage *imageDefault;
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, assign) id<NotifyEventProtocol> RecReloadDelegate;
-@property (nonatomic, assign) CPPPPChannelManagement* m_PpppchannelMgt;
+
 @property (nonatomic, retain) CameraListMgt* camListMgt;
 - (UIImage*) fitImage:(UIImage*)image tofitHeight:(CGFloat)height;
 @end

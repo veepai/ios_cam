@@ -11,6 +11,11 @@
 #import "CameraInfoCell.h"
 #import "MBProgressHUD.h"
 
+#import "VSNet.h"
+#import "cmdhead.h"
+#import "APICommon.h"
+#import "CameraViewController.h"
+
 static const double PageViewControllerTextAnimationDuration = 0.33;
 
 @interface UserPwdSetViewController ()
@@ -22,7 +27,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 @implementation UserPwdSetViewController
 
-@synthesize m_pChannelMgt;
 @synthesize m_strUser;
 @synthesize m_strPwd;
 @synthesize textUser;
@@ -87,28 +91,11 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         
         //修改成功，重新启动P2P连接
         sleep(3.0f);
-        m_pChannelMgt->Stop([did UTF8String]);
-		
-		 if ([[did uppercaseString] rangeOfString:@"VSTA"].location != NSNotFound) {
-            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EFGFFBBOKAIEGHJAEDHJFEEOHMNGDCNJCDFKAKHLEBJHKEKMCAFCDLLLHAOCJPPMBHMNOMCJKGJEBGGHJHIOMFBDNPKNFEGCEGCBGCALMFOHBCGMFK",0);
-        }else if ([[did uppercaseString] rangeOfString:@"VSTG"].location != NSNotFound) {
-            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EEGDFHBOKCIGGFJPECHIFNEBGJNLHOMIHEFJBADPAGJELNKJDKANCBPJGHLAIALAADMDKPDGOENEBECCIK:vstarcam2018",0);
-        }else if ([[did uppercaseString] rangeOfString:@"VSTE"].location != NSNotFound) {
-            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"EEGDFHBAKKIOGNJHEGHMFEEDGLNOHJMPHAFPBEDLADILKEKPDLBDDNPOHKKCIFKJBNNNKLCPPPNDBFDL",0);
-        }else if ([[did uppercaseString] rangeOfString:@"VSTB"].location != NSNotFound ) {
-            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL",0);
-        }else if ([[did uppercaseString] rangeOfString:@"VSTC"].location != NSNotFound ) {
-            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL",0);
-        }else if ([[did uppercaseString] rangeOfString:@"VSTD"].location != NSNotFound ) {
-            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$",1);
-        }else if ([[did uppercaseString] rangeOfString:@"VSTF"].location != NSNotFound ) {
-            m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"HZLXEJIALKHYATPCHULNSVLMEELSHWIHPFIBAOHXIDICSQEHENEKPAARSTELERPDLNEPLKEILPHUHXHZEJEEEHEGEM-$$",1);
-        }
-        else
-        {
-             m_pChannelMgt->Start([did UTF8String], [user UTF8String], [pwd UTF8String],@"",0);
-        }
-        
+        [[VSNet shareinstance] stop:did];
+        [[VSNet shareinstance] start:did withUser:user withPassWord:pwd initializeStr:nil LanSearch:1];
+        CameraViewController *camereView = [self.navigationController.viewControllers objectAtIndex:0];
+        [[VSNet shareinstance] setStatusDelegate:did withDelegate:camereView];
+        [[VSNet shareinstance] setControlDelegate:did withDelegate:camereView];
         
         [loadHUD hide:YES];
         
@@ -148,13 +135,14 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     [alertView release];
     alertView = nil;
     
-    
     loadHUD = [[MBProgressHUD alloc] initWithView:self.view];
     [self.view addSubview:loadHUD];
     loadHUD.dimBackground = YES;
     
     loadHUD.labelText = NSLocalizedStringFromTable(@"PleaseWait", @STR_LOCALIZED_FILE_NAME, Nil);
     [loadHUD show:YES];
+    
+    [[VSNet shareinstance] setControlDelegate:m_strDID withDelegate:self];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self sendCGI];
     });
@@ -162,30 +150,16 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void)sendCGI
 {
-    
-    m_pChannelMgt->SetUserPwd((char*)[m_strDID UTF8String], (char*)"", (char*)"", (char*)"", (char*)"", (char*)[m_strUser UTF8String], (char*)[m_strPwd UTF8String]);
-    
-    sleep(2.0f);
-    m_pChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_REBOOT_DEVICE, NULL, 0);
-    
-    [self EditP2PCameraInfo:NO Name:self.cameraName DID:self.m_strDID User:@"admin" Pwd:self.m_strPwd OldDID:self.m_strDID];
+
+    NSString *cmdStr = [NSString stringWithFormat:@"set_users.cgi?&user1=%@&user2=%@&user3=%@&pwd1=%@&pwd2=%@&pwd3=%@&", @"", @"", @"admin", @"", @"", m_strPwd];
+    [[VSNet shareinstance] sendCgiCommand:cmdStr withIdentity:m_strDID];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-    
-    //UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
-    //[self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
-    //self.navigationBar.delegate = self;
-    //self.navigationBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
-    
     self.textPassword = nil;
     NSString *strTitle = NSLocalizedStringFromTable(@"UserSetting", @STR_LOCALIZED_FILE_NAME, nil);
-    //UINavigationItem *back = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
-    //UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:strTitle];
-  
     self.navigationItem.title = strTitle;
     
     //创建一个右边按钮  
@@ -194,23 +168,12 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
                                                                    target:self     
                                                                    action:@selector(btnSetUserPwd:)];
     
-    //item.rightBarButtonItem = rightButton;
     self.navigationItem.rightBarButtonItem = rightButton;
-    ////NSArray *array = [NSArray arrayWithObjects:back, item, nil];
-    //[self.navigationBar setItems:array];
 
     [rightButton release];
-    //[item release];
-    //[back release];
-
     _swipeGes = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGes)];
     _swipeGes.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:_swipeGes];
-    
-    int i = m_pChannelMgt->SetUserPwdParamDelegate((char*)[m_strDID UTF8String], self);
-    int j = m_pChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_GET_PARAMS, NULL, 0);
-    NSLog(@"代理设置结果 i = %d,j = %d",i,j);
-    //m_pChannelMgt->PPPPSetSystemParams((char*)[m_strDID UTF8String], MSG_TYPE_WIFI_SCAN, NULL, 0);
 }
 
 - (void) handleSwipeGes{
@@ -250,14 +213,8 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-    
     UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
     [self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
-    
-    int k = m_pChannelMgt->SetUserPwdParamDelegate((char*)[m_strDID UTF8String], nil);
-    NSLog(@"k = %d",k);
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -276,9 +233,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         self.timer = nil;
     }
    
-    
-    m_pChannelMgt->SetUserPwdParamDelegate((char*)[m_strDID UTF8String], nil);
-    self.m_pChannelMgt = nil;
     self.m_strUser = nil;
     self.m_strPwd = nil;
     self.textPassword = nil;
@@ -298,15 +252,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void)keyboardWillShowNotification:(NSNotification *)aNotification
 {
-    //NSLog(@"keyboardWillShowNotification");
-
     CGRect keyboardRect = CGRectZero;
-	
-	//
-	// Perform different work on iOS 4 and iOS 3.x. Note: This requires that
-	// UIKit is weak-linked. Failure to do so will cause a dylib error trying
-	// to resolve UIKeyboardFrameEndUserInfoKey on startup.
-	//
 	if (UIKeyboardFrameEndUserInfoKey != nil)
 	{
 		keyboardRect = [self.view.superview
@@ -322,11 +268,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 		}
 		
 		UIView *topLevelView = [[self.view.window subviews] objectAtIndex:0];
-		
-		//
-		// UIKeyboardBoundsUserInfoKey is used as an actual string to avoid
-		// deprecated warnings in the compiler.
-		//
 		keyboardRect = [[[aNotification userInfo] objectForKey:@"UIKeyboardBoundsUserInfoKey"] CGRectValue];
 		keyboardRect.origin.y = topLevelView.bounds.size.height - keyboardRect.size.height;
 		keyboardRect = [self.view.superview
@@ -348,10 +289,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 		[UIView commitAnimations];
 	}
     
-    //    NSLog(@"currentTextField: %f, %f, %f, %f",currentTextField.bounds.origin.x, currentTextField.bounds.origin.y, currentTextField.bounds.size.height, currentTextField.bounds.size.width);
-    
 	const CGFloat PageViewControllerTextFieldScrollSpacing = 10;
-    
 	CGRect textFieldRect =
     [self.tableView convertRect:currentTextField.bounds fromView:currentTextField];
     
@@ -360,9 +298,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         return;
     }
     
-    //    NSIndexPath * indexPath = [rectarray objectAtIndex:0];
-    //    NSLog(@"row: %d", indexPath.row);
-    
 	textFieldRect = CGRectInset(textFieldRect, 0, -PageViewControllerTextFieldScrollSpacing);
 	[self.tableView scrollRectToVisible:textFieldRect animated:NO];     
     
@@ -370,10 +305,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void)keyboardWillHideNotification:(NSNotification* )aNotification
 {
-    //NSLog(@"keyboardWillHideNotification");
-    
-    if (textFieldAnimatedDistance == 0)
-	{
+    if (textFieldAnimatedDistance == 0){
 		return;
 	}
 	
@@ -384,13 +316,11 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 	[UIView setAnimationDuration:PageViewControllerTextAnimationDuration];
 	[self.tableView setFrame:viewFrame];
 	[UIView commitAnimations];
-	
 	textFieldAnimatedDistance = 0;
 }
 
-#pragma mark -
-#pragma mark TableViewDelegate
 
+#pragma mark TableViewDelegate
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)aTableView
 {
     return 1;
@@ -420,12 +350,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         
         NSInteger row = anIndexPath.row;
         switch (row) {
-//            case 0: 
-//                cell.keyLable.text = NSLocalizedStringFromTable(@"UserName", @STR_LOCALIZED_FILE_NAME, nil);
-//                cell.textField.placeholder = NSLocalizedStringFromTable(@"InputUserName", @STR_LOCALIZED_FILE_NAME, nil);            
-//                cell.textField.text = self.m_strUser;
-//                //[cell.textField setEnabled: NO];
-//                break;
             case 0:
                 cell.keyLable.text = NSLocalizedStringFromTable(@"NewPwd", @STR_LOCALIZED_FILE_NAME, nil);
                 cell.textField.placeholder = NSLocalizedStringFromTable(@"InputPassword", @STR_LOCALIZED_FILE_NAME, nil);
@@ -446,7 +370,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
-    //[currentTextField resignFirstResponder];
 }
 
 #pragma mark -
@@ -454,11 +377,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
-    //NSLog(@"textFieldShouldBeginEditing");
     switch (textField.tag) {
-//        case 0:
-//            self.textUser = textField; 
-//            break;
         case 0:
             self.textPassword = textField; 
             break;        
@@ -471,11 +390,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-	//NSLog(@"textFieldDidEndEditing");
     switch (textField.tag) {
-//        case 0:
-//            self.m_strUser = textField.text;
-//            break;
         case 0:
             self.m_strPwd = textField.text;
             break;        
@@ -499,25 +414,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     return YES;
 }
 
-/*- (void) UserPwdResult:(NSString*)strUser1 pwd1:(NSString*)strPwd1 user2:(NSString*)strUser2 pwd2:(NSString*)strPwd2 user3:(NSString*)strUser3 pwd3:(NSString*)strPwd3*/
-- (void) UserPwdResult:(NSString*)szuid user1:(NSString*)strUser1 pwd1:(NSString*)strPwd1 user2:(NSString*)strUser2 pwd2:(NSString*)strPwd2 user3:(NSString*)strUser3 pwd3:(NSString*)strPwd3
-{
-    self.m_strUser = strUser3;
-    self.m_strPwd = strPwd3;
-    
-    self.m_user1 = strUser1;
-    self.m_pwd1 = strPwd1;
-    
-    self.m_user2 = strUser2;
-    self.m_pwd2 = strPwd2;
-    
-    NSLog(@"m_strPwd = %@",self.m_strPwd);
-    NSLog(@"m_pwd1 = %@",self.m_pwd1);
-    NSLog(@"m_pwd2 = %@", self.m_pwd2);
-    
-    [self performSelectorOnMainThread:@selector(reloadTableView:) withObject:nil waitUntilDone:NO];
-}
-#pragma mark -
+
 #pragma mark PerformInMainThread
 
 - (void) reloadTableView:(id) param
@@ -527,11 +424,26 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 #pragma mark -
 #pragma mark navigationBarDelegate
-
 - (BOOL) navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item
 {
     [self.navigationController popViewControllerAnimated:YES];
     return NO;
+}
+
+#pragma mark - VSNetControlProtocol
+- (void) VSNetControl: (NSString*) deviceIdentity commandType:(NSInteger) comType buffer:(NSString*)retString length:(int)length charBuffer:(char *)buffer
+{
+    NSLog(@"UserPwdSetViewController VSNet返回数据 UID:%@ comtype %ld",deviceIdentity,(long)comType);
+    if (comType == CGI_IESET_USER && [deviceIdentity isEqualToString:m_strDID]) {
+        NSInteger result = [[APICommon stringAnalysisWithFormatStr:@"result=" AndRetString:retString] integerValue];
+        if (result == 0){
+            [[VSNet shareinstance] sendCgiCommand:@"reboot.cgi?" withIdentity:m_strDID];
+            [self EditP2PCameraInfo:NO Name:self.cameraName DID:self.m_strDID User:@"admin" Pwd:self.m_strPwd OldDID:self.m_strDID];
+        }
+        else{
+            NSLog(@"修改密码失败");
+        }
+    }
 }
 
 @end

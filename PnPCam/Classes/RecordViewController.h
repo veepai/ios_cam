@@ -10,7 +10,6 @@
 #import "CameraListMgt.h"
 #import "NotifyEventProtocol.h"
 #import "RecPathManagement.h"
-#import "PPPPChannelManagement.h"
 
 @interface RecordViewController : UIViewController<NotifyEventProtocol>{
     IBOutlet UINavigationBar *navigationBar;
@@ -25,8 +24,6 @@
     
     BOOL m_bLocal;
     
-    CPPPPChannelManagement *m_pPPPPChannelMgt;
-    
 }
 
 @property (nonatomic, retain) UINavigationBar *navigationBar;
@@ -36,6 +33,5 @@
 @property (nonatomic, assign) RecPathManagement *m_pRecPathMgt;
 @property (nonatomic, retain) UIImage *imageVideoDefault;
 @property (nonatomic, retain) UIImage *imagePlay;
-@property (nonatomic, assign) CPPPPChannelManagement *m_pPPPPChannelMgt;
 
 @end

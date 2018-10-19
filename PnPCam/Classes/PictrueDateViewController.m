@@ -50,16 +50,7 @@
     picDataArray = nil;
     picDataArray = [m_pPicPathMgt GetTotalPicDataArray:strDID] ;
     
-   // UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
-   // [self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
-    //self.navigationBar.delegate = self;
-    //self.navigationBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
-    
-    //UINavigationItem *back = [[UINavigationItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Back", @STR_LOCALIZED_FILE_NAME, nil)];
-    //back.leftBarButtonItem.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
-    //UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:strName];
     self.navigationItem.title = strName;
-    
     UIImage* albumImg = [UIImage imageNamed:@"Camera"];
     UIImage* newalbumImg = [self fitImage:albumImg tofitHeight:35];
     UIButton* albumBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -72,29 +63,9 @@
     UIBarButtonItem* rightBar = [[UIBarButtonItem alloc] initWithCustomView:albumBtn];
     self.navigationItem.rightBarButtonItem  = rightBar;
     [rightBar release];
-    //rightItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Picture", @STR_LOCALIZED_FILE_NAME, nil) style:UIBarButtonItemStyleBordered target:self action:@selector(album:)];
-    //item.rightBarButtonItem = rightItem;
-        
-   // NSArray *array = [NSArray arrayWithObjects:back, item,nil];
-    //[self.navigationBar setItems:array];
-    
-    //[item release];
-    //[back release];
-    //menutableView = [[UITableView alloc] initWithFrame:CGRectMake(100, 100, 100, 200) style:UITableViewStylePlain];
-    ////menutableView.dataSource =self;
-   //// menutableView.delegate = self;
-   // self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    //[self.view addSubview:menutableView];
+
     self.imageBkDefault = [UIImage imageNamed:@"picbk.png"];
-    
-    //UIPopoverController
-//    menuTableCtr = [[UITableViewController alloc] initWithStyle:UITableViewStylePlain];
-//    menuTableCtr.tableView = self.menutableView;
-//    popovewCtr = [[UIPopoverController alloc] initWithContentViewController:menuTableCtr];
-//    popovewCtr.delegate = self;
-//    popovewCtr.popoverContentSize = CGSizeMake(400, 220);
-    //[menutableView reloadData];
-    
+
     _swipeGes = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGes)];
     _swipeGes.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:_swipeGes];
@@ -143,7 +114,7 @@
     albumTable = nil;
 }
 
-#pragma mark - 
+
 #pragma mark AlbumTableViewControllerDelegate
 - (void)reloadData:(NSString*)strUID{
     if (self.fPPopoverCtr != nil) {
@@ -153,7 +124,7 @@
     picDataArray = [m_pPicPathMgt GetTotalPicDataArray:strDID] ;
     [self.tableView reloadData];
 }
-#pragma mark -
+
 #pragma mark FPPopoverControllerDelegate
 - (void)popoverControllerDidDismissPopover:(FPPopoverController *)popoverController{
     if (popoverController != nil) {
@@ -226,13 +197,11 @@
 }
 
 #pragma mark UITableViewDataSource
-
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     return 1;
 }
 
 #pragma mark TableViewDelegate
-
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
     //NSLog(@"numberOfRowsInSection11111");
@@ -279,8 +248,8 @@
     if (nPicCount == 0) {
         return nil;
     }
+        
     NSString *strShowName = [NSString stringWithFormat:@"%@(%d)", strDate, nPicCount];
-    
     NSString *strPath = [m_pPicPathMgt GetFirstPathByIDAndDate:strDID Date:strDate];
     UIImage *image = [APICommon GetImageByNameFromImage:strDID filename:strPath];
     
@@ -313,64 +282,9 @@
             
             cell = [nib objectAtIndex:0];
         }
-        /*NSDictionary* cameraDic = [cameraListMgt GetCameraAtIndex:anIndexPath.row];
-        NSString *name = [cameraDic objectForKey:@STR_NAME];
-        UIImage *img = [cameraDic objectForKey:@STR_IMG];
-        NSNumber *nPPPPStatus = [cameraDic objectForKey:@STR_PPPP_STATUS];
-        //NSNumber *nPPPPMode = [cameraDic objectForKey:@STR_PPPP_MODE];
-        NSString *did = [cameraDic objectForKey:@STR_DID];
-        
-        int ppppstatus = [nPPPPStatus integerValue];
-        cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
-        if (img != nil) {
-            cell.imageCamera.image = img;
-        }
-        cell.NameLable.text = name;
-        cell.PPPPIDLable.text = did;
-        
-       
-        NSString *strPPPPStatus = nil;
-        switch (ppppstatus) {
-            case PPPP_STATUS_UNKNOWN:
-                strPPPPStatus = NSLocalizedStringFromTable(@"PPPPStatusUnknown", @STR_LOCALIZED_FILE_NAME, nil);
-                break;
-            case PPPP_STATUS_CONNECTING:
-                strPPPPStatus = NSLocalizedStringFromTable(@"PPPPStatusConnecting", @STR_LOCALIZED_FILE_NAME, nil);
-                break;
-            case PPPP_STATUS_INITIALING:
-                strPPPPStatus = NSLocalizedStringFromTable(@"PPPPStatusInitialing", @STR_LOCALIZED_FILE_NAME, nil);
-                break;
-            case PPPP_STATUS_CONNECT_FAILED:
-                strPPPPStatus = NSLocalizedStringFromTable(@"PPPPStatusConnectFailed", @STR_LOCALIZED_FILE_NAME, nil);
-                break;
-            case PPPP_STATUS_DISCONNECT:
-                strPPPPStatus = NSLocalizedStringFromTable(@"PPPPStatusDisconnected", @STR_LOCALIZED_FILE_NAME, nil);
-                break;
-            case PPPP_STATUS_INVALID_ID:
-                strPPPPStatus = NSLocalizedStringFromTable(@"PPPPStatusInvalidID", @STR_LOCALIZED_FILE_NAME, nil);
-                break;
-            case PPPP_STATUS_ON_LINE:
-                strPPPPStatus = NSLocalizedStringFromTable(@"PPPPStatusOnline", @STR_LOCALIZED_FILE_NAME, nil);
-                break;
-            case PPPP_STATUS_DEVICE_NOT_ON_LINE:
-                strPPPPStatus = NSLocalizedStringFromTable(@"CameraIsNotOnline", @STR_LOCALIZED_FILE_NAME, nil);
-                break;
-            case PPPP_STATUS_CONNECT_TIMEOUT:
-                strPPPPStatus = NSLocalizedStringFromTable(@"PPPPStatusConnectTimeout", @STR_LOCALIZED_FILE_NAME, nil);
-                break;
-            default:
-                strPPPPStatus = NSLocalizedStringFromTable(@"PPPPStatusUnknown", @STR_LOCALIZED_FILE_NAME, nil);
-                break;
-        }
-        cell.PPPPStatusLable.text = strPPPPStatus;*/
-        
 
-        
         return cell;
     }
-        
-    
-    
 }
 
 - (CGFloat)tableView:(UITableView*)tableview heightForRowAtIndexPath:(NSIndexPath*)indexpath
@@ -399,12 +313,12 @@
     [picListViewController release];
     
 }
-#pragma mark-
+
 #pragma mark perfortInMainThread
 -(void)reloadTableViewData{
     [self.tableView reloadData];
 }
-#pragma mark-
+
 #pragma mark NotifyReloadData
 -(void)NotifyReloadData{
     if(self.NotifyReloadDataDelegate!=nil){
@@ -412,13 +326,11 @@
     }
     
     picDataArray = [m_pPicPathMgt GetTotalPicDataArray:strDID] ;
-   
     [self performSelectorOnMainThread:@selector(reloadTableViewData) withObject:nil waitUntilDone:NO];
 }
 
-#pragma mark -
-#pragma mark uinavigationbardelegate
 
+#pragma mark uinavigationbardelegate
 - (BOOL) navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item
 {
     [popovewCtr dismissPopoverAnimated:NO];

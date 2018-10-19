@@ -9,6 +9,9 @@
 #import "DemoTableController.h"
 #import "CustomCell.h"
 #import "obj_common.h"
+
+#import "VSNet.h"
+
 @interface DemoTableController ()
 
 @end
@@ -37,12 +40,6 @@
     if ([fileMng createFileAtPath:imgPath contents:imagedata attributes:nil]){
        
     }
-    //[fileMng createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
-    //[fileMng createFileAtPath:path contents:nil attributes:nil];
-//    if ([imagedata writeToFile:path atomically:YES])
-//    {
-//        NSLog(@"write");
-//    }
 }
 
 -(void)defaultCell{
@@ -106,11 +103,10 @@
     
     if(cell == nil)
     {
-        ///cell = [[[CustomCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier] autorelease];
         NSArray* nib = [[NSBundle mainBundle] loadNibNamed:@"CustomCell" owner:self options:nil];
         cell = [nib lastObject];
     }
-    //[cell.resetbutton setImage:[UIImage imageNamed:@"Camera"] forState:UIControlStateNormal];
+   
     cell.label.text = [NSString stringWithFormat:@"%@%d",NSLocalizedStringFromTable(@"Preset", @STR_LOCALIZED_FILE_NAME, nil),indexPath.row+1];
     
     
@@ -174,7 +170,7 @@
 }
 
 -(void)againreset:(id)sender{
-   // _cppppchannelMgt->PTZ_Control([_strDID UTF8String], CMD_PTZ_PREFAB_BIT_SET0);
+
     _button_tag = ((UIButton*)sender).tag;
     _butonTap = YES;
     UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"replace", @STR_LOCALIZED_FILE_NAME, nil) message:nil delegate:self cancelButtonTitle:NSLocalizedStringFromTable(@"Cancel", @STR_LOCALIZED_FILE_NAME, nil) otherButtonTitles:NSLocalizedStringFromTable(@"OK", @STR_LOCALIZED_FILE_NAME, nil), nil];
@@ -195,8 +191,10 @@
         switch (_button_tag) {
             case 50:
             {
-                _cppppchannelMgt->PTZ_Control([_strDID UTF8String], CMD_PTZ_PREFAB_BIT_SET0);
-                //[(UIButton*)[self.view viewWithTag:100] setImage:_img forState:UIControlStateNormal];
+            
+                NSString *cgi = [NSString stringWithFormat:@"GET /decoder_control.cgi?command=%d&onestep=0&" ,CMD_PTZ_PREFAB_BIT_SET0];
+                [[VSNet shareinstance] sendCgiCommand:cgi withIdentity:_strDID];
+                
                 NSString* path1 = [[self PathForDocumentStrDID:_strDID] stringByAppendingPathComponent:[NSString stringWithFormat:@"photo%d",50]];
                 
                 if ([fileMng fileExistsAtPath:path1]) {
@@ -216,9 +214,10 @@
                 break;
             case 51:
             {
-                _cppppchannelMgt->PTZ_Control([_strDID UTF8String], CMD_PTZ_PREFAB_BIT_SET1);
-                
-                //[(UIButton*)[self.view viewWithTag:101] setImage:_img forState:UIControlStateNormal];
+               
+     
+                NSString *cgi = [NSString stringWithFormat:@"GET /decoder_control.cgi?command=%d&onestep=0&" ,CMD_PTZ_PREFAB_BIT_SET1];
+                [[VSNet shareinstance] sendCgiCommand:cgi withIdentity:_strDID];
                 NSString* path1 = [[self PathForDocumentStrDID:_strDID] stringByAppendingPathComponent:[NSString stringWithFormat:@"photo%d",51]];
                 
                 if ([fileMng fileExistsAtPath:path1]) {
@@ -239,8 +238,8 @@
                 break;
             case 52:
             {
-                _cppppchannelMgt->PTZ_Control([_strDID UTF8String], CMD_PTZ_PREFAB_BIT_SET2);
-                //[(UIButton*)[self.view viewWithTag:102] setImage:_img forState:UIControlStateNormal];
+                NSString *cgi = [NSString stringWithFormat:@"GET /decoder_control.cgi?command=%d&onestep=0&" ,CMD_PTZ_PREFAB_BIT_SET2];
+                [[VSNet shareinstance] sendCgiCommand:cgi withIdentity:_strDID];
                 NSString* path1 = [[self PathForDocumentStrDID:_strDID] stringByAppendingPathComponent:[NSString stringWithFormat:@"photo%d",52]];
                 
                 if ([fileMng fileExistsAtPath:path1]) {
@@ -260,8 +259,9 @@
                 break;
             case 53:
             {
-                _cppppchannelMgt->PTZ_Control([_strDID UTF8String], CMD_PTZ_PREFAB_BIT_SET3);
-                //[(UIButton*)[self.view viewWithTag:103] setImage:_img forState:UIControlStateNormal];
+                NSString *cgi = [NSString stringWithFormat:@"GET /decoder_control.cgi?command=%d&onestep=0&" ,CMD_PTZ_PREFAB_BIT_SET3];
+                [[VSNet shareinstance] sendCgiCommand:cgi withIdentity:_strDID];
+            
                 NSString* path1 = [[self PathForDocumentStrDID:_strDID] stringByAppendingPathComponent:[NSString stringWithFormat:@"photo%d",53]];
                 
                 if ([fileMng fileExistsAtPath:path1]) {
@@ -282,8 +282,10 @@
                 break;
             case 54:
             {
-                _cppppchannelMgt->PTZ_Control([_strDID UTF8String], CMD_PTZ_PREFAB_BIT_SET4);
-                //[(UIButton*)[self.view viewWithTag:104] setImage:_img forState:UIControlStateNormal];
+                int onestep = 0;
+                NSString *cgi = [NSString stringWithFormat:@"GET /decoder_control.cgi?command=%d&onestep=%d&" ,CMD_PTZ_PREFAB_BIT_SET4, onestep];
+                [[VSNet shareinstance] sendCgiCommand:cgi withIdentity:_strDID];
+                
                 NSString* path1 = [[self PathForDocumentStrDID:_strDID] stringByAppendingPathComponent:[NSString stringWithFormat:@"photo%d",54]];
                 
                 if ([fileMng fileExistsAtPath:path1]) {
@@ -313,25 +315,31 @@
 }
 
 -(void)reset:(id)sender{
+    NSString *cgi = nil;
     switch (((UIButton*)sender).tag) {
         case 100:
-            _cppppchannelMgt->PTZ_Control([_strDID UTF8String], CMD_PTZ_PREFAB_BIT_RUN0);
+            cgi = [NSString stringWithFormat:@"GET /decoder_control.cgi?command=%d&onestep=0&" ,CMD_PTZ_PREFAB_BIT_RUN0];
             break;
             case 101:
-            _cppppchannelMgt->PTZ_Control([_strDID UTF8String], CMD_PTZ_PREFAB_BIT_RUN1);
+            cgi = [NSString stringWithFormat:@"GET /decoder_control.cgi?command=%d&onestep=0&" ,CMD_PTZ_PREFAB_BIT_RUN1];
             break;
             case 102:
-            _cppppchannelMgt->PTZ_Control([_strDID UTF8String], CMD_PTZ_PREFAB_BIT_RUN2);
+            cgi = [NSString stringWithFormat:@"GET /decoder_control.cgi?command=%d&onestep=0&" ,CMD_PTZ_PREFAB_BIT_RUN2];
             break;
             case 103:
-            _cppppchannelMgt->PTZ_Control([_strDID UTF8String], CMD_PTZ_PREFAB_BIT_RUN3);
+            cgi = [NSString stringWithFormat:@"GET /decoder_control.cgi?command=%d&onestep=0&" ,CMD_PTZ_PREFAB_BIT_RUN3];
             break;
             case 104:
-            _cppppchannelMgt->PTZ_Control([_strDID UTF8String], CMD_PTZ_PREFAB_BIT_RUN4);
+            cgi = [NSString stringWithFormat:@"GET /decoder_control.cgi?command=%d&onestep=0&" ,CMD_PTZ_PREFAB_BIT_RUN4];
             break;
         default:
             break;
     }
+    
+    if (cgi) {
+        [[VSNet shareinstance] sendCgiCommand:cgi withIdentity:_strDID];
+    }
+    
     [_fppopoverCtr dismissPopoverAnimated:YES];
 }
 

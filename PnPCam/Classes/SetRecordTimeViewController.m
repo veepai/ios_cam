@@ -36,12 +36,10 @@
         for (int i = 0; i < 7; i++) {
             weeks[i] = 1;
         }
-        //self.startDateStr = [NSString string];
-        //self.endDateStr = [NSString string];
+       
         _is_change = NO;
         _is_openRecord = YES;
-        //self.startTime = [NSDate date];
-        //self.endTime = [NSDate date];
+
     }
     return self;
 }
@@ -49,19 +47,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-    //[self.navigationItem setHidesBackButton:YES];
-    
-//    UIButton* leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-//    [leftBtn setBackgroundImage:[[UIImage imageNamed:@"middle_back_btn_down"] stretchableImageWithLeftCapWidth:56 topCapHeight:0] forState:UIControlStateNormal];
-//    [leftBtn setTitle:NSLocalizedStringFromTable(@"SDSetting", @STR_LOCALIZED_FILE_NAME, nil) forState:UIControlStateNormal];
-//    leftBtn.titleLabel.font = [UIFont systemFontOfSize:10.f];
-//    leftBtn.titleLabel.shadowColor = [UIColor darkGrayColor];
-//    leftBtn.titleLabel.shadowOffset = CGSizeMake(-1.f, 0.f);
-//    [leftBtn addTarget:self action:@selector(backSuperView:) forControlEvents:UIControlEventTouchUpInside];
-//    leftBtn.frame = CGRectMake(0.f, 5.f, 70.f, 34.f);
-//    
-//    self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc] initWithCustomView:leftBtn] autorelease];
     
     UIBarButtonItem* rightItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Done", @STR_LOCALIZED_FILE_NAME, nil) style:UIBarButtonItemStyleDone target:self action:@selector(doneSetRecordTime:)];
     self.navigationItem.rightBarButtonItem = rightItem;
@@ -78,10 +63,6 @@
     self.aTabelView.delegate = self;
     self.aTabelView.dataSource = self;
     [self.view addSubview:self.aTabelView];
-    
-    //    self.singlePic = [[SingleDatePicCustomView alloc] initWithFrame:CGRectMake(winsize.size.width/2 - 160.f, (winsize.size.height - 20.f - 44.f)/ 2 - 163.f, 320.f, 326.f)];
-    //    self.singlePic.delegate = self;
-    //    [self.view addSubview:self.singlePic];
     
     self.selectedWeekView = [[CustomRepeatView alloc] initWithFrame:CGRectMake(0.f, 0.f, 280.f, 0.f)];
     self.selectedWeekView.delegate = self;
@@ -434,11 +415,6 @@
             [_selectedWeekView showCustomRepeatView];
         }
     }else if (indexPath.row == 1){
-        /* CGSize winsize = [UIScreen mainScreen].applicationFrame.size;
-         DatePickerCustomView* pick = [[DatePickerCustomView alloc] initWithFrame:CGRectMake(winsize.width/2 - 230.f, winsize.height/2 - 155.f, 460.f, 320.f)];
-         pick.center = self.view.center;
-         [self.view addSubview:pick];
-         [pick release],pick = nil;*/
         self.is_startTime = YES;
         self.actionSheet.title = [NSString stringWithFormat:@"%@\n\n\n\n\n\n\n\n\n\n\n\n\n",NSLocalizedStringFromTable(@"StartTime", @STR_LOCALIZED_FILE_NAME, nil)];
         if (self.startTime != nil) {
@@ -447,11 +423,6 @@
             self.datePic.date = [NSDate date];
         }
         [self.actionSheet showInView:self.view];
-        /*if (!_singlePic.Pic_show) {
-         [_singlePic showSingleView];
-         }else{
-         [_singlePic DismissSingleView];
-         }*/
     }else if (indexPath.row == 2){
         self.is_endTime = YES;
         self.actionSheet.title = [NSString stringWithFormat:@"%@\n\n\n\n\n\n\n\n\n\n\n\n\n",NSLocalizedStringFromTable(@"EndTime", @STR_LOCALIZED_FILE_NAME, nil)];
@@ -464,13 +435,6 @@
     }
 }
 
-//#pragma mark -
-//#pragma mark SingleDatePicCustomViewDelegate
-//- (void) sendDateToParentView:(SingleDatePicCustomView *)singView isStartTimeBigEndTime:(BOOL)is_startbigEnd is_selectedMiddle:(BOOL)is_seletedMid{
-//    NSLog(@"SingleDatePicCustomView  %@   %@",singView.startTime,singView.endTime);
-//}
-
-#pragma mark -
 #pragma mark CustomRepeatViewDelegate
 - (void) sendCustomRepeatViewToParentView:(CustomRepeatView*) custom andSeletedItems:(int*) seleted{
     for (int i = 0; i < 7; i++) {
@@ -487,7 +451,6 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 - (BOOL)shouldAutorotate{
-    //UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     return NO;//(interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 - (NSUInteger)supportedInterfaceOrientations{
@@ -506,11 +469,7 @@
     [_swipeGes release],_swipeGes = nil;
     
     [super dealloc];
-    //self.aTabelView = nil;
-    //[_aTabelView release],_aTabelView = nil;
     [_selectedWeekView release],_selectedWeekView = nil;
-    //[_actionSheet release],_actionSheet = nil;
-    //[_datePic release],_datePic = nil;
 }
 
 @end

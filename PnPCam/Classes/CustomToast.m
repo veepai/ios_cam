@@ -80,7 +80,7 @@
     }
     [textLabel setFrame: CGRectMake(x, y, width, height)];
     textLabel.text = strText;
-    textLabel.textAlignment = UITextAlignmentCenter;
+    textLabel.textAlignment = NSTextAlignmentCenter;
     textLabel.textColor = [UIColor whiteColor];
     textLabel.font = font;
     textLabel.layer.masksToBounds = YES;
