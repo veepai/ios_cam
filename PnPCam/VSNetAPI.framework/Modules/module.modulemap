@@ -1,0 +1,6 @@
+framework module VSNetAPI {
+  umbrella header "VSNetAPI.h"
+
+  export *
+  module * { export * }
+}

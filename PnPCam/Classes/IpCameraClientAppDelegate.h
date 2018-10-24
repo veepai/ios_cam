@@ -20,8 +20,13 @@
 #import "Split-screenViewController.h"
 #import <SystemConfiguration/SystemConfiguration.h>
 #import "MyNavigationController.h"
+#define IOS8 ([UIDevice currentDevice].systemVersion.floatValue >= 8.0)
+#define IOS10 ([UIDevice currentDevice].systemVersion.floatValue >= 10.0)
+#ifdef NSFoundationVersionNumber_iOS_9_x_Max
+#import <UserNotifications/UserNotifications.h>
+#endif
 @class LoginViewController;
-@interface IpCameraClientAppDelegate : NSObject <UIApplicationDelegate,UIAlertViewDelegate,NSURLConnectionDataDelegate,NSURLConnectionDelegate,NSXMLParserDelegate> {
+@interface IpCameraClientAppDelegate : NSObject <UIApplicationDelegate,UIAlertViewDelegate,UNUserNotificationCenterDelegate,NSURLConnectionDataDelegate,NSURLConnectionDelegate,NSXMLParserDelegate> {
     
     IBOutlet UIWindow *window;    
     MyNavigationController *navigationController;

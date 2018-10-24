@@ -36,6 +36,7 @@
     IBOutlet UINavigationBar *navigationBar;
     
     IBOutlet UIButton *btnAddCamera;
+    IBOutlet UIButton *setPushCamera;
     
     id<NotifyEventProtocol> PicNotifyEventDelegate;
     id<NotifyEventProtocol> RecordNotifyEventDelegate;
@@ -52,6 +53,7 @@
 @property (nonatomic, retain) UINavigationBar *navigationBar;
 
 @property (nonatomic, retain) UIButton *btnAddCamera;
+@property (nonatomic, retain) UIButton *setPushCamera;
 @property (nonatomic, assign) CameraListMgt *cameraListMgt;
 @property (nonatomic, assign) PicPathManagement *m_pPicPathMgt;
 @property (nonatomic, assign) RecPathManagement *m_pRecPathMgt;
@@ -67,6 +69,9 @@
 
 - (IBAction)btnAddCameraTouchDown:(id)sender;
 - (IBAction)btnAddCameraTouchUp:(id)sender;
+
+- (IBAction)setPushCameraTouchDown:(id)sender;
+- (IBAction)setPushCameraTouchUp:(id)sender;
 
 - (NSString*)PathForDocumentStrDID:(NSString*)strDID;
 

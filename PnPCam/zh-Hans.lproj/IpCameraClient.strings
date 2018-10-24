@@ -33,6 +33,7 @@ InputCameraName = "输入摄像机名称";
 InputCameraID = "输入摄像机ID";
 InputUserName = "输入用户名";
 InputPassword = "输入密码";
+InputOemID = "输入OEMID";
 CameraInfo = "摄像机信息";
 Done =  "完成";
 PPPPModeP2P = "p2p连接";
@@ -151,7 +152,8 @@ SavePictureSuccess = "图像已转存到手机相册" ;
 Message= "提示";
 DeletePicture = "删除该图片?";
 TouchAddCamera = "点此添加摄像机";
-
+TouchPushCamera = "设置摄像机推送";
+TouchMessageCamera = "消息记录";
 FTPSetting = "FTP设置";
 FTPServer = "FTP服务器" ;
 FTPUser = "用户名";
@@ -178,6 +180,15 @@ InputMailUser = "输入用户名";
 InputMailPwd = "输入密码";
 InputMailRecv = "输入收件人邮箱";
 alarmRecord = "报警TF卡录像";
+bingdev = "绑定设备";
+unbingdev = "解绑设备";
+
+RebootCamera = "重启摄像机";
+FirmwareUpgrade = "固件升级";
+SDSetting = "SD 设置";
+PwdSetting = "密码设置";
+TFRecord = "TF 录像";
+LocalRec = "本地文件";
 
 
 

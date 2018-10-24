@@ -1,7 +1,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AddCameraCell : UITableViewCell{
+@interface MessageCameraCell : UITableViewCell{
     IBOutlet UILabel *labelAddCamera;
 }
 

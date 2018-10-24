@@ -1,26 +1,20 @@
-    //
-//  CameraEditViewController.m
-//  IpCameraClient
-//
-//  Created by jiyonglong on 12-4-23.
-//  Copyright 2012 __MyCompanyName__. All rights reserved.
-//
 
-#import "CameraEditViewController.h"
+
+#import "CameraMessageViewController.h"
 #import "CameraViewController.h"
 #import "CameraInfoCell.h"
 #import "mytoast.h"
 #import "CameraSearchViewController.h"
 #import "iCloudLivePFZUIviewQR.h"
+#import <VSNetAPI/VSNetAPI.h>
 
 static const double PageViewControllerTextAnimationDuration = 0.33;
 
-@interface CameraEditViewController ()
+@interface CameraMessageViewController ()
 @property (nonatomic, retain) UISwipeGestureRecognizer* swipeGes;
 @end
 
-@implementation CameraEditViewController
-
+@implementation CameraMessageViewController
 @synthesize bAddCamera;
 @synthesize editCameraDelegate;
 @synthesize strCameraName;
@@ -32,18 +26,14 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 @synthesize tableView;
 @synthesize navigationBar;
 
-
-// The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
-
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization.
         self.strCameraName = @STR_DEFAULT_CAMERA_NAME;
-        self.strCameraID = @"";
+        self.strCameraID = @"VSTH000012BWZBR";
         self.strOldDID = @"";
         self.strUser = @STR_DEFAULT_USER_NAME;
-        self.strPwd = @"";
+        self.strPwd = @"2018-10-24";
     }
     return self;
 }
@@ -77,13 +67,9 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     [super viewDidLoad];       
     
     NSString *strTitle;
-    if (bAddCamera == YES) {
-        strTitle = NSLocalizedStringFromTable(@"AddCamera", @STR_LOCALIZED_FILE_NAME, nil);
-    }else {
-        strTitle = NSLocalizedStringFromTable(@"EditCamera", @STR_LOCALIZED_FILE_NAME, nil);
-    }   
+   
+    strTitle = NSLocalizedStringFromTable(@"TouchPushCamera", @STR_LOCALIZED_FILE_NAME, nil);
     self.winsize = [UIScreen mainScreen].applicationFrame.size;
-    
     self.navigationItem.title = strTitle;
     //创建一个右边按钮  
     UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"Done", @STR_LOCALIZED_FILE_NAME, nil)      
@@ -102,7 +88,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     }
     
     self.tableView.allowsSelection = NO;
-      
+
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     _swipeGes = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGes)];
@@ -196,7 +182,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
     //if (section == 0) {
-        return 3;
+        return 2;
     //}else {
        // return 1;
     //}
@@ -208,7 +194,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     
     UITableViewCell *cell1 =  [aTableView dequeueReusableCellWithIdentifier:cellIdentifier];
     
-     NSInteger row = anIndexPath.row;
+    NSInteger row = anIndexPath.row;
     
     if (row != 1) {
        
@@ -220,10 +206,8 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         
         //disable selected cell
         cell1.selectionStyle = UITableViewCellSelectionStyleNone;
-        
         CameraInfoCell * cell = (CameraInfoCell*)cell1;
 
-        
        
         CGRect newFrame = cell.textField.frame;
         newFrame.size = CGSizeMake(self.winsize.width - 180, newFrame.size.height);
@@ -231,29 +215,12 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         
         switch (row) {
             case 0: 
-                cell.keyLable.text = NSLocalizedStringFromTable(@"CameraName", @STR_LOCALIZED_FILE_NAME, nil);
-                cell.textField.placeholder = NSLocalizedStringFromTable(@"InputCameraName", @STR_LOCALIZED_FILE_NAME, nil);
+                cell.keyLable.text = NSLocalizedStringFromTable(@"OEMID", @STR_LOCALIZED_FILE_NAME, nil);
+                cell.textField.placeholder = NSLocalizedStringFromTable(@"InputOemName", @STR_LOCALIZED_FILE_NAME, nil);
                 cell.keyLable.font = [UIFont fontWithName:@"System Bold" size:17.f];
-                cell.textField.text = self.strCameraName;            
+                cell.textField.text = NSLocalizedStringFromTable(@"PUSH", @STR_LOCALIZED_FILE_NAME, nil);
                 break;
-//            case 2:
-//                cell.keyLable.text = NSLocalizedStringFromTable(@"User", @STR_LOCALIZED_FILE_NAME, nil);
-//                cell.textField.placeholder = NSLocalizedStringFromTable(@"InputUserName", @STR_LOCALIZED_FILE_NAME, nil);            
-//                cell.textField.text = self.strUser;            
-//                break;
-            case 2:
-                cell.keyLable.text = NSLocalizedStringFromTable(@"Pwd", @STR_LOCALIZED_FILE_NAME, nil);
-                cell.textField.placeholder = NSLocalizedStringFromTable(@"InputPassword", @STR_LOCALIZED_FILE_NAME, nil);
-                cell.keyLable.font = [UIFont fontWithName:@"System Bold" size:17.f];
-                cell.textField.secureTextEntry = YES;
-                cell.textField.text = self.strPwd;
-               
-                break;
-                default:
-                break;
-            
         }
-        
         
         cell.textField.delegate = self;
         cell.textField.tag = row; 
@@ -267,11 +234,11 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         UIImage* btnbackground = [UIImage imageNamed:@"BtnBackGround"];
         btnbackground = [btnbackground stretchableImageWithLeftCapWidth:13 topCapHeight:0];
         UIImage* btnbackgroundselect = [UIImage imageNamed:@"BtnBackGroundSelect"];
-        btnbackgroundselect = [btnbackgroundselect stretchableImageWithLeftCapWidth:13 topCapHeight:0];
+        btnbackgroundselect = [btnbackgroundselect stretchableImageWithLeftCapWidth:10 topCapHeight:0];
         CustomAddCameraCell* Customcell = (CustomAddCameraCell*)cell1;
     
         CGRect newFrame = Customcell.textField.frame;
-        newFrame.size = CGSizeMake(self.winsize.width - 180, newFrame.size.height);
+        newFrame.size = CGSizeMake(self.winsize.width - 150, newFrame.size.height);
         Customcell.textField.frame = newFrame;
         
         Customcell.keyLabel.text = NSLocalizedStringFromTable(@"CameraID", @STR_LOCALIZED_FILE_NAME, nil);
@@ -281,8 +248,8 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         Customcell.textField.delegate = self;
         Customcell.textField.tag = row;
 
-        [Customcell.seachButton setTitle:NSLocalizedStringFromTable(@"Search", @STR_LOCALIZED_FILE_NAME, nil) forState:UIControlStateNormal];
-        NSString* seachButtonText = NSLocalizedStringFromTable(@"Search", @STR_LOCALIZED_FILE_NAME, nil);
+        [Customcell.seachButton setTitle:NSLocalizedStringFromTable(@"bingdev", @STR_LOCALIZED_FILE_NAME, nil) forState:UIControlStateNormal];
+        NSString* seachButtonText = NSLocalizedStringFromTable(@"Search11", @STR_LOCALIZED_FILE_NAME, nil);
         CGSize fontSize = [seachButtonText sizeWithFont:Customcell.seachButton.titleLabel.font constrainedToSize:Customcell.frame.size lineBreakMode:NSLineBreakByWordWrapping];
         fontSize = CGSizeMake(fontSize.width + 20, fontSize.height + 10);
          CGRect newframe =  Customcell.seachButton.frame;
@@ -296,9 +263,9 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         //Customcell.seachButton.backgroundColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1.0];
         [Customcell.seachButton setBackgroundImage:btnbackground forState:UIControlStateNormal];
         [Customcell.seachButton setBackgroundImage:btnbackgroundselect forState:UIControlStateSelected];
-        [Customcell.seachButton addTarget:self action:@selector(search:) forControlEvents:UIControlEventTouchUpInside];
+        [Customcell.seachButton addTarget:self action:@selector(bind:) forControlEvents:UIControlEventTouchUpInside];
                 
-        [Customcell.scanButton setTitle:NSLocalizedStringFromTable(@"ScanQRCode", @STR_LOCALIZED_FILE_NAME, nil) forState:UIControlStateNormal];
+        [Customcell.scanButton setTitle:NSLocalizedStringFromTable(@"unbingdev", @STR_LOCALIZED_FILE_NAME, nil) forState:UIControlStateNormal];
         NSString* scanstr = NSLocalizedStringFromTable(@"ScanQRCode", @STR_LOCALIZED_FILE_NAME, nil);
         CGSize scanstrsize = [scanstr sizeWithFont:Customcell.scanButton.titleLabel.font constrainedToSize:Customcell.frame.size lineBreakMode:NSLineBreakByWordWrapping];
         scanstrsize = CGSizeMake(scanstrsize.width + 20, scanstrsize.height + 10);
@@ -307,7 +274,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         scanNewFrame.origin = CGPointMake(scanNewFrame.origin.x , scanNewFrame.origin.y + 10);
         Customcell.scanButton.frame = scanNewFrame;
 
-        [Customcell.scanButton addTarget:self action:@selector(qrscan:) forControlEvents:UIControlEventTouchUpInside];
+        [Customcell.scanButton addTarget:self action:@selector(unbind:) forControlEvents:UIControlEventTouchUpInside];
         Customcell.scanButton.titleLabel.textColor = [UIColor whiteColor];
         //Customcell.scanButton.layer.masksToBounds = YES;
         //Customcell.scanButton.layer.cornerRadius = 4.0f;
@@ -327,19 +294,39 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     return 44;
 }
 
--(void)search:(id)sender{
-    CameraSearchViewController *cameraSearchView = [[CameraSearchViewController alloc] init];
-    cameraSearchView.SearchAddCameraDelegate = self;
-    [self.navigationController pushViewController:cameraSearchView animated:YES];
-    [cameraSearchView release];
+-(void)bind:(id)sender{
+    NSLog(@"bind");
+
 }
--(void)qrscan:(id)sender{
-    //zzy 这里写二维码0713
-    iCloudLivePFZUIviewQR *Scan = [[iCloudLivePFZUIviewQR alloc]init];
-    Scan.hidesBottomBarWhenPushed = YES;
-    Scan.delegate= self;
-    [self.navigationController pushViewController:Scan animated:YES];
-    [Scan release];
+-(void)unbind:(id)sender{
+    NSLog(@"messageinf");
+    
+    UIActivityIndicatorView *activityIV = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
+    activityIV.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+    activityIV.color = [UIColor grayColor];
+    [self.view addSubview:activityIV];
+    [activityIV startAnimating];
+    
+    [WebAPIManager GetMessageDevice:self.strCameraID Time:self.strPwd  ResultBlockSuccess:^(id result) {
+        [activityIV stopAnimating];
+        [activityIV release];
+        NSDictionary *dic = result;
+        NSLog(@"api记录成功 %@", result);
+         //[mytoast showWithText:result];
+//        NSString *msgStr = dic[@"msg"];
+//        if ([msgStr isEqualToString:@"unbind success"]) {
+//            NSLog(@"api记录成功 %@", result);
+//            [mytoast showWithText:NSLocalizedStringFromTable(@"api记录", @STR_LOCALIZED_FILE_NAME, nil)];
+//            [self.navigationController popViewControllerAnimated:YES];
+//        }
+//        else
+//            [mytoast showWithText:msgStr];
+        
+    } Failure:^(NSError *error, NSInteger statusCode, NSString *resultMessage) {
+        [activityIV stopAnimating];
+        [activityIV release];
+        NSLog(@"反注册摄像机失败：%@ %ld", resultMessage, (long)statusCode);
+    }];
 }
 
 //反向传值

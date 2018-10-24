@@ -140,6 +140,14 @@
 		4AEA12BC1CBDFC0200A3D6DB /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12BB1CBDFC0200A3D6DB /* libz.tbd */; };
 		4AEA12BE1CBDFC3600A3D6DB /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12BD1CBDFC3600A3D6DB /* libsqlite3.tbd */; };
 		4AEA12C01CBDFC5C00A3D6DB /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12BF1CBDFC5C00A3D6DB /* libiconv.tbd */; };
+		6C07506D217DEF0B00E63073 /* PushCameraCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C07506A217DEF0A00E63073 /* PushCameraCell.m */; };
+		6C07506E217DEF0B00E63073 /* PushCameraCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C07506B217DEF0B00E63073 /* PushCameraCell.xib */; };
+		6C260CFD217EB9570010BDE2 /* CameraPushViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C260CFC217EB9570010BDE2 /* CameraPushViewController.m */; };
+		6C260D02217F30610010BDE2 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C260D01217F30610010BDE2 /* UserNotifications.framework */; };
+		6C35055421805F2300D17E87 /* VSNetAPI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C260CFE217F1A170010BDE2 /* VSNetAPI.framework */; };
+		6C35055D21806CAE00D17E87 /* MessageCameraCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C35055A21806CAD00D17E87 /* MessageCameraCell.m */; };
+		6C35055E21806CAE00D17E87 /* MessageCameraCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C35055C21806CAE00D17E87 /* MessageCameraCell.xib */; };
+		6C3505612180713400D17E87 /* CameraMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C3505602180713400D17E87 /* CameraMessageViewController.m */; };
 		83A99C1F1B53A183006A418F /* iCloudLivePFZUIviewQR.m in Sources */ = {isa = PBXBuildFile; fileRef = 83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		83A99C281B53A1B6006A418F /* lineT.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C211B53A1B6006A418F /* lineT.png */; };
 		83A99C291B53A1B6006A418F /* lineT@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C221B53A1B6006A418F /* lineT@2x.png */; };
@@ -572,6 +580,19 @@
 		4AEA12BB1CBDFC0200A3D6DB /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		4AEA12BD1CBDFC3600A3D6DB /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		4AEA12BF1CBDFC5C00A3D6DB /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		6C07506A217DEF0A00E63073 /* PushCameraCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PushCameraCell.m; sourceTree = "<group>"; };
+		6C07506B217DEF0B00E63073 /* PushCameraCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PushCameraCell.xib; sourceTree = "<group>"; };
+		6C07506C217DEF0B00E63073 /* PushCameraCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushCameraCell.h; sourceTree = "<group>"; };
+		6C260CFB217EB9570010BDE2 /* CameraPushViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraPushViewController.h; sourceTree = "<group>"; };
+		6C260CFC217EB9570010BDE2 /* CameraPushViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraPushViewController.m; sourceTree = "<group>"; };
+		6C260CFE217F1A170010BDE2 /* VSNetAPI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = VSNetAPI.framework; sourceTree = "<group>"; };
+		6C260D00217F275D0010BDE2 /* PNPCam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PNPCam.entitlements; sourceTree = "<group>"; };
+		6C260D01217F30610010BDE2 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		6C35055A21806CAD00D17E87 /* MessageCameraCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageCameraCell.m; sourceTree = "<group>"; };
+		6C35055B21806CAE00D17E87 /* MessageCameraCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageCameraCell.h; sourceTree = "<group>"; };
+		6C35055C21806CAE00D17E87 /* MessageCameraCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MessageCameraCell.xib; sourceTree = "<group>"; };
+		6C35055F2180713300D17E87 /* CameraMessageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraMessageViewController.h; sourceTree = "<group>"; };
+		6C3505602180713400D17E87 /* CameraMessageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraMessageViewController.m; sourceTree = "<group>"; };
 		83A99C1D1B53A183006A418F /* iCloudLivePFZUIviewQR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCloudLivePFZUIviewQR.h; sourceTree = "<group>"; };
 		83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCloudLivePFZUIviewQR.m; sourceTree = "<group>"; };
 		83A99C201B53A19D006A418F /* ScanStringDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScanStringDelegate.h; sourceTree = "<group>"; };
@@ -912,6 +933,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C35055421805F2300D17E87 /* VSNetAPI.framework in Frameworks */,
+				6C260D02217F30610010BDE2 /* UserNotifications.framework in Frameworks */,
 				9CD216B72154BDDE00EB72A6 /* libstdc++.tbd in Frameworks */,
 				9C1CEB6C20D36EBF00086231 /* AssetsLibrary.framework in Frameworks */,
 				4AEA12C01CBDFC5C00A3D6DB /* libiconv.tbd in Frameworks */,
@@ -1162,6 +1185,10 @@
 		04B4030C162E7AF700A2F05D /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				6C35055F2180713300D17E87 /* CameraMessageViewController.h */,
+				6C3505602180713400D17E87 /* CameraMessageViewController.m */,
+				6C260CFC217EB9570010BDE2 /* CameraPushViewController.m */,
+				6C260CFB217EB9570010BDE2 /* CameraPushViewController.h */,
 				FDF73B8916E5799B00906BF4 /* Login */,
 				B7D869A1167973A80057C00F /* Setting */,
 				B7CD90DA1670A443005FE4FA /* MyGLViewController.h */,
@@ -1224,6 +1251,12 @@
 		04B9B151163A253200349F4E /* tableview-cell */ = {
 			isa = PBXGroup;
 			children = (
+				6C35055B21806CAE00D17E87 /* MessageCameraCell.h */,
+				6C35055A21806CAD00D17E87 /* MessageCameraCell.m */,
+				6C35055C21806CAE00D17E87 /* MessageCameraCell.xib */,
+				6C07506C217DEF0B00E63073 /* PushCameraCell.h */,
+				6C07506A217DEF0A00E63073 /* PushCameraCell.m */,
+				6C07506B217DEF0B00E63073 /* PushCameraCell.xib */,
 				FDE055F617704A5F00EE303D /* PlayViewModeCell.h */,
 				FDE055F717704A5F00EE303D /* PlayViewModeCell.m */,
 				FDE055F817704A5F00EE303D /* PlayViewModeCell.xib */,
@@ -1334,6 +1367,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				6C260D00217F275D0010BDE2 /* PNPCam.entitlements */,
 				FD3ED9C91B2E740A00E4E155 /* SytemUpgrade */,
 				FDFF57A61784218600DFA5D9 /* RecordTimeMode */,
 				FDFF574F17841BF400DFA5D9 /* CustomRepeatView */,
@@ -1381,6 +1415,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6C260D01217F30610010BDE2 /* UserNotifications.framework */,
+				6C260CFE217F1A170010BDE2 /* VSNetAPI.framework */,
 				9CD216B62154BDDE00EB72A6 /* libstdc++.tbd */,
 				9C1CEB6B20D36E8E00086231 /* AssetsLibrary.framework */,
 				4AEA12B91CBDF92200A3D6DB /* libbz2.tbd */,
@@ -1759,6 +1795,11 @@
 				TargetAttributes = {
 					1D6058900D05DD3D006BFB54 = {
 						DevelopmentTeam = 9XGDE5JWD8;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -1825,6 +1866,7 @@
 				04B631261629678E007B647A /* ptz_playmode_standard.png in Resources */,
 				04B63128162967A6007B647A /* ng.png in Resources */,
 				04B40271162C11AF00A2F05D /* AboutViewController.xib in Resources */,
+				6C07506E217DEF0B00E63073 /* PushCameraCell.xib in Resources */,
 				F8CFCCFE1D40BD61002A9307 /* cameraWarn@3x.png in Resources */,
 				04B402F7162D1DBA00A2F05D /* ipcadd30.png in Resources */,
 				83A99C2A1B53A1B6006A418F /* pick_bg@2x.png in Resources */,
@@ -2008,6 +2050,7 @@
 				83A99C2E1B53A1B6006A418F /* NEWADD_BACKT@2x.png in Resources */,
 				FDFF576617841CA100DFA5D9 /* Unselected.png in Resources */,
 				FDFF576717841CA100DFA5D9 /* Selected.png in Resources */,
+				6C35055E21806CAE00D17E87 /* MessageCameraCell.xib in Resources */,
 				FDFF576C17841CDE00DFA5D9 /* SDCardCell.xib in Resources */,
 				FDFF577117841D0800DFA5D9 /* SDStatusCell.xib in Resources */,
 				FDFF577617841D2400DFA5D9 /* SetRecordTimeCell.xib in Resources */,
@@ -2073,6 +2116,7 @@
 				040AD24E162EDE64007B5E19 /* CustomToast.m in Sources */,
 				047869011637D63F00E7FC9A /* UserPwdSetViewController.m in Sources */,
 				04AFA7831639471600FA3FD3 /* DateTimeController.m in Sources */,
+				6C35055D21806CAE00D17E87 /* MessageCameraCell.m in Sources */,
 				04AFA7891639478600FA3FD3 /* AlarmController.m in Sources */,
 				04B9B15A163A295900349F4E /* oLableCell.m in Sources */,
 				04B9B15F163A343A00349F4E /* oTextCell.m in Sources */,
@@ -2088,6 +2132,7 @@
 				9C440C7E20C4DAED00A0DACC /* IJKSDLGLRenderI420.m in Sources */,
 				04FE57C916534B4400D48E04 /* PicPathManagement.m in Sources */,
 				04FE57CC16534E4900D48E04 /* PicPathDBUtils.m in Sources */,
+				6C260CFD217EB9570010BDE2 /* CameraPushViewController.m in Sources */,
 				9CD216B52153A7F600EB72A6 /* oDropListStruct.m in Sources */,
 				04AA96D01653955500E03320 /* PictrueDateViewController.m in Sources */,
 				9C1CEB7120D3A7BE00086231 /* SystemUpgradeViewController.m in Sources */,
@@ -2109,6 +2154,7 @@
 				9C440C8020C4DAED00A0DACC /* IJKSDLGLView.m in Sources */,
 				B7D869A6167ADA3A0057C00F /* RemoteRecordFileListViewController.m in Sources */,
 				B7659688167C201D00105FA5 /* RemotePlaybackViewController.m in Sources */,
+				6C07506D217DEF0B00E63073 /* PushCameraCell.m in Sources */,
 				FDDDE917168C37B300417069 /* PicListCell_iPad.m in Sources */,
 				4A1EB50D1E4B108000EABDA8 /* AddPlanViewController.m in Sources */,
 				FDD83E52168EBEA80050EF53 /* RecListCell_iPad.m in Sources */,
@@ -2130,6 +2176,7 @@
 				FDB8A8E016B0CBF500E4509B /* RemoteRecordCell.m in Sources */,
 				FD3ED9D71B2E741B00E4E155 /* MBProgressHUD.m in Sources */,
 				FDB8A8F516B0D08100E4509B /* RemoteRecordGroupCell.m in Sources */,
+				6C3505612180713400D17E87 /* CameraMessageViewController.m in Sources */,
 				FDF0992516D30C09007F98BC /* Split-screenViewController.m in Sources */,
 				FDF73B9216E579E800906BF4 /* LoginViewController.m in Sources */,
 				FDE1590E16E872F500B92CE2 /* CustomTableAlert.m in Sources */,
@@ -2199,11 +2246,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = BrandAsset;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = PNPCam.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				DEVELOPMENT_TEAM = 9XGDE5JWD8;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_INPUT_FILETYPE = sourcecode.c.objc;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2226,7 +2278,7 @@
 					"$(PROJECT_DIR)/VSNet/lib",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.vstarcam.p2pipcamerazx1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vstarcam.p2pdemo;
 				PRODUCT_NAME = PNPCam;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -2243,11 +2295,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = BrandAsset;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = PNPCam.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = 9XGDE5JWD8;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_INPUT_FILETYPE = sourcecode.c.objc;
@@ -2272,7 +2329,7 @@
 					"$(PROJECT_DIR)/VSNet/lib",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.vstarcam.p2pipcamerazx1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vstarcam.p2pdemo;
 				PRODUCT_NAME = PNPCam;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -2289,11 +2346,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = BrandAsset;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = PNPCam.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				DEVELOPMENT_TEAM = 9XGDE5JWD8;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_INPUT_FILETYPE = sourcecode.c.objc;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2316,7 +2378,7 @@
 					"$(PROJECT_DIR)/VSNet/lib",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.vstarcam.p2pipcamerazx1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vstarcam.p2pdemo;
 				PRODUCT_NAME = PNPCam;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";

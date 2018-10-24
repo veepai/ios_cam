@@ -8,6 +8,8 @@
 
 #import "CameraViewController.h"
 #import "CameraEditViewController.h"
+#import "CameraPushViewController.h"
+#import "CameraMessageViewController.h"
 #import "CameraListCell.h"
 #import "IpCameraClientAppDelegate.h"
 #import <QuartzCore/QuartzCore.h>
@@ -16,6 +18,8 @@
 #include "MyAudioSession.h"
 #import "SettingViewController.h"
 #import "AddCameraCell.h"
+#import "PushCameraCell.h"
+#import "MessageCameraCell.h"
 #import "CameraEditViewController.h"
 //#import "H264Decoder.h"
 #import "CustomTableAlert.h"
@@ -33,6 +37,7 @@
 @synthesize navigationBar;
 @synthesize actionPop = _actionPop;
 @synthesize btnAddCamera;
+@synthesize setPushCamera;
 @synthesize cameraListMgt;
 @synthesize m_pPicPathMgt;
 @synthesize PicNotifyEventDelegate;
@@ -95,11 +100,13 @@
 
 - (IBAction)btnAddCameraTouchDown:(id)sender
 {
+    NSLog(@"btnAddCameraTouchDown");
     btnAddCamera.backgroundColor = [UIColor colorWithRed:ADD_CAMERA_RED/255.0f green:ADD_CAMERA_GREED/255.0f blue:ADD_CAMERA_BLUE/255.0f alpha:1.0];
 }
 
 - (IBAction)btnAddCameraTouchUp:(id)sender
 {
+    NSLog(@"btnAddCameraTouchUp");
     btnAddCamera.backgroundColor = [UIColor colorWithRed:ADD_CAMERA_NORMAL_RED/255.0f green:ADD_CAMERA_NORMAL_GREEN/255.0f blue:ADD_CAMERA_NORMAL_BLUE/255.0f alpha:1.0];
     
     CameraEditViewController *cameraEditViewController = [[CameraEditViewController alloc] init];
@@ -108,7 +115,25 @@
     [self.navigationController pushViewController:cameraEditViewController animated:YES]; 
     [cameraEditViewController release];
     
-   // [cameraListMgt AddCamera:@"aaaaa" DID:@"bbbbb" User:@"dsfsfs" Pwd:@"" Snapshot:nil];
+}
+
+- (IBAction)setPushCameraTouchDown:(id)sender
+{
+       NSLog(@"setPushCameraTouchDown");
+    setPushCamera.backgroundColor = [UIColor colorWithRed:ADD_CAMERA_RED/255.0f green:ADD_CAMERA_GREED/255.0f blue:ADD_CAMERA_BLUE/255.0f alpha:1.0];
+}
+
+- (IBAction)setPushCameraTouchUp:(id)sender
+{
+      NSLog(@"setPushCameraTouchUp");
+    setPushCamera.backgroundColor = [UIColor colorWithRed:ADD_CAMERA_NORMAL_RED/255.0f green:ADD_CAMERA_NORMAL_GREEN/255.0f blue:ADD_CAMERA_NORMAL_BLUE/255.0f alpha:1.0];
+    
+    CameraEditViewController *cameraEditViewController = [[CameraEditViewController alloc] init];
+    cameraEditViewController.editCameraDelegate = self;
+    cameraEditViewController.bAddCamera = YES;
+    [self.navigationController pushViewController:cameraEditViewController animated:YES];
+    [cameraEditViewController release];
+   
 }
 
 - (void) btnEdit:(id)sender
@@ -150,6 +175,7 @@
 
 -(void)AddCamera:(id)sender
 {
+    NSLog(@"addcamera");
     CameraEditViewController *cameraEditViewController = [[CameraEditViewController alloc] init];
     cameraEditViewController.editCameraDelegate = self;
     cameraEditViewController.bAddCamera = YES;
@@ -241,13 +267,8 @@
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
-      
     int count = [cameraListMgt GetCount];
-    
-
-   
     return count + 1;
-    
 }
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)anIndexPath
@@ -262,6 +283,7 @@
         
     //index = 0显示添加摄像机
     if (index == [cameraListMgt GetCount]) {
+        NSLog(@"AddCameraCell %d",0);
         NSString *cellIdentifier = @"AddCameraCell";       
         //当状态为显示当前的设备列表信息时
         AddCameraCell *cell =  (AddCameraCell*)[aTableView dequeueReusableCellWithIdentifier:cellIdentifier];
@@ -276,6 +298,60 @@
         float cellHeight = cell.frame.size.height;
        // float cellWidth = cell.frame.size.width;
         
+        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(cell.frame.origin.x, 0, winsize.width, cellHeight - 1)];
+        label.backgroundColor = [UIColor colorWithRed:CELL_SEPERATOR_RED/255.0f green:CELL_SEPERATOR_GREEN/255.0f blue:CELL_SEPERATOR_BLUE/255.0f alpha:1.0];
+        
+        UIView *cellBgView = [[UIView alloc] initWithFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y, winsize.width, cellHeight - 1)];
+        [cellBgView addSubview:label];
+        [label release];
+        
+        cell.backgroundView = cellBgView;
+        
+        return cell;
+    }
+    if (index == [cameraListMgt GetCount ]+1)
+    {
+        NSString *cellIdentifier = @"PushCameraCell";
+        //当状态为显示当前的设备列表信息时
+        NSLog(@"PushCameraCell %d",1);
+        PushCameraCell *cell =  (PushCameraCell*)[aTableView dequeueReusableCellWithIdentifier:cellIdentifier];
+        if (cell == nil)
+        {
+            NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"PushCameraCell" owner:self options:nil];
+            cell = [nib objectAtIndex:0];
+        }
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.labelAddCamera.text = NSLocalizedStringFromTable(@"TouchPushCamera", @STR_LOCALIZED_FILE_NAME, nil);
+        
+        float cellHeight = cell.frame.size.height;
+        // float cellWidth = cell.frame.size.width;
+        
+        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(cell.frame.origin.x, 0, winsize.width, cellHeight - 1)];
+        label.backgroundColor = [UIColor colorWithRed:CELL_SEPERATOR_RED/255.0f green:CELL_SEPERATOR_GREEN/255.0f blue:CELL_SEPERATOR_BLUE/255.0f alpha:1.0];
+        
+        UIView *cellBgView = [[UIView alloc] initWithFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y, winsize.width, cellHeight - 1)];
+        [cellBgView addSubview:label];
+        [label release];
+        
+        cell.backgroundView = cellBgView;
+        
+        return cell;
+    }
+    
+    if (index == [cameraListMgt GetCount ]+2)
+    {
+        NSString *cellIdentifier = @"MessageCameraCell";
+        NSLog(@"MessageCameraCell %d",1);
+        MessageCameraCell *cell =  (MessageCameraCell*)[aTableView dequeueReusableCellWithIdentifier:cellIdentifier];
+        if (cell == nil)
+        {
+            NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"MessageCameraCell" owner:self options:nil];
+            cell = [nib objectAtIndex:0];
+        }
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.labelAddCamera.text = NSLocalizedStringFromTable(@"TouchMessageCamera", @STR_LOCALIZED_FILE_NAME, nil);
+        
+        float cellHeight = cell.frame.size.height;
         UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(cell.frame.origin.x, 0, winsize.width, cellHeight - 1)];
         label.backgroundColor = [UIColor colorWithRed:CELL_SEPERATOR_RED/255.0f green:CELL_SEPERATOR_GREEN/255.0f blue:CELL_SEPERATOR_BLUE/255.0f alpha:1.0];
         
@@ -388,12 +464,9 @@
 
 - (CGFloat)tableView:(UITableView*)tableview heightForRowAtIndexPath:(NSIndexPath*)indexpath
 {
-    
-    
-    if (indexpath.row == [cameraListMgt GetCount]) {
+    if (indexpath.row == [cameraListMgt GetCount] || indexpath.row == [cameraListMgt GetCount]+1 || indexpath.row == [cameraListMgt GetCount]+2) {
         return 44;
     }
-    
     return 74;
 }
 
@@ -403,11 +476,33 @@
     indPath = anIndexPath;
        
     if (anIndexPath.row == [cameraListMgt GetCount]) {
+        NSLog(@"table did selec addcamera");
         CameraEditViewController *cameraEditViewController = [[CameraEditViewController alloc] initWithNibName:@"CameraEditView" bundle:nil];
         cameraEditViewController.editCameraDelegate = self;
         cameraEditViewController.bAddCamera = YES;
         [self.navigationController pushViewController:cameraEditViewController animated:YES]; 
         [cameraEditViewController release];
+        return;
+    }
+    
+    //Pushview 进入推送设置界面
+    if (anIndexPath.row == [cameraListMgt GetCount]+1) {
+        NSLog(@"table did selec Pushview");
+        CameraPushViewController *cameraPushViewController = [[CameraPushViewController alloc] initWithNibName:@"CameraEditView" bundle:nil];
+        cameraPushViewController.editCameraDelegate = self;
+        cameraPushViewController.bAddCamera = YES;
+        [self.navigationController pushViewController:cameraPushViewController animated:YES];
+        [cameraPushViewController release];
+        return;
+    }
+    //Messageview 进入消息记录界面
+    if (anIndexPath.row == [cameraListMgt GetCount]+2) {
+        NSLog(@"table did selec Pushview");
+        CameraMessageViewController *cameraMViewController = [[CameraMessageViewController alloc] initWithNibName:@"CameraEditView" bundle:nil];
+        cameraMViewController.editCameraDelegate = self;
+        cameraMViewController.bAddCamera = YES;
+        [self.navigationController pushViewController:cameraMViewController animated:YES];
+        [cameraMViewController release];
         return;
     }
     
@@ -842,6 +937,8 @@
     [self.cameraList setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 
     btnAddCamera.backgroundColor = [UIColor colorWithRed:ADD_CAMERA_NORMAL_RED/255.0f green:ADD_CAMERA_NORMAL_GREEN/255.0f blue:ADD_CAMERA_NORMAL_BLUE/255.0f alpha:1.0];
+    
+    setPushCamera.backgroundColor = [UIColor colorWithRed:ADD_CAMERA_NORMAL_RED/255.0f green:ADD_CAMERA_NORMAL_GREEN/255.0f blue:ADD_CAMERA_NORMAL_BLUE/255.0f alpha:1.0];
   
     [self StartPPPPThread];
     InitAudioSession();

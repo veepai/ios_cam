@@ -1,8 +1,8 @@
 
 
-#import "AddCameraCell.h"
+#import "MessageCameraCell.h"
 
-@implementation AddCameraCell
+@implementation MessageCameraCell
 
 @synthesize labelAddCamera;
 

@@ -34,6 +34,7 @@ InputCameraName = "Please input camera name";
 InputCameraID = "Please input camera id";
 InputUserName = "Please input user name";
 InputPassword = "Please input password";
+InputOemID = "Please input OEMID";
 CameraInfo = "Camera Information";
 Done = "Done";
 OnlineCD-ROM = "Online CD";
@@ -175,7 +176,8 @@ SavePictureSuccess = "Save picture to album successfully" ;
 Message= "Message";
 DeletePicture = "Delete the picture?";
 TouchAddCamera = "Add Camera";
-
+TouchPushCamera = "Setting Push Camera";
+TouchMessageCamera = "Message Record";
 FTPSetting = "FTP Setting";
 FTPServer = "Server" ;
 FTPUser = "User";
@@ -336,3 +338,6 @@ PFZB_UPGRADE_UPCANCEL_ADD = "The upgrade fails";
 
 Warn_AlertMessage                   ="Your device password belonging to the original password, there is a big security risk! Whether modifications to the device password?";
 tip_pwd                             ="Dangerous";                                    
+
+bingdev = "Bing Dev";
+unbingdev = "UnBind Dev";

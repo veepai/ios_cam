@@ -14,6 +14,8 @@
 #import "AboutViewController.h"
 #import "LoginViewController.h"
 
+
+
 #import "VSNet.h"
 
 @implementation UINavigationController (supportedOrientation)
@@ -42,6 +44,7 @@
 #define ServiceAddress @"http://cd.ipcam.so/Updates/2000/OEM.xml"//中性
 #define AppUrl @"itms-apps://itunes.apple.com/us/app/pnpcamera/id557459163?ls=1&mt=8"//中性
 //#define AppUrl @"itms-apps://itunes.apple.com/us/app/vscam/id555961183?ls=1&mt=8"//品牌
+
 
 #pragma mark -
 #pragma mark Application lifecycle
@@ -93,7 +96,81 @@
     [ [VSNet shareinstance] PPPP_Initialize];
     [[VSNet shareinstance] XQP2P_NetworkDetect];
     [[VSNet shareinstance] XQP2P_Initialize];
+    
+    if (IOS10)
+        [self registeriOS10];
+    else if(IOS8)
+        [self registerPushForIOS8];
+    else
+        [self registerPush];
+    
+    //if
+
     return YES;
+}
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler
+{
+    completionHandler(UNNotificationPresentationOptionSound|UNNotificationPresentationOptionAlert);
+}
+
+- (void)registeriOS10
+{
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate = self;
+    [center requestAuthorizationWithOptions:(UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (!error && granted) {
+            //用户点击允许
+            NSLog(@"注册成功");
+        }else{
+            //用户点击不允许
+            NSLog(@"注册失败");
+        }
+    }];
+    // 可以通过 getNotificationSettingsWithCompletionHandler 获取权限设置
+    //之前注册推送服务，用户点击了同意还是不同意，以及用户之后又做了怎样的更改我们都无从得知，现在 apple 开放了这个 API，我们可以直接获取到用户的设定信息了。注意UNNotificationSettings是只读对象哦，不能直接修改！
+    [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+        NSLog(@"========%@",settings);
+    }];
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
+}
+
+- (void)registerPushForIOS8
+{
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= _IPHONE80_
+    
+    //Types
+    UIUserNotificationType types = UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
+    
+    //Actions
+    UIMutableUserNotificationAction *acceptAction = [[UIMutableUserNotificationAction alloc] init];
+    
+    acceptAction.identifier = @"ACCEPT_IDENTIFIER";
+    acceptAction.title = @"Accept";
+    
+    acceptAction.activationMode = UIUserNotificationActivationModeForeground;
+    acceptAction.destructive = NO;
+    acceptAction.authenticationRequired = NO;
+    
+    //Categories
+    UIMutableUserNotificationCategory *inviteCategory = [[UIMutableUserNotificationCategory alloc] init];
+    
+    inviteCategory.identifier = @"INVITE_CATEGORY";
+    
+    [inviteCategory setActions:@[acceptAction] forContext:UIUserNotificationActionContextDefault];
+    
+    [inviteCategory setActions:@[acceptAction] forContext:UIUserNotificationActionContextMinimal];
+    
+    NSSet *categories = [NSSet setWithObjects:inviteCategory, nil];
+    
+    
+    UIUserNotificationSettings *mySettings = [UIUserNotificationSettings settingsForTypes:types categories:categories];
+    
+    [[UIApplication sharedApplication] registerUserNotificationSettings:mySettings];
+    
+    
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
+#endif
 }
 
 - (void) XmlPa:(id)sender{
@@ -353,6 +430,18 @@
      Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
      */
     //NSLog(@"applicationDidBecomeActive");    
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+    NSString* str = [[NSString alloc] initWithFormat:@"%@",deviceToken];
+    NSString* substr = [str substringWithRange:NSMakeRange(1, [str length] - 2)];
+    NSArray* devicearr = [substr componentsSeparatedByString:@" "];
+    NSString* deviceStr = [devicearr componentsJoinedByString:@""];
+    
+    NSLog(@"deviceTokenStr:%@ \n %@",str,deviceStr);
+    [[NSUserDefaults standardUserDefaults] setObject:deviceStr forKey:@"DeviceToken"];
+    [mytoast showWithText:deviceStr];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
