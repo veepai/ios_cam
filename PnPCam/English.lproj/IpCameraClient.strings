@@ -341,3 +341,7 @@ tip_pwd                             ="Dangerous";
 
 bingdev = "Bing Dev";
 unbingdev = "UnBind Dev";
+Motion_noty_plan = "Motion Detection Alarm notify plan";
+time = "date";
+timetip = "2018-10-20";
+PleaseInputTime = "Please enter the query time";

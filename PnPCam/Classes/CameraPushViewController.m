@@ -10,7 +10,7 @@
 
 static const double PageViewControllerTextAnimationDuration = 0.33;
 
-@interface CameraPushViewController ()
+@interface CameraPushViewController()
 @property (nonatomic, retain) UISwipeGestureRecognizer* swipeGes;
 @end
 
@@ -20,27 +20,20 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 @synthesize editCameraDelegate;
 @synthesize strCameraName;
 @synthesize strCameraID;
-@synthesize strOldDID;
 @synthesize oemid;
-@synthesize strUser;
-@synthesize strPwd;
 @synthesize currentTextField;
 @synthesize tableView;
 @synthesize navigationBar;
-
-
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization.
         self.strCameraName = @STR_DEFAULT_CAMERA_NAME;
-        self.strCameraID = @"VSTH000012BWZBR";
-        self.strOldDID = @"";
-        self.strUser = @STR_DEFAULT_USER_NAME;
-        self.strPwd = @"2018-10-24";
+        self.strCameraID = @"";
         self.oemid = @"PUSH";
-        
+//        self.strCameraID = @"";
+//        self.oemid = @"PUSH";
     }
     return self;
 }
@@ -61,11 +54,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     if (self != nil) {
         self.strCameraName = @STR_DEFAULT_CAMERA_NAME;
         self.strCameraID = @"";
-        self.strOldDID = @"";
-        self.strUser = @STR_DEFAULT_USER_NAME;
-        self.strPwd = @"";
     }
-    
     return self ;
 }
 
@@ -90,9 +79,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     self.navigationItem.rightBarButtonItem = rightButton;
     [rightButton release];
     
-    if (bAddCamera == NO) {
-        self.strOldDID = self.strCameraID;
-    }
+
     
     self.tableView.allowsSelection = NO;
 
@@ -166,9 +153,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     self.editCameraDelegate = nil;
     self.strCameraName = nil;
     self.strCameraID = nil;
-    self.strOldDID = nil;
-    self.strUser = nil;
-    self.strPwd = nil;
     self.currentTextField = nil;
     self.tableView = nil;
     self.navigationBar = nil;
@@ -200,11 +184,9 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     NSString *cellIdentifier = [NSString stringWithFormat:@"CameraInfoCell%d%d", anIndexPath.section, anIndexPath.row];//= @"CameraInfoCell1";	
     
     UITableViewCell *cell1 =  [aTableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    
     NSInteger row = anIndexPath.row;
     
     if (row != 1) {
-       
         if (cell1 == nil)
         {
             NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"CameraInfoCell" owner:self options:nil];
@@ -215,17 +197,16 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         cell1.selectionStyle = UITableViewCellSelectionStyleNone;
         CameraInfoCell * cell = (CameraInfoCell*)cell1;
 
-       
         CGRect newFrame = cell.textField.frame;
         newFrame.size = CGSizeMake(self.winsize.width - 180, newFrame.size.height);
         cell.textField.frame = newFrame;
-        
-        switch (row) {
+        switch (row)
+        {
             case 0: 
                 cell.keyLable.text = NSLocalizedStringFromTable(@"OEMID", @STR_LOCALIZED_FILE_NAME, nil);
-                cell.textField.placeholder = NSLocalizedStringFromTable(@"InputOemName", @STR_LOCALIZED_FILE_NAME, nil);
+                cell.textField.placeholder = NSLocalizedStringFromTable(@"InputOemID", @STR_LOCALIZED_FILE_NAME, nil);
                 cell.keyLable.font = [UIFont fontWithName:@"System Bold" size:17.f];
-                cell.textField.text = NSLocalizedStringFromTable(@"PUSH", @STR_LOCALIZED_FILE_NAME, nil);
+                cell.textField.text = self.oemid;
                 break;
         }
         
@@ -251,7 +232,8 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         Customcell.keyLabel.text = NSLocalizedStringFromTable(@"CameraID", @STR_LOCALIZED_FILE_NAME, nil);
         Customcell.keyLabel.font = [UIFont fontWithName:@"System Bold" size:17.f];
         Customcell.textField.placeholder = NSLocalizedStringFromTable(@"InputCameraID", @STR_LOCALIZED_FILE_NAME, nil);
-        Customcell.textField.text = self.strCameraID;
+        self.strCameraID = Customcell.textField.text;
+        //Customcell.textField.text = self.strCameraID;
         Customcell.textField.delegate = self;
         Customcell.textField.tag = row;
 
@@ -302,14 +284,19 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 }
 
 -(void)bind:(id)sender{
-    NSLog(@"bind");
-//    CameraSearchViewController *cameraSearchView = [[CameraSearchViewController alloc] init];
-//    cameraSearchView.SearchAddCameraDelegate = self;
-//    [self.navigationController pushViewController:cameraSearchView animated:YES];
-//    [cameraSearchView release];
+    NSLog(@"vst bind");
+    if ([oemid length] == 0) {
+        [mytoast showWithText:NSLocalizedStringFromTable(@"InputOemID", @STR_LOCALIZED_FILE_NAME, nil)];
+        return;
+    }
+    
+    if ([strCameraID length] == 0) {
+        [mytoast showWithText:NSLocalizedStringFromTable(@"PleaseInputCameraID", @STR_LOCALIZED_FILE_NAME, nil)];
+        return;
+    }
     
     NSString *deviceToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"DeviceToken"];
-    NSLog(@"deviceToken %s",deviceToken);
+    NSLog(@"deviceToken %@",deviceToken);
     if (deviceToken.length == 0 || deviceToken == nil) {
         [mytoast showWithText:@"未获取到APNS token"];
         return;
@@ -319,21 +306,19 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     activityIV.color = [UIColor grayColor];
     [self.view addSubview:activityIV];
     [activityIV startAnimating];
-    NSLog(@"deviceToken %s",deviceToken);
-    NSLog(@"strCameraID %s",strCameraID);
+    NSLog(@"deviceToken %@",deviceToken);
+    NSLog(@"strCameraID %@",strCameraID);
+    NSLog(@"oemid %@",oemid);
     [WebAPIManager BingdingDeviceUID:strCameraID Token:deviceToken Oemid:oemid Language:@"en" ResultBlockSuccess:^(id result) {
         [activityIV stopAnimating];
         [activityIV release];
-        NSLog(@"注册摄像机成功 %s",result);
+        NSLog(@"注册摄像机成功 %@",result);
         [mytoast showWithText:NSLocalizedStringFromTable(@"推送绑定成功", @STR_LOCALIZED_FILE_NAME, nil)];
         [self.navigationController popViewControllerAnimated:YES];
     } Failure:^(NSError *error, NSInteger statusCode, NSString *resultMessage) {
         [activityIV stopAnimating];
         [activityIV release];
         if (statusCode == 401) {
-            BOOL bRet = [editCameraDelegate EditP2PCameraInfo:bAddCamera Name:strCameraName DID:strCameraID User:strUser Pwd:strPwd OldDID:self.strOldDID];
-            if (bRet == NO) {
-            }
             [self.navigationController popViewControllerAnimated:YES];
         }
         NSLog(@"注册摄像机失败: %ld %@", (long)statusCode, resultMessage);
@@ -341,7 +326,10 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 }
 -(void)unbind:(id)sender{
     NSLog(@"unbind");
-
+    if ([strCameraID length] == 0) {
+        [mytoast showWithText:NSLocalizedStringFromTable(@"PleaseInputCameraID", @STR_LOCALIZED_FILE_NAME, nil)];
+        return;
+    }
     UIActivityIndicatorView *activityIV = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
     activityIV.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
     activityIV.color = [UIColor grayColor];
@@ -486,20 +474,14 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-	//NSLog(@"textFieldDidEndEditing");
+	NSLog(@"vst textFieldDidEndEditing");
     
     switch (textField.tag) {
         case TAG_CAMERA_NAME:
-            self.strCameraName = textField.text;
+            self.oemid = textField.text;
             break;
         case TAG_CAMERA_ID:
             self.strCameraID = textField.text;
-            break;
-//        case TAG_USER_NAME:
-//            self.strUser = textField.text;
-//            break;
-        case TAG_PASSWORD:
-            self.strPwd = textField.text;
             break;
         default:
             break;
@@ -514,6 +496,15 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
+    NSLog(@"vst shouldChangeCharactersInRange %@",string);
+    switch (textField.tag) {
+        case TAG_CAMERA_ID:
+            self.strCameraID = [textField.text stringByAppendingString:string];
+            break;
+        case TAG_PASSWORD:
+            self.oemid = [textField.text stringByAppendingString:string];
+            break;
+    }
     if (range.location >= 32) {
         return NO;
     }
@@ -521,18 +512,23 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     return YES;
 }
 
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+      NSLog(@"vst textFieldDidBeginEditing %@",textField.text);
+}
+
+
 #pragma mark -
 #pragma mark other
 
 
 - (void) btnFinished:(id)sender
 {
+    NSLog(@"btnfinish------");
     [currentTextField resignFirstResponder];
     
     NSLog(@"CameraName: %@", strCameraName);
     NSLog(@"CameraID: %@", strCameraID);
-    NSLog(@"UserName: %@", strUser);
-    NSLog(@"Password: %@", strPwd); 
     
     if ([strCameraName length] == 0) {
         [mytoast showWithText:NSLocalizedStringFromTable(@"PleaseInputCamreraName", @STR_LOCALIZED_FILE_NAME, nil)];
@@ -544,14 +540,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         return;
     }
     
-    if ([strUser length] == 0) {
-        [mytoast showWithText:NSLocalizedStringFromTable(@"PleaseInputUserName", @STR_LOCALIZED_FILE_NAME, nil)];
-        return;
-    }
-    
-    BOOL bRet = [editCameraDelegate EditP2PCameraInfo:bAddCamera Name:strCameraName DID:strCameraID User:strUser Pwd:strPwd OldDID:self.strOldDID];
-    if (bRet == NO) {
-    }
     if (NO == bAddCamera) {
         [self.navigationController popToRootViewControllerAnimated:YES];
     }else{

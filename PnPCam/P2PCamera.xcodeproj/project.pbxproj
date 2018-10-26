@@ -148,6 +148,8 @@
 		6C35055D21806CAE00D17E87 /* MessageCameraCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C35055A21806CAD00D17E87 /* MessageCameraCell.m */; };
 		6C35055E21806CAE00D17E87 /* MessageCameraCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C35055C21806CAE00D17E87 /* MessageCameraCell.xib */; };
 		6C3505612180713400D17E87 /* CameraMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C3505602180713400D17E87 /* CameraMessageViewController.m */; };
+		6C933D3A2181BE5D0093AAF9 /* CustomMessageCameraCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C933D372181BE5C0093AAF9 /* CustomMessageCameraCell.m */; };
+		6C933D3B2181BE5D0093AAF9 /* CustomMessageCameraCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C933D382181BE5C0093AAF9 /* CustomMessageCameraCell.xib */; };
 		83A99C1F1B53A183006A418F /* iCloudLivePFZUIviewQR.m in Sources */ = {isa = PBXBuildFile; fileRef = 83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		83A99C281B53A1B6006A418F /* lineT.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C211B53A1B6006A418F /* lineT.png */; };
 		83A99C291B53A1B6006A418F /* lineT@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C221B53A1B6006A418F /* lineT@2x.png */; };
@@ -593,6 +595,9 @@
 		6C35055C21806CAE00D17E87 /* MessageCameraCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MessageCameraCell.xib; sourceTree = "<group>"; };
 		6C35055F2180713300D17E87 /* CameraMessageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraMessageViewController.h; sourceTree = "<group>"; };
 		6C3505602180713400D17E87 /* CameraMessageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraMessageViewController.m; sourceTree = "<group>"; };
+		6C933D372181BE5C0093AAF9 /* CustomMessageCameraCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomMessageCameraCell.m; sourceTree = "<group>"; };
+		6C933D382181BE5C0093AAF9 /* CustomMessageCameraCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CustomMessageCameraCell.xib; sourceTree = "<group>"; };
+		6C933D392181BE5D0093AAF9 /* CustomMessageCameraCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomMessageCameraCell.h; sourceTree = "<group>"; };
 		83A99C1D1B53A183006A418F /* iCloudLivePFZUIviewQR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCloudLivePFZUIviewQR.h; sourceTree = "<group>"; };
 		83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCloudLivePFZUIviewQR.m; sourceTree = "<group>"; };
 		83A99C201B53A19D006A418F /* ScanStringDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScanStringDelegate.h; sourceTree = "<group>"; };
@@ -1251,6 +1256,9 @@
 		04B9B151163A253200349F4E /* tableview-cell */ = {
 			isa = PBXGroup;
 			children = (
+				6C933D392181BE5D0093AAF9 /* CustomMessageCameraCell.h */,
+				6C933D372181BE5C0093AAF9 /* CustomMessageCameraCell.m */,
+				6C933D382181BE5C0093AAF9 /* CustomMessageCameraCell.xib */,
 				6C35055B21806CAE00D17E87 /* MessageCameraCell.h */,
 				6C35055A21806CAD00D17E87 /* MessageCameraCell.m */,
 				6C35055C21806CAE00D17E87 /* MessageCameraCell.xib */,
@@ -1831,6 +1839,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
+				6C933D3B2181BE5D0093AAF9 /* CustomMessageCameraCell.xib in Resources */,
 				CC918613154520BA001D459B /* StartView.xib in Resources */,
 				CC918615154520C4001D459B /* PlayView.xib in Resources */,
 				CC91870415452CC8001D459B /* CameraView.xib in Resources */,
@@ -2178,6 +2187,7 @@
 				FDB8A8F516B0D08100E4509B /* RemoteRecordGroupCell.m in Sources */,
 				6C3505612180713400D17E87 /* CameraMessageViewController.m in Sources */,
 				FDF0992516D30C09007F98BC /* Split-screenViewController.m in Sources */,
+				6C933D3A2181BE5D0093AAF9 /* CustomMessageCameraCell.m in Sources */,
 				FDF73B9216E579E800906BF4 /* LoginViewController.m in Sources */,
 				FDE1590E16E872F500B92CE2 /* CustomTableAlert.m in Sources */,
 				FDE055F41770428C00EE303D /* CustomToolBar.m in Sources */,

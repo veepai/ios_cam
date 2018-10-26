@@ -47,6 +47,7 @@ PPPPStatusConnectFailed = "连接失败";
 PPPPStatusDisconnected = "连接断开";
 PPPPStatusInvalidID = "无效ID";
 PleaseInputCamreraName = "请输入摄像机名称";
+PleaseInputTime = "请输入查询时间";
 PleaseInputCameraID = "请输入摄像机ID";
 PleaseInputUserName = "请输入用户名";
 CameraIsNotOnline = "摄像机不在线";
@@ -189,6 +190,9 @@ SDSetting = "SD 设置";
 PwdSetting = "密码设置";
 TFRecord = "TF 录像";
 LocalRec = "本地文件";
+Motion_noty_plan = "移动侦测报警通知计划";
+time = "日期";
+timetip = "2018-10-20";
 
 
 

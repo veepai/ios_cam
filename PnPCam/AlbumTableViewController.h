@@ -1,10 +1,4 @@
-//
-//  AlbumTableViewController.h
-//  P2PCamera
-//
-//  Created by yan luke on 13-1-23.
-//
-//
+
 
 #import <UIKit/UIKit.h>
 #import "CameraListMgt.h"

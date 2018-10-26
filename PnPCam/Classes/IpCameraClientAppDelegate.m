@@ -2,9 +2,7 @@
 //  IpCameraClientAppDelegate.m
 //  IpCameraClient
 //
-//  Created by jiyonglong on 12-4-23.
-//  Copyright 2012 __MyCompanyName__. All rights reserved.
-//
+
 
 #import "IpCameraClientAppDelegate.h"
 #import "obj_common.h"
@@ -103,8 +101,6 @@
         [self registerPushForIOS8];
     else
         [self registerPush];
-    
-    //if
 
     return YES;
 }
@@ -441,7 +437,7 @@
     
     NSLog(@"deviceTokenStr:%@ \n %@",str,deviceStr);
     [[NSUserDefaults standardUserDefaults] setObject:deviceStr forKey:@"DeviceToken"];
-    [mytoast showWithText:deviceStr];
+    //[mytoast showWithText:deviceStr];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

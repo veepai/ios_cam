@@ -1,5 +1,4 @@
 
-
 #import "CameraMessageViewController.h"
 #import "CameraViewController.h"
 #import "CameraInfoCell.h"
@@ -19,9 +18,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 @synthesize editCameraDelegate;
 @synthesize strCameraName;
 @synthesize strCameraID;
-@synthesize strOldDID;
-@synthesize strUser;
-@synthesize strPwd;
+@synthesize time;
 @synthesize currentTextField;
 @synthesize tableView;
 @synthesize navigationBar;
@@ -30,20 +27,13 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.strCameraName = @STR_DEFAULT_CAMERA_NAME;
-        self.strCameraID = @"VSTH000012BWZBR";
-        self.strOldDID = @"";
-        self.strUser = @STR_DEFAULT_USER_NAME;
-        self.strPwd = @"2018-10-24";
+        self.strCameraID = @"";
+        self.time = @"";
+        //self.strCameraID = @"VSTH000012BWZBR";
+        //self.time = @"2018-10-24";
     }
     return self;
 }
-
-
-/*
-// Implement loadView to create a view hierarchy programmatically, without using a nib.
-- (void)loadView {
-}
-*/
 
 #pragma mark -
 #pragma mark system
@@ -54,9 +44,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     if (self != nil) {
         self.strCameraName = @STR_DEFAULT_CAMERA_NAME;
         self.strCameraID = @"";
-        self.strOldDID = @"";
-        self.strUser = @STR_DEFAULT_USER_NAME;
-        self.strPwd = @"";
+        self.time = @"";
     }
     
     return self ;
@@ -68,7 +56,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     
     NSString *strTitle;
    
-    strTitle = NSLocalizedStringFromTable(@"TouchPushCamera", @STR_LOCALIZED_FILE_NAME, nil);
+    strTitle = NSLocalizedStringFromTable(@"TouchMessageCamera", @STR_LOCALIZED_FILE_NAME, nil);
     self.winsize = [UIScreen mainScreen].applicationFrame.size;
     self.navigationItem.title = strTitle;
     //创建一个右边按钮  
@@ -83,9 +71,6 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     self.navigationItem.rightBarButtonItem = rightButton;
     [rightButton release];
     
-    if (bAddCamera == NO) {
-        self.strOldDID = self.strCameraID;
-    }
     
     self.tableView.allowsSelection = NO;
 
@@ -159,9 +144,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     self.editCameraDelegate = nil;
     self.strCameraName = nil;
     self.strCameraID = nil;
-    self.strOldDID = nil;
-    self.strUser = nil;
-    self.strPwd = nil;
+    self.time = nil;
     self.currentTextField = nil;
     self.tableView = nil;
     self.navigationBar = nil;
@@ -207,18 +190,17 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         //disable selected cell
         cell1.selectionStyle = UITableViewCellSelectionStyleNone;
         CameraInfoCell * cell = (CameraInfoCell*)cell1;
-
-       
         CGRect newFrame = cell.textField.frame;
         newFrame.size = CGSizeMake(self.winsize.width - 180, newFrame.size.height);
         cell.textField.frame = newFrame;
         
-        switch (row) {
+        switch (row)
+        {
             case 0: 
-                cell.keyLable.text = NSLocalizedStringFromTable(@"OEMID", @STR_LOCALIZED_FILE_NAME, nil);
-                cell.textField.placeholder = NSLocalizedStringFromTable(@"InputOemName", @STR_LOCALIZED_FILE_NAME, nil);
+                cell.keyLable.text = NSLocalizedStringFromTable(@"time", @STR_LOCALIZED_FILE_NAME, nil);
+                cell.textField.placeholder = NSLocalizedStringFromTable(@"timetip", @STR_LOCALIZED_FILE_NAME, nil);
                 cell.keyLable.font = [UIFont fontWithName:@"System Bold" size:17.f];
-                cell.textField.text = NSLocalizedStringFromTable(@"PUSH", @STR_LOCALIZED_FILE_NAME, nil);
+                //cell.textField.text = NSLocalizedStringFromTable(@"timetip", @STR_LOCALIZED_FILE_NAME, nil);
                 break;
         }
         
@@ -226,7 +208,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         cell.textField.tag = row; 
     }else  if (row == 1){// lan search
         if (cell1 == nil) {
-            NSArray* nib = [[NSBundle mainBundle] loadNibNamed:@"CustomAddCameraCell" owner:nil options:nil];
+            NSArray* nib = [[NSBundle mainBundle] loadNibNamed:@"CustomMessageCameraCell" owner:nil options:nil];
             
             cell1 = [nib lastObject];
             
@@ -235,7 +217,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         btnbackground = [btnbackground stretchableImageWithLeftCapWidth:13 topCapHeight:0];
         UIImage* btnbackgroundselect = [UIImage imageNamed:@"BtnBackGroundSelect"];
         btnbackgroundselect = [btnbackgroundselect stretchableImageWithLeftCapWidth:10 topCapHeight:0];
-        CustomAddCameraCell* Customcell = (CustomAddCameraCell*)cell1;
+        CustomMessageCameraCell* Customcell = (CustomMessageCameraCell*)cell1;
     
         CGRect newFrame = Customcell.textField.frame;
         newFrame.size = CGSizeMake(self.winsize.width - 150, newFrame.size.height);
@@ -244,28 +226,11 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         Customcell.keyLabel.text = NSLocalizedStringFromTable(@"CameraID", @STR_LOCALIZED_FILE_NAME, nil);
         Customcell.keyLabel.font = [UIFont fontWithName:@"System Bold" size:17.f];
         Customcell.textField.placeholder = NSLocalizedStringFromTable(@"InputCameraID", @STR_LOCALIZED_FILE_NAME, nil);
-        Customcell.textField.text = self.strCameraID;
         Customcell.textField.delegate = self;
         Customcell.textField.tag = row;
-
-        [Customcell.seachButton setTitle:NSLocalizedStringFromTable(@"bingdev", @STR_LOCALIZED_FILE_NAME, nil) forState:UIControlStateNormal];
-        NSString* seachButtonText = NSLocalizedStringFromTable(@"Search11", @STR_LOCALIZED_FILE_NAME, nil);
-        CGSize fontSize = [seachButtonText sizeWithFont:Customcell.seachButton.titleLabel.font constrainedToSize:Customcell.frame.size lineBreakMode:NSLineBreakByWordWrapping];
-        fontSize = CGSizeMake(fontSize.width + 20, fontSize.height + 10);
-         CGRect newframe =  Customcell.seachButton.frame;
-        newframe.size = fontSize;
-        newframe.origin = CGPointMake(newframe.origin.x , newframe.origin.y + 10);
-        Customcell.seachButton.frame = newframe;
+      
         
-        //Customcell.seachButton.layer.masksToBounds = YES;
-        //Customcell.seachButton.layer.cornerRadius = 4.0;
-        Customcell.seachButton.titleLabel.textColor = [UIColor whiteColor];
-        //Customcell.seachButton.backgroundColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1.0];
-        [Customcell.seachButton setBackgroundImage:btnbackground forState:UIControlStateNormal];
-        [Customcell.seachButton setBackgroundImage:btnbackgroundselect forState:UIControlStateSelected];
-        [Customcell.seachButton addTarget:self action:@selector(bind:) forControlEvents:UIControlEventTouchUpInside];
-                
-        [Customcell.scanButton setTitle:NSLocalizedStringFromTable(@"unbingdev", @STR_LOCALIZED_FILE_NAME, nil) forState:UIControlStateNormal];
+        [Customcell.scanButton setTitle:NSLocalizedStringFromTable(@"GET", @STR_LOCALIZED_FILE_NAME, nil) forState:UIControlStateNormal];
         NSString* scanstr = NSLocalizedStringFromTable(@"ScanQRCode", @STR_LOCALIZED_FILE_NAME, nil);
         CGSize scanstrsize = [scanstr sizeWithFont:Customcell.scanButton.titleLabel.font constrainedToSize:Customcell.frame.size lineBreakMode:NSLineBreakByWordWrapping];
         scanstrsize = CGSizeMake(scanstrsize.width + 20, scanstrsize.height + 10);
@@ -274,14 +239,12 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         scanNewFrame.origin = CGPointMake(scanNewFrame.origin.x , scanNewFrame.origin.y + 10);
         Customcell.scanButton.frame = scanNewFrame;
 
-        [Customcell.scanButton addTarget:self action:@selector(unbind:) forControlEvents:UIControlEventTouchUpInside];
+        [Customcell.scanButton addTarget:self action:@selector(btnGetMessage:) forControlEvents:UIControlEventTouchUpInside];
         Customcell.scanButton.titleLabel.textColor = [UIColor whiteColor];
-        //Customcell.scanButton.layer.masksToBounds = YES;
-        //Customcell.scanButton.layer.cornerRadius = 4.0f;
       
         [Customcell.scanButton setBackgroundImage:btnbackground forState:UIControlStateNormal];
-         [Customcell.scanButton setBackgroundImage:btnbackgroundselect forState:UIControlStateSelected];
-        //Customcell.scanButton.backgroundColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
+        [Customcell.scanButton setBackgroundImage:btnbackgroundselect forState:UIControlStateSelected];
+ 
     }    
     
 	return cell1;
@@ -293,21 +256,27 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     }
     return 44;
 }
-
--(void)bind:(id)sender{
-    NSLog(@"bind");
-
-}
--(void)unbind:(id)sender{
+-(void)btnGetMessage:(id)sender{
     NSLog(@"messageinf");
+    [[[UIApplication sharedApplication] keyWindow] endEditing:YES];
+    if ([time length] == 0) {
+        [mytoast showWithText:NSLocalizedStringFromTable(@"PleaseInputTime", @STR_LOCALIZED_FILE_NAME, nil)];
+        return;
+    }
     
+    if ([strCameraID length] == 0) {
+        [mytoast showWithText:NSLocalizedStringFromTable(@"PleaseInputCameraID", @STR_LOCALIZED_FILE_NAME, nil)];
+        return;
+    }
     UIActivityIndicatorView *activityIV = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
     activityIV.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
     activityIV.color = [UIColor grayColor];
     [self.view addSubview:activityIV];
     [activityIV startAnimating];
     
-    [WebAPIManager GetMessageDevice:self.strCameraID Time:self.strPwd  ResultBlockSuccess:^(id result) {
+    NSLog(@"strCameraID %@",strCameraID);
+    NSLog(@"time %@",time);
+    [WebAPIManager GetMessageDevice:self.strCameraID Time:self.time  ResultBlockSuccess:^(id result) {
         [activityIV stopAnimating];
         [activityIV release];
         NSDictionary *dic = result;
@@ -445,20 +414,17 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-	//NSLog(@"textFieldDidEndEditing");
+	NSLog(@"textFieldDidEndEditing");
     
     switch (textField.tag) {
         case TAG_CAMERA_NAME:
-            self.strCameraName = textField.text;
+            self.time = textField.text;
             break;
         case TAG_CAMERA_ID:
             self.strCameraID = textField.text;
             break;
-//        case TAG_USER_NAME:
-//            self.strUser = textField.text;
-//            break;
         case TAG_PASSWORD:
-            self.strPwd = textField.text;
+            self.time = textField.text;
             break;
         default:
             break;
@@ -473,6 +439,20 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
+    NSLog(@"textField %@ ,%d",textField.text,textField.tag);
+    switch (textField.tag) {
+        case TAG_CAMERA_NAME:
+            self.time = [textField.text stringByAppendingString:string];
+            break;
+        case TAG_CAMERA_ID:
+            self.strCameraID =  [textField.text stringByAppendingString:string];
+            break;
+        case TAG_PASSWORD:
+            self.time = textField.text;
+            break;
+        default:
+            break;
+    }
     if (range.location >= 32) {
         return NO;
     }
@@ -490,10 +470,9 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     
     NSLog(@"CameraName: %@", strCameraName);
     NSLog(@"CameraID: %@", strCameraID);
-    NSLog(@"UserName: %@", strUser);
-    NSLog(@"Password: %@", strPwd); 
+    NSLog(@"Password: %@", time);
     
-    if ([strCameraName length] == 0) {
+    if ([time length] == 0) {
         [mytoast showWithText:NSLocalizedStringFromTable(@"PleaseInputCamreraName", @STR_LOCALIZED_FILE_NAME, nil)];
         return;
     }
@@ -502,22 +481,9 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         [mytoast showWithText:NSLocalizedStringFromTable(@"PleaseInputCameraID", @STR_LOCALIZED_FILE_NAME, nil)];
         return;
     }
-    
-    if ([strUser length] == 0) {
-        [mytoast showWithText:NSLocalizedStringFromTable(@"PleaseInputUserName", @STR_LOCALIZED_FILE_NAME, nil)];
-        return;
-    }
-    
-    BOOL bRet = [editCameraDelegate EditP2PCameraInfo:bAddCamera Name:strCameraName DID:strCameraID User:strUser Pwd:strPwd OldDID:self.strOldDID];
-    if (bRet == NO) {
-    }
-    if (NO == bAddCamera) {
-        [self.navigationController popToRootViewControllerAnimated:YES];
-    }else{
-        [self.navigationController popViewControllerAnimated:YES];
-    }
+   [self.navigationController popViewControllerAnimated:YES];
+   
 }
-
 
 - (void)performResultAction {
     

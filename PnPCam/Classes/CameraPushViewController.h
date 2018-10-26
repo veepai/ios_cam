@@ -25,9 +25,7 @@
     id<EditCameraProtocol> editCameraDelegate;
     NSString *strCameraName;
     NSString *strCameraID;
-    NSString *strUser;
-    NSString *strPwd;
-    NSString *strOldDID;
+    NSString *oemid;
     UITextField *currentTextField;
    
     //outlet
@@ -39,9 +37,6 @@
 @property (nonatomic, assign) id<EditCameraProtocol> editCameraDelegate;
 @property (nonatomic, copy) NSString *strCameraName;
 @property (nonatomic, copy) NSString *strCameraID;
-@property (nonatomic, copy) NSString *strUser;
-@property (nonatomic, copy) NSString *strPwd;
-@property (nonatomic, copy) NSString *strOldDID;
 @property (nonatomic, retain) UITextField *currentTextField;
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) UINavigationBar *navigationBar;

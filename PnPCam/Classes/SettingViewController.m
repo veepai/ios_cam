@@ -1,10 +1,7 @@
 //
 //  SettingViewController.m
 //  P2PCamera
-//
-//  Created by mac on 12-10-2.
-//  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
-//
+
 
 #import "SettingViewController.h"
 #import "WifiSettingViewController.h"
@@ -280,7 +277,8 @@
                 cell.textLabel.text = NSLocalizedStringFromTable(@"SDSetting", @STR_LOCALIZED_FILE_NAME, nil);
                 break;
             case 5:
-                cell.textLabel.text = @"移动侦测报警通知计划";
+                //移动侦测报警通知计划
+                cell.textLabel.text = NSLocalizedStringFromTable(@"Motion_noty_plan", @STR_LOCALIZED_FILE_NAME, nil);
                 break;
             case 6:
                 cell.textLabel.text = NSLocalizedStringFromTable(@"PlayViewMode", @STR_LOCALIZED_FILE_NAME, nil);

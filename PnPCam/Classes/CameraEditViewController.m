@@ -111,6 +111,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 }
 
 - (void) handleSwipeGes{
+        NSLog(@"btnfinish %s","finsih");
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -499,6 +500,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 
 - (void) btnFinished:(id)sender
 {
+    NSLog(@"btnfinish %s","finsih");
     [currentTextField resignFirstResponder];
     
     NSLog(@"CameraName: %@", strCameraName);
@@ -563,6 +565,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 #pragma mark navigationbardelegate
 - (BOOL) navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item
 {
+        NSLog(@"btnfinish %s","finsih");
     [self.navigationController popViewControllerAnimated:YES];
     
     return NO;

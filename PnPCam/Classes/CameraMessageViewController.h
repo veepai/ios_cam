@@ -4,7 +4,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "EditCameraProtocol.h"
 #import "SearchAddCameraInfoProtocol.h"
-#import "CustomAddCameraCell.h"
+#import "CustomMessageCameraCell.h"
 #import "ScanStringDelegate.h"
 #define TAG_CAMERA_NAME 0
 #define TAG_CAMERA_ID 1
@@ -15,18 +15,13 @@
 
 @interface CameraMessageViewController : UIViewController <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, SearchAddCameraInfoProtocol, UINavigationBarDelegate,ScanStringDelegate> {
            
-    //---------------------------------
     
     CGFloat textFieldAnimatedDistance;
-    
-    //-------------------------
     BOOL bAddCamera;
     id<EditCameraProtocol> editCameraDelegate;
     NSString *strCameraName;
     NSString *strCameraID;
-    NSString *strUser;
     NSString *strPwd;
-    NSString *strOldDID;
     UITextField *currentTextField;
    
     //outlet
@@ -38,9 +33,7 @@
 @property (nonatomic, assign) id<EditCameraProtocol> editCameraDelegate;
 @property (nonatomic, copy) NSString *strCameraName;
 @property (nonatomic, copy) NSString *strCameraID;
-@property (nonatomic, copy) NSString *strUser;
-@property (nonatomic, copy) NSString *strPwd;
-@property (nonatomic, copy) NSString *strOldDID;
+@property (nonatomic, copy) NSString *time;
 @property (nonatomic, retain) UITextField *currentTextField;
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) UINavigationBar *navigationBar;

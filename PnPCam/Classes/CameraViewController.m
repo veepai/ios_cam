@@ -1,11 +1,4 @@
 
-//  CameraViewController.m   com.WildcardTest.VsC
-//  IpCameraClient
-//
-//  Created by jiyonglong on 12-4-23.
-//  Copyright 2012 __MyCompanyName__. All rights reserved.
-//
-
 #import "CameraViewController.h"
 #import "CameraEditViewController.h"
 #import "CameraPushViewController.h"
@@ -21,7 +14,6 @@
 #import "PushCameraCell.h"
 #import "MessageCameraCell.h"
 #import "CameraEditViewController.h"
-//#import "H264Decoder.h"
 #import "CustomTableAlert.h"
 #import "UserPwdSetViewController.h"
 
@@ -268,7 +260,7 @@
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
     int count = [cameraListMgt GetCount];
-    return count + 1;
+    return count + 3;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)anIndexPath
