@@ -23,6 +23,7 @@
     NSString *strCameraID;
     NSString *strPwd;
     UITextField *currentTextField;
+    UITextView *messageView;
    
     //outlet
     IBOutlet UITableView *tableView;
@@ -38,6 +39,7 @@
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) UINavigationBar *navigationBar;
 @property (nonatomic, assign) CGSize winsize;
+@property (nonatomic, assign) UITextView *messageView;
 
 - (void)keyboardWillShowNotification:(NSNotification *)aNotification;
 - (void)keyboardWillHideNotification:(NSNotification* )aNotification;

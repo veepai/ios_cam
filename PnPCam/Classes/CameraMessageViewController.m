@@ -22,6 +22,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 @synthesize currentTextField;
 @synthesize tableView;
 @synthesize navigationBar;
+@synthesize messageView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -70,8 +71,10 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     //item.rightBarButtonItem = rightButton;
     self.navigationItem.rightBarButtonItem = rightButton;
     [rightButton release];
+    messageView = [[UITextView alloc] initWithFrame:CGRectMake(10, 280, 400, 300)];
+    [messageView setText:@"message record"];
     
-    
+    [self.view addSubview:messageView];
     self.tableView.allowsSelection = NO;
 
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -256,6 +259,31 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
     }
     return 44;
 }
+
+-(NSString *)convertToJsonData:(NSDictionary *)dict
+{
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:&error];
+    NSString *jsonString;
+    
+    if (!jsonData) {
+        NSLog(@"%@",error);
+    }else{
+        jsonString = [[NSString alloc]initWithData:jsonData encoding:NSUTF8StringEncoding];
+    }
+    
+    NSMutableString *mutStr = [NSMutableString stringWithString:jsonString];
+    //    NSRange range = {0,jsonString.length};
+    //    //去掉字符串中的空格
+    //    [mutStr replaceOccurrencesOfString:@" " withString:@"" options:NSLiteralSearch range:range];
+    NSRange range2 = {0,mutStr.length};
+    //去掉字符串中的换行符
+    [mutStr replaceOccurrencesOfString:@"\n" withString:@"" options:NSLiteralSearch range:range2];
+    
+    return mutStr;
+}
+
+
 -(void)btnGetMessage:(id)sender{
     NSLog(@"messageinf");
     [[[UIApplication sharedApplication] keyWindow] endEditing:YES];
@@ -280,7 +308,20 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         [activityIV stopAnimating];
         [activityIV release];
         NSDictionary *dic = result;
-        NSLog(@"api记录成功 %@", result);
+        NSString *json = nil;
+        NSError *error ;
+        NSData *jsondate = [NSJSONSerialization dataWithJSONObject:result options:NSJSONWritingPrettyPrinted error:&error];
+        if(!jsondate)
+        {
+            NSLog(@"api记录 json error");
+        }else{
+            json = [[NSString alloc] initWithData:jsondate encoding:NSUTF8StringEncoding];
+        }
+        NSLog(@"api记录成功 json%@", json);
+        //NSString *content = [[NSString alloc]initWithData:result encoding:NSUTF8StringEncoding];
+        //NSLog(@"api记录成功 %@", content);
+        
+        [messageView setText: json];
          //[mytoast showWithText:result];
 //        NSString *msgStr = dic[@"msg"];
 //        if ([msgStr isEqualToString:@"unbind success"]) {
