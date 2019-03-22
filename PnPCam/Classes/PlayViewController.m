@@ -364,8 +364,10 @@
         
         NSString* strBasePath = [self GetBasePath:strDID];
         NSString* fileName = [strBasePath stringByAppendingPathComponent:@"test22.mp4"];
+        NSLog(@"fileName %@",fileName);
         if (fileName != nil) {
             [[VSNet shareinstance] StartRecord:fileName cameraUid:strDID completion:^(BOOL success, int nError) {
+                NSLog(@"fileName  error%d",nError);
                 if (success) {
                     NSLog(@"Record success");
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

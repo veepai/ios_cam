@@ -136,7 +136,6 @@
 		4A1EB51C1E4B13FB00EABDA8 /* WeekButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A1EB51B1E4B13FB00EABDA8 /* WeekButton.m */; };
 		4A1EB51E1E4B1CD900EABDA8 /* PlayViewHandleBgImageView@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A1EB51D1E4B1CD900EABDA8 /* PlayViewHandleBgImageView@2x.png */; };
 		4A46B8521E4C375300B824FD /* MotionPushPlanViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A46B8511E4C375300B824FD /* MotionPushPlanViewController.m */; };
-		4AEA12BA1CBDF92200A3D6DB /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12B91CBDF92200A3D6DB /* libbz2.tbd */; };
 		4AEA12BC1CBDFC0200A3D6DB /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12BB1CBDFC0200A3D6DB /* libz.tbd */; };
 		4AEA12BE1CBDFC3600A3D6DB /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12BD1CBDFC3600A3D6DB /* libsqlite3.tbd */; };
 		4AEA12C01CBDFC5C00A3D6DB /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12BF1CBDFC5C00A3D6DB /* libiconv.tbd */; };
@@ -148,6 +147,7 @@
 		6C35055D21806CAE00D17E87 /* MessageCameraCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C35055A21806CAD00D17E87 /* MessageCameraCell.m */; };
 		6C35055E21806CAE00D17E87 /* MessageCameraCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C35055C21806CAE00D17E87 /* MessageCameraCell.xib */; };
 		6C3505612180713400D17E87 /* CameraMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C3505602180713400D17E87 /* CameraMessageViewController.m */; };
+		6C57C16721BA64B100DE9CCD /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12B91CBDF92200A3D6DB /* libbz2.tbd */; };
 		6C933D3A2181BE5D0093AAF9 /* CustomMessageCameraCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C933D372181BE5C0093AAF9 /* CustomMessageCameraCell.m */; };
 		6C933D3B2181BE5D0093AAF9 /* CustomMessageCameraCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C933D382181BE5C0093AAF9 /* CustomMessageCameraCell.xib */; };
 		83A99C1F1B53A183006A418F /* iCloudLivePFZUIviewQR.m in Sources */ = {isa = PBXBuildFile; fileRef = 83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
@@ -938,6 +938,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C57C16721BA64B100DE9CCD /* libbz2.tbd in Frameworks */,
 				6C35055421805F2300D17E87 /* VSNetAPI.framework in Frameworks */,
 				6C260D02217F30610010BDE2 /* UserNotifications.framework in Frameworks */,
 				9CD216B72154BDDE00EB72A6 /* libstdc++.tbd in Frameworks */,
@@ -945,7 +946,6 @@
 				4AEA12C01CBDFC5C00A3D6DB /* libiconv.tbd in Frameworks */,
 				4AEA12BE1CBDFC3600A3D6DB /* libsqlite3.tbd in Frameworks */,
 				4AEA12BC1CBDFC0200A3D6DB /* libz.tbd in Frameworks */,
-				4AEA12BA1CBDF92200A3D6DB /* libbz2.tbd in Frameworks */,
 				FDE428FC16B7AB6900ACC2C4 /* SystemConfiguration.framework in Frameworks */,
 				B7E4A4B216704E1E002E9D2B /* OpenGLES.framework in Frameworks */,
 				B7E4A4B016704E18002E9D2B /* GLKit.framework in Frameworks */,
