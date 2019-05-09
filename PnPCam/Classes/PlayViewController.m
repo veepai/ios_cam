@@ -24,6 +24,7 @@
 #import "CameraViewController.h"
 #import <CoreVideo/CoreVideo.h>
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "VideoFramePool.h"
 
 @implementation UIScrollView (UITouchEvent)
 
@@ -64,13 +65,14 @@
 
 @end
 
-@interface PlayViewController ()
+@interface PlayViewController ()<VSNetFrameProtocol>
 @property (nonatomic, assign) BOOL is_animationUp;
 @property (nonatomic, assign) BOOL is_animationDown;
 @property (nonatomic, assign) BOOL is_animationLeft;
 @property (nonatomic, assign) BOOL is_animationRight;
 @property (nonatomic, assign) double FocalLength;
 @property (nonatomic, retain) CustomToolBar* menuToolBar;
+@property (nonatomic, strong) VideoFramePool *framePool;
 @end
 
 @implementation PlayViewController
@@ -120,6 +122,7 @@
 #define spliteBtn @"SpliteButton"
 #define TalkMark @"IsTalking"
 #define AudioMark @"IsAudioing"
+
 
 //开始监听
 - (void) StartAudio{
@@ -1186,7 +1189,9 @@
         [self->timeStampTimer invalidate];
         self->timeStampTimer = nil;
     }
-  
+    if(_framePool){
+        [_framePool stop];
+    }
     if(m_bTalkStarted)
         [[VSNet shareinstance] stopTalk:strDID];
     
@@ -1972,6 +1977,7 @@
         myGLViewController.view.frame = imgView.frame;
     }
     
+    
     if(myGLViewController)
         [self.subDisplayScrollView addSubview:myGLViewController.view];
     
@@ -2449,6 +2455,9 @@
     
     NSArray* items = [NSArray arrayWithObjects:item1, item2, item3, item4, item5, item6, item7, item8, nil];
     _menuToolBar = [[CustomToolBar alloc] initFrom:[self.view viewWithTag:550] andRowItems:4 andItems:items andRowHeight:44.f andWidth:imgView.frame.size.width];
+    
+    _framePool = [[VideoFramePool alloc] init];
+    _framePool.delegate = self;
     [self.view addSubview:_menuToolBar];
 }
 
@@ -2464,6 +2473,7 @@
         [self performSelectorOnMainThread:@selector(StopPlay:) withObject:nil waitUntilDone:NO];
         return;
     }
+    [_framePool startWithFrameRate:15];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -2638,6 +2648,9 @@
         [fishC61SView FreeObject];
         fishC61SView = nil;
     }
+    if (_framePool) {
+        [_framePool clear];
+    }
     
     [super dealloc];
     
@@ -2663,6 +2676,9 @@
     
     if (m_bAudioStarted)
         [[VSNet shareinstance] stopAudio:strDID];
+    if(_framePool){
+        [_framePool stop];
+    }
     
     [[VSNet shareinstance] stopLivestream:strDID];
     
@@ -2800,9 +2816,11 @@
     }
     
     //[self performSelectorOnMainThread:@selector(updateTimestamp) withObject:nil waitUntilDone:NO];
-    if(myGLViewController)
-        [myGLViewController WriteYUVFrame:buff Len:(int)len width:(int)width height:(int)height];
-    
+    //if(myGLViewController)
+    //    [myGLViewController WriteYUVFrame:buff Len:(int)len width:(int)width height:(int)height];
+    NSData *data = [[NSData alloc] initWithBytes:buff length:len];
+    [self.framePool pushVideoData:data videoWidth:(int)width videoHeight:(int)height];
+    [data release];
  
     [m_YUVDataLock lock];
     if (m_pYUVData) {
@@ -2832,6 +2850,36 @@
         }
     }
     [m_YUVDataLock unlock];
+  
+}
+
+#pragma mark ------
+#pragma mark - VSNetFrameProtocol
+- (void) VSNetFrameData: (NSData*) frameData width:(int) width height:(int) height{
+    //NSLog(@"3CFGetRetainCount:%d",CFGetRetainCount((__bridge CFTypeRef)frameData));
+    Byte *buff = (Byte *)[frameData bytes];
+//    //NSLog(@"解码视频数据--3");
+//    //将获取的传输速度在主线程中返回
+//    __weak PlayViewController *weakSelf = self;
+//  
+//    
+    SDL_VoutOverlay stOverlay;
+    memset(&stOverlay, 0, sizeof(stOverlay));
+//    stOverlay.w = (int)width ;
+//    stOverlay.h = (int)height;
+//    stOverlay.pitches[0] = width;
+//    stOverlay.pitches[1] = stOverlay.pitches[2] = width /2;
+//    stOverlay.pixels[0] = buff;
+//    stOverlay.pixels[1] = buff + width*height;
+//    stOverlay.pixels[2] = buff + width*height*5/4;
+//    
+//    [_mainVideoImgView display:&stOverlay];
+    
+    
+    if(myGLViewController)
+        [myGLViewController WriteYUVFrame:buff Len:(int)frameData.length width:(int)width height:(int)height];
+    
+    
 }
 
 //- (void) ImageNotify:(UIImage *)image timestamp:(NSInteger)timestamp

@@ -57,6 +57,7 @@ enum
 
 - (void)WriteYUVFrame:(Byte *)pYUV Len:(int)length width:(int)width height:(int)height
 {
+    
     [m_YUVDataLock lock];
     if (m_pYUVData != NULL) {
         free(m_pYUVData);
@@ -255,7 +256,7 @@ enum
     [m_YUVDataLock lock];
     
     if (m_bNeedSleep) {
-        usleep(100000);
+        //usleep(100000);
     }
     
     m_bNeedSleep = YES;

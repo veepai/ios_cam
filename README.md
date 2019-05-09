@@ -18,10 +18,11 @@ Xcode8 权限的问题
 
 20190423     
 支持全景展开  
+添加vsFisheye.a 和vsFisheye.h    
 1.通过get_status.cgi得到correctModel 和installType值做设备机型的判断（考虑cgi文档）
-2.实现化对象
-FisheyeView* fishView;         //C60摄像机
-FisheyeC61SView *fishC61SView; //C61s摄像机 
+2.实现化对象  
+FisheyeView* fishView;         //C60摄像机   
+FisheyeC61SView *fishC61SView; //C61s摄像机    
 
 
 
