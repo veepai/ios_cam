@@ -2,7 +2,7 @@
 //  VideoFramePool.m
 //  ismartsee-A 
 //
-//  Created by 杨柳 on 2018/6/25.
+//  Created by  on 2018/6/25.
 //
 
 #import "VideoFramePool.h"
@@ -133,6 +133,7 @@
     if (frameData) {
         rate ++;
         if (self.delegate) {
+              NSLog(@"frame222 size pool:%ld rate:%d",(long)frameArray.count,rate);
             [self.delegate VSNetFrameData:frameData[@"frame"] width:[frameData[@"width"] intValue] height:[frameData[@"height"] intValue]];
         }
     }

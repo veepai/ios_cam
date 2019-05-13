@@ -20,6 +20,7 @@
 #import "VSNet.h"
 #include "cmdhead.h"
 #import "APICommon.h"
+#import "VSNetSendCommand.h"
 
 @interface CameraViewController()
 @property (nonatomic, retain) CustomTableAlert* customTalert;
@@ -1073,6 +1074,7 @@
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 NSString *strCMD = @"get_factory_param.cgi?";
                  [[VSNet shareinstance] sendCgiCommand:strCMD withIdentity:deviceIdentity];
+                    [[VSNet shareinstance] sendCgiCommand:@"get_params.cgi?" withIdentity:deviceIdentity];
             });
         }
         
@@ -1176,6 +1178,32 @@
             }
             [[NSUserDefaults standardUserDefaults] synchronize];
             break;
+        case CGI_IEGET_PARAM:
+            NSLog(@"CameraViewController VSNet返回数据 对时区 UID:%@ comtype %ld",deviceIdentity,(long)comType);
+            NSInteger timeZone = -[[APICommon stringAnalysisWithFormatStr:@"tz=" AndRetString:retString] integerValue];
+            NSInteger now = [[APICommon stringAnalysisWithFormatStr:@"now=" AndRetString:retString] integerValue];
+            
+            NSTimeZone *zone = [NSTimeZone defaultTimeZone];
+            NSInteger interval = [zone secondsFromGMTForDate:[NSDate date]];
+            
+            NSInteger IntervalSince1970 = [[NSDate date] timeIntervalSince1970];
+            //        NSLog(@"\nIntervalSince1970:%ld ",(long)IntervalSince1970);
+            NSInteger roundValue = round((IntervalSince1970-now)/3600.0) * 3600;
+            NSInteger timeZone1 = roundValue + interval;
+            
+            //        NSLog(@"\ncameraTimeZone :%ld  \n now:%ld \nroundValue:%ld  \nPhoneTimeZone1:%ld",(long)timeZone,(long)now,(long)roundValue,(long)timeZone1);
+            if (timeZone1 != timeZone) {
+                if (timeZone + roundValue != timeZone1 && abs((int)(IntervalSince1970 - now)) < 1800) {
+                    //                NSLog(@"setCameraTime1:%ld %ld",(long)timeZone,(long)timeZone1);
+                    [self setCameraTime:deviceIdentity];
+                } else {
+                    if (abs((int)(IntervalSince1970 - now)) >= 1800) {
+                        //                    NSLog(@"setCameraTime2:%ld",(long)IntervalSince1970);
+                        [VSNetSendCommand VSNetCommandSetDateTime:deviceIdentity isNow:IntervalSince1970 timeZone:-timeZone1 npt:1 netServer:@"time.windows.com"];
+                    }
+                }
+            }
+            break;
         }
         default:
             break;
@@ -1200,6 +1228,16 @@
     
     [pool release];
     [img release];
+}
+
+-(void) setCameraTime:(NSString *)m_strDID{
+    NSTimeZone *zone = [NSTimeZone defaultTimeZone];
+    NSInteger interval = [zone secondsFromGMTForDate:[NSDate date]];
+    NSInteger IntervalSince1970 = [[NSDate date] timeIntervalSince1970];
+    
+    //vinsent
+    
+    [VSNetSendCommand VSNetCommandSetDateTime:m_strDID isNow:IntervalSince1970 timeZone:(-1)*interval npt:1 netServer:@"time.windows.com"];
 }
 
 @end
