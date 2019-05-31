@@ -871,22 +871,49 @@
         }
         
         usleep(100000);
-        int nRet = [[VSNet shareinstance] start:strDID  withUser:strUser withPassWord:strPwd initializeStr:nil LanSearch:1];
+        NSString *p2pstring = [self getPPPPString:strDID];
+        int nRet = [[VSNet shareinstance] start:strDID  withUser:strUser withPassWord:strPwd initializeStr:p2pstring LanSearch:1];
+        [[VSNet shareinstance] setStatusDelegate:strDID withDelegate:self];
+        [[VSNet shareinstance] setControlDelegate:strDID withDelegate:self];
         if(nRet == 0){
             //连接不成功，3秒后再试一次
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [[VSNet shareinstance] start:strDID  withUser:strUser withPassWord:strPwd initializeStr:nil LanSearch:1];
-                [[VSNet shareinstance] setStatusDelegate:strDID withDelegate:self];
-                [[VSNet shareinstance] setControlDelegate:strDID withDelegate:self];
+                [[VSNet shareinstance] start:strDID  withUser:strUser withPassWord:strPwd initializeStr:p2pstring LanSearch:1];
+               // [[VSNet shareinstance] setStatusDelegate:strDID withDelegate:self];
+                //[[VSNet shareinstance] setControlDelegate:strDID withDelegate:self];
             });
         }
         else
         {
-            [[VSNet shareinstance] setStatusDelegate:strDID withDelegate:self];
-            [[VSNet shareinstance] setControlDelegate:strDID withDelegate:self];
+           // [[VSNet shareinstance] setStatusDelegate:strDID withDelegate:self];
+            //[[VSNet shareinstance] setControlDelegate:strDID withDelegate:self];
         }
     }
 }
+
+
+- (NSString*)getPPPPString:(NSString*)strDID{
+    if ([[strDID uppercaseString] rangeOfString:@"VSTG"].location != NSNotFound) {
+        return @"EEGDFHBOKCIGGFJPECHIFNEBGJNLHOMIHEFJBADPAGJELNKJDKANCBPJGHLAIALAADMDKPDGOENEBECCIK:vstarcam2018";
+    }else if ([[strDID uppercaseString] rangeOfString:@"VSTH"].location != NSNotFound) {
+        return @"EEGDFHBLKGJIGEJLEKGOFMEDHAMHHJNAGGFABMCOBGJOLHLJDFAFCPPHGILKIKLMANNHKEDKOINIBNCPJOMK:vstarcam2018";
+    }else if ([[strDID uppercaseString] rangeOfString:@"VSTF"].location != NSNotFound) {
+        return @"HZLXEJIALKHYATPCHULNSVLMEELSHWIHPFIBAOHXIDICSQEHENEKPAARSTELERPDLNEPLKEILPHUHXHZEJEEEHEGEM-$$";
+    }else if ([[strDID uppercaseString] rangeOfString:@"VSTD"].location != NSNotFound) {
+        return @"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$";
+    }else if ([[strDID uppercaseString] rangeOfString:@"VSTA"].location != NSNotFound) {
+        return @"EFGFFBBOKAIEGHJAEDHJFEEOHMNGDCNJCDFKAKHLEBJHKEKMCAFCDLLLHAOCJPPMBHMNOMCJKGJEBGGHJHIOMFBDNPKNFEGCEGCBGCALMFOHBCGMFK";
+    }else if ([[strDID uppercaseString] rangeOfString:@"VSTB"].location != NSNotFound) {
+        return @"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL";
+    }else if ([[strDID uppercaseString] rangeOfString:@"VSTC"].location != NSNotFound) {
+        return @"ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL";
+    }else
+    {
+        return nil;
+    }
+    return nil;
+}
+
 
 - (void) StopPPPP
 {
@@ -1011,28 +1038,32 @@
     }
     
     if (bRet == YES) {
+        NSString *p2pstring = [self getPPPPString:did];
         if (bAdd) {//添加成功，增加P2P连接
-            int nRet = [[VSNet shareinstance] start:did  withUser:user withPassWord:pwd initializeStr:nil LanSearch:1];
+            
+            int nRet = [[VSNet shareinstance] start:did  withUser:user withPassWord:pwd initializeStr:p2pstring LanSearch:1];
             if(nRet == 0){
                 //连接不成功，3秒后再试一次
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [[VSNet shareinstance] start:did  withUser:user withPassWord:user initializeStr:nil LanSearch:1];
-                    [[VSNet shareinstance] setStatusDelegate:did withDelegate:self];
-                    [[VSNet shareinstance] setControlDelegate:did withDelegate:self];
+                    [[VSNet shareinstance] start:did  withUser:user withPassWord:user initializeStr:p2pstring LanSearch:1];
+                   // [[VSNet shareinstance] setStatusDelegate:did withDelegate:self];
+                   // [[VSNet shareinstance] setControlDelegate:did withDelegate:self];
                 });
             }
             else
             {
-                [[VSNet shareinstance] setStatusDelegate:did withDelegate:self];
-                [[VSNet shareinstance] setControlDelegate:did withDelegate:self];
+               // [[VSNet shareinstance] setStatusDelegate:did withDelegate:self];
+               // [[VSNet shareinstance] setControlDelegate:did withDelegate:self];
             }
         }else {//修改成功，重新启动P2P连接
             [[VSNet shareinstance] stop:did];
-            [[VSNet shareinstance] start:did withUser:user withPassWord:pwd initializeStr:nil LanSearch:1];
-            [[VSNet shareinstance] setStatusDelegate:did withDelegate:self];
-            [[VSNet shareinstance] setControlDelegate:did withDelegate:self];
+            [[VSNet shareinstance] start:did withUser:user withPassWord:pwd initializeStr:p2pstring LanSearch:1];
+            //[[VSNet shareinstance] setStatusDelegate:did withDelegate:self];
+            //[[VSNet shareinstance] setControlDelegate:did withDelegate:self];
             [self btnEdit:nil];
         }
+        [[VSNet shareinstance] setStatusDelegate:did withDelegate:self];
+        [[VSNet shareinstance] setControlDelegate:did withDelegate:self];
         
         if (bEditMode && [olddid caseInsensitiveCompare:did] != NSOrderedSame) {
             [m_pPicPathMgt RemovePicPathByID:olddid];
@@ -1239,5 +1270,7 @@
     
     [VSNetSendCommand VSNetCommandSetDateTime:m_strDID isNow:IntervalSince1970 timeZone:(-1)*interval npt:1 netServer:@"time.windows.com"];
 }
+
+
 
 @end

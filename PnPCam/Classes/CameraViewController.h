@@ -68,6 +68,7 @@
 - (IBAction)setPushCameraTouchUp:(id)sender;
 
 - (NSString*)PathForDocumentStrDID:(NSString*)strDID;
+- (NSString*)getPPPPString:(NSString*)strDID;
 
 - (void)pushtoView:(UIViewController*)ViewCtr;
 - (void)deleteCamera;
