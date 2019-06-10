@@ -22,7 +22,13 @@ Xcode8 权限的问题
 1.通过get_status.cgi得到correctModel 和installType值做设备机型的判断（考虑cgi文档）
 2.实现化对象  
 FisheyeView* fishView;         //C60摄像机   
-FisheyeC61SView *fishC61SView; //C61s摄像机    
+FisheyeC61SView *fishC61SView; //C61s摄像机       
+
+
+20190610
+添加TF下载功能    
+
+
 
 
 

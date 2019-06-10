@@ -150,8 +150,12 @@
 		6C35055E21806CAE00D17E87 /* MessageCameraCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C35055C21806CAE00D17E87 /* MessageCameraCell.xib */; };
 		6C3505612180713400D17E87 /* CameraMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C3505602180713400D17E87 /* CameraMessageViewController.m */; };
 		6C57C16721BA64B100DE9CCD /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12B91CBDF92200A3D6DB /* libbz2.tbd */; };
+		6C7B95EC22A66246008F1E1C /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C7B95EB22A66246008F1E1C /* Photos.framework */; };
 		6C933D3A2181BE5D0093AAF9 /* CustomMessageCameraCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C933D372181BE5C0093AAF9 /* CustomMessageCameraCell.m */; };
 		6C933D3B2181BE5D0093AAF9 /* CustomMessageCameraCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C933D382181BE5C0093AAF9 /* CustomMessageCameraCell.xib */; };
+		6CEE78E522A7522F000A19A0 /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6CEE78E222A7522F000A19A0 /* SVProgressHUD.bundle */; };
+		6CEE78E622A7522F000A19A0 /* SVProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CEE78E422A7522F000A19A0 /* SVProgressHUD.m */; };
+		6CEE78E922A75473000A19A0 /* PHPhotoLibrary+SaveAndGetVideo.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CEE78E722A75473000A19A0 /* PHPhotoLibrary+SaveAndGetVideo.m */; };
 		83A99C1F1B53A183006A418F /* iCloudLivePFZUIviewQR.m in Sources */ = {isa = PBXBuildFile; fileRef = 83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		83A99C281B53A1B6006A418F /* lineT.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C211B53A1B6006A418F /* lineT.png */; };
 		83A99C291B53A1B6006A418F /* lineT@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83A99C221B53A1B6006A418F /* lineT@2x.png */; };
@@ -601,9 +605,15 @@
 		6C35055C21806CAE00D17E87 /* MessageCameraCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MessageCameraCell.xib; sourceTree = "<group>"; };
 		6C35055F2180713300D17E87 /* CameraMessageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraMessageViewController.h; sourceTree = "<group>"; };
 		6C3505602180713400D17E87 /* CameraMessageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraMessageViewController.m; sourceTree = "<group>"; };
+		6C7B95EB22A66246008F1E1C /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		6C933D372181BE5C0093AAF9 /* CustomMessageCameraCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomMessageCameraCell.m; sourceTree = "<group>"; };
 		6C933D382181BE5C0093AAF9 /* CustomMessageCameraCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CustomMessageCameraCell.xib; sourceTree = "<group>"; };
 		6C933D392181BE5D0093AAF9 /* CustomMessageCameraCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomMessageCameraCell.h; sourceTree = "<group>"; };
+		6CEE78E222A7522F000A19A0 /* SVProgressHUD.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SVProgressHUD.bundle; sourceTree = "<group>"; };
+		6CEE78E322A7522F000A19A0 /* SVProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVProgressHUD.h; sourceTree = "<group>"; };
+		6CEE78E422A7522F000A19A0 /* SVProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVProgressHUD.m; sourceTree = "<group>"; };
+		6CEE78E722A75473000A19A0 /* PHPhotoLibrary+SaveAndGetVideo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "PHPhotoLibrary+SaveAndGetVideo.m"; sourceTree = "<group>"; };
+		6CEE78E822A75473000A19A0 /* PHPhotoLibrary+SaveAndGetVideo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PHPhotoLibrary+SaveAndGetVideo.h"; sourceTree = "<group>"; };
 		83A99C1D1B53A183006A418F /* iCloudLivePFZUIviewQR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCloudLivePFZUIviewQR.h; sourceTree = "<group>"; };
 		83A99C1E1B53A183006A418F /* iCloudLivePFZUIviewQR.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCloudLivePFZUIviewQR.m; sourceTree = "<group>"; };
 		83A99C201B53A19D006A418F /* ScanStringDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScanStringDelegate.h; sourceTree = "<group>"; };
@@ -944,6 +954,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C7B95EC22A66246008F1E1C /* Photos.framework in Frameworks */,
 				6C57C16721BA64B100DE9CCD /* libbz2.tbd in Frameworks */,
 				6C35055421805F2300D17E87 /* VSNetAPI.framework in Frameworks */,
 				6C2F0AF8226EACE900205018 /* libvsFisheye.a in Frameworks */,
@@ -1160,6 +1171,11 @@
 		040289571627E5A3007BD608 /* Src */ = {
 			isa = PBXGroup;
 			children = (
+				6CEE78E822A75473000A19A0 /* PHPhotoLibrary+SaveAndGetVideo.h */,
+				6CEE78E722A75473000A19A0 /* PHPhotoLibrary+SaveAndGetVideo.m */,
+				6CEE78E222A7522F000A19A0 /* SVProgressHUD.bundle */,
+				6CEE78E322A7522F000A19A0 /* SVProgressHUD.h */,
+				6CEE78E422A7522F000A19A0 /* SVProgressHUD.m */,
 				6C27DDB02283C9BA00CE50C0 /* VideoFramePool.h */,
 				6C27DDAF2283C9BA00CE50C0 /* VideoFramePool.m */,
 				04C0EAD7165A32DE00FD88D8 /* RecPathManagement.h */,
@@ -1433,6 +1449,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6C7B95EB22A66246008F1E1C /* Photos.framework */,
 				6C260D01217F30610010BDE2 /* UserNotifications.framework */,
 				6C260CFE217F1A170010BDE2 /* VSNetAPI.framework */,
 				9CD216B62154BDDE00EB72A6 /* libstdc++.tbd */,
@@ -1932,6 +1949,7 @@
 				9C1CEB7020D3A7BE00086231 /* SystemUpgradeViewController.xib in Resources */,
 				04BA966A165E047300B60006 /* RecListCell.xib in Resources */,
 				04BA966C165E1CF300B60006 /* del_hook.png in Resources */,
+				6CEE78E522A7522F000A19A0 /* SVProgressHUD.bundle in Resources */,
 				25DA61561BDE34F700825CBA /* icon@2x.png in Resources */,
 				04BA966E165F090200B60006 /* videodefault.png in Resources */,
 				25DA61571BDE34F700825CBA /* icon2.png in Resources */,
@@ -2125,6 +2143,7 @@
 				CC91861F15452136001D459B /* CameraEditViewController.m in Sources */,
 				CCB227C11546434A0003AE49 /* CameraListCell.m in Sources */,
 				CCB22A9C1546B5AC0003AE49 /* CameraListMgt.m in Sources */,
+				6CEE78E622A7522F000A19A0 /* SVProgressHUD.m in Sources */,
 				CCB22ABA1546B9AE0003AE49 /* CameraDBUtils.m in Sources */,
 				CC87C459154924E60086B180 /* SearchListCell.m in Sources */,
 				CC87C4831549297B0086B180 /* SearchListMgt.m in Sources */,
@@ -2135,6 +2154,7 @@
 				9C440C7F20C4DAED00A0DACC /* IJKSDLGLShader.m in Sources */,
 				044EFA5615D1451B0098D45A /* MyAudioSession.m in Sources */,
 				048FFB7C161AC5C2009103F1 /* SettingViewController.m in Sources */,
+				6CEE78E922A75473000A19A0 /* PHPhotoLibrary+SaveAndGetVideo.m in Sources */,
 				04C66DB41622BBAC006E25E2 /* WifiSettingViewController.m in Sources */,
 				04F5DB061623DAB500474C90 /* WifiPwdViewController.m in Sources */,
 				04F5DB3F1623F83300474C90 /* WifiPwdCell.m in Sources */,

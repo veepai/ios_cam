@@ -2858,28 +2858,11 @@
 - (void) VSNetFrameData: (NSData*) frameData width:(int) width height:(int) height{
     //NSLog(@"3CFGetRetainCount:%d",CFGetRetainCount((__bridge CFTypeRef)frameData));
     Byte *buff = (Byte *)[frameData bytes];
-//    //NSLog(@"解码视频数据--3");
-//    //将获取的传输速度在主线程中返回
-//    __weak PlayViewController *weakSelf = self;
-//  
-//    
     SDL_VoutOverlay stOverlay;
     memset(&stOverlay, 0, sizeof(stOverlay));
-//    stOverlay.w = (int)width ;
-//    stOverlay.h = (int)height;
-//    stOverlay.pitches[0] = width;
-//    stOverlay.pitches[1] = stOverlay.pitches[2] = width /2;
-//    stOverlay.pixels[0] = buff;
-//    stOverlay.pixels[1] = buff + width*height;
-//    stOverlay.pixels[2] = buff + width*height*5/4;
-//    
-//    [_mainVideoImgView display:&stOverlay];
-    
-    
+
     if(myGLViewController)
         [myGLViewController WriteYUVFrame:buff Len:(int)frameData.length width:(int)width height:(int)height];
-    
-    
 }
 
 //- (void) ImageNotify:(UIImage *)image timestamp:(NSInteger)timestamp

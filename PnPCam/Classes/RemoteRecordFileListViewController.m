@@ -407,6 +407,7 @@
 
 - (void)VSNetControl:(NSString *)deviceIdentity commandType:(NSInteger)comType buffer:(NSString *)retString length:(int)length charBuffer:(char *)buffer {
     NSLog(@"RemoteRecordFileListViewController VSNet返回数据 UID:%@ comtype %ld",deviceIdentity,(long)comType);
+    NSString *string = [[NSString alloc]initWithBytes:buffer length:length encoding:NSUTF8StringEncoding];
     if (comType == CGI_IEGET_RECORD_FILE && [deviceIdentity isEqualToString:deviceIdentity]){
         [self performSelectorOnMainThread:@selector(StopTimer) withObject:nil waitUntilDone:YES];
         NSRange range = [retString rangeOfString:@"record_name0[0]="];

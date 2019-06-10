@@ -1,10 +1,6 @@
 //
 //  VSNetProtocol.h
 //  vsNet
-//
-//  Created by 莫晓文 on 16/6/15.
-//  Copyright © 2016年 莫晓文. All rights reserved.
-//
 
 #ifndef VSNetProtocol_h
 #define VSNetProtocol_h
