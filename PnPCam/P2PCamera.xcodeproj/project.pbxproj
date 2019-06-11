@@ -185,8 +185,6 @@
 		B7D8699A16785BD80057C00F /* FtpSettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B7D8699816785BD80057C00F /* FtpSettingViewController.xib */; };
 		B7D869A6167ADA3A0057C00F /* RemoteRecordFileListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B7D869A4167ADA360057C00F /* RemoteRecordFileListViewController.m */; };
 		B7D869A7167ADA3A0057C00F /* RemoteRecordFileListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B7D869A5167ADA380057C00F /* RemoteRecordFileListViewController.xib */; };
-		B7D891E01670686E0087CE9D /* Shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = B7D891DF1670686E0087CE9D /* Shader.vsh */; };
-		B7D891E2167068780087CE9D /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = B7D891E1167068780087CE9D /* Shader.fsh */; };
 		B7E4A4B016704E18002E9D2B /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7E4A4AF16704E18002E9D2B /* GLKit.framework */; };
 		B7E4A4B216704E1E002E9D2B /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7E4A4B116704E1E002E9D2B /* OpenGLES.framework */; };
 		B7F3CF7A166064F5001A92E6 /* video_play_pause_normal.png in Resources */ = {isa = PBXBuildFile; fileRef = B7F3CF76166064F5001A92E6 /* video_play_pause_normal.png */; };
@@ -662,8 +660,6 @@
 		B7D869A3167ADA340057C00F /* RemoteRecordFileListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteRecordFileListViewController.h; sourceTree = "<group>"; };
 		B7D869A4167ADA360057C00F /* RemoteRecordFileListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RemoteRecordFileListViewController.m; sourceTree = "<group>"; };
 		B7D869A5167ADA380057C00F /* RemoteRecordFileListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RemoteRecordFileListViewController.xib; sourceTree = "<group>"; };
-		B7D891DF1670686E0087CE9D /* Shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.vsh; sourceTree = "<group>"; };
-		B7D891E1167068780087CE9D /* Shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.fsh; sourceTree = "<group>"; };
 		B7E4A4AF16704E18002E9D2B /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		B7E4A4B116704E1E002E9D2B /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		B7F3CF76166064F5001A92E6 /* video_play_pause_normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = video_play_pause_normal.png; sourceTree = "<group>"; };
@@ -1412,7 +1408,6 @@
 				FDC3FA7C16A92B49007AE289 /* CameraSet */,
 				FDE0399A169FA3D900A7C56C /* FPPopover */,
 				FDC8970D16A4032900A081C4 /* WEPopover */,
-				B7D891DD1670685C0087CE9D /* res */,
 				04B9B151163A253200349F4E /* tableview-cell */,
 				040289551627E45F007BD608 /* Image */,
 				040289541627E416007BD608 /* Interface */,
@@ -1591,15 +1586,6 @@
 				FDFF574817841B3000DFA5D9 /* LookCurrentRecordScheduleViewController.xib */,
 			);
 			name = Setting;
-			sourceTree = "<group>";
-		};
-		B7D891DD1670685C0087CE9D /* res */ = {
-			isa = PBXGroup;
-			children = (
-				B7D891DF1670686E0087CE9D /* Shader.vsh */,
-				B7D891E1167068780087CE9D /* Shader.fsh */,
-			);
-			name = res;
 			sourceTree = "<group>";
 		};
 		FD2D174C16AF959A008E8FB5 /* AlbumTableView */ = {
@@ -1958,8 +1944,6 @@
 				B7F3CF7C166064F5001A92E6 /* video_play_play_normal.png in Resources */,
 				B7F3CF7D166064F5001A92E6 /* video_play_play_pressed.png in Resources */,
 				B714817C1664A3E700085781 /* recoard.png in Resources */,
-				B7D891E01670686E0087CE9D /* Shader.vsh in Resources */,
-				B7D891E2167068780087CE9D /* Shader.fsh in Resources */,
 				B7D1DE30167081C800136437 /* CustomGLView.xib in Resources */,
 				B7D8699A16785BD80057C00F /* FtpSettingViewController.xib in Resources */,
 				B7D869A7167ADA3A0057C00F /* RemoteRecordFileListViewController.xib in Resources */,

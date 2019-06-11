@@ -1,10 +1,6 @@
 //
 //  ViewController.m
 //  TestOpenGL
-//
-//  Created by apple on 12-5-31.
-//  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
-//
 
 #import "MyGLViewController.h"
 
@@ -27,6 +23,47 @@ enum
     NUM_ATTRIBUTES
 };
 
+#define IJK_STRINGIZE(x) #x
+#define IJK_STRINGIZE2(x) IJK_STRINGIZE(x)
+#define IJK_SHADER_STRING(text) @ IJK_STRINGIZE2(text)
+
+NSString* const rgbFragmentShaderString  = IJK_SHADER_STRING
+(
+    uniform mat4 uMVPMatrix;
+    attribute vec4 vPosition;
+    attribute vec4 myTexCoord;
+    varying vec4 VaryingTexCoord0;
+    void main()
+    {
+        VaryingTexCoord0 = myTexCoord;
+        gl_Position = vPosition;
+    }
+);
+
+static NSString *const yuvFragmentShaderString = IJK_SHADER_STRING
+(
+ uniform sampler2D Ytex;
+ uniform sampler2D Utex;
+ uniform sampler2D Vtex;
+ precision mediump float;
+ varying vec4 VaryingTexCoord0;
+ vec4 color;
+ 
+ void main()
+{
+    float yuv0 = (texture2D(Ytex,VaryingTexCoord0.xy)).r;
+    float yuv1 = (texture2D(Utex,VaryingTexCoord0.xy)).r;
+    float yuv2 = (texture2D(Vtex,VaryingTexCoord0.xy)).r;
+
+    color.r = yuv0 + 1.4022 * yuv2 - 0.7011;
+    color.r = (color.r < 0.0) ? 0.0 : ((color.r > 1.0) ? 1.0 : color.r);
+    color.g = yuv0 - 0.3456 * yuv1 - 0.7145 * yuv2 + 0.53005;
+    color.g = (color.g < 0.0) ? 0.0 : ((color.g > 1.0) ? 1.0 : color.g);
+    color.b = yuv0 + 1.771 * yuv1 - 0.8855;
+    color.b = (color.b < 0.0) ? 0.0 : ((color.b > 1.0) ? 1.0 : color.b);
+    gl_FragColor = color;
+}
+ );
 
 @interface MyGLViewController () {
     GLuint _program;
@@ -114,7 +151,7 @@ enum
     _program = glCreateProgram();
     
     // Create and compile vertex shader.
-    vertShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"vsh"];
+    //vertShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"vsh"];
     //NSLog(@"vertShaderPathname: %@", vertShaderPathname);
     if (![self compileShader:&vertShader type:GL_VERTEX_SHADER file:vertShaderPathname]) {
     //if (![self compileShader:&vertShader type:GL_VERTEX_SHADER file:@"ShaderTest.vsh"]) {
@@ -123,7 +160,7 @@ enum
     }
     
     // Create and compile fragment shader.
-    fragShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"fsh"];
+    //fragShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"fsh"];
     //NSLog(@"fragShaderPathname: %@", fragShaderPathname);
     if (![self compileShader:&fragShader type:GL_FRAGMENT_SHADER file:fragShaderPathname]) {
         NSLog(@"Failed to compile fragment shader");
@@ -345,14 +382,14 @@ enum
     NSString *vertShaderPathname, *fragShaderPathname;
     
     _program = glCreateProgram();
-    vertShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"vsh"];
+    //vertShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"vsh"];
     if (![self compileShader:&vertShader type:GL_VERTEX_SHADER file:vertShaderPathname]) {
         NSLog(@"Failed to compile vertex shader");
         return NO;
     }
     
     // Create and compile fragment shader.
-    fragShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"fsh"];
+    //fragShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"fsh"];
     if (![self compileShader:&fragShader type:GL_FRAGMENT_SHADER file:fragShaderPathname]) {
         NSLog(@"Failed to compile fragment shader");
         return NO;
@@ -406,12 +443,19 @@ enum
     return YES;
 }
 
+
 - (BOOL)compileShader:(GLuint *)shader type:(GLenum)type file:(NSString *)file
 {
     GLint status;
     const GLchar *source;
-    
-    source = (GLchar *)[[NSString stringWithContentsOfFile:file encoding:NSUTF8StringEncoding error:nil] UTF8String];
+    if (GL_VERTEX_SHADER == type) {
+        source = [rgbFragmentShaderString UTF8String];
+    }
+    else  if (GL_FRAGMENT_SHADER == type){
+        source = [yuvFragmentShaderString UTF8String];
+    }
+        
+    //source = (GLchar *)[[NSString stringWithContentsOfFile:file encoding:NSUTF8StringEncoding error:nil] UTF8String];
     if (!source) {
         NSLog(@"Failed to load vertex shader");
         return NO;
