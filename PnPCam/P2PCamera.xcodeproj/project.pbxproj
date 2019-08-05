@@ -150,6 +150,7 @@
 		6C35055E21806CAE00D17E87 /* MessageCameraCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C35055C21806CAE00D17E87 /* MessageCameraCell.xib */; };
 		6C3505612180713400D17E87 /* CameraMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C3505602180713400D17E87 /* CameraMessageViewController.m */; };
 		6C57C16721BA64B100DE9CCD /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AEA12B91CBDF92200A3D6DB /* libbz2.tbd */; };
+		6C6EBFE022F80FD700120C1C /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C6EBFDF22F80FD700120C1C /* libc++.tbd */; };
 		6C7B95EC22A66246008F1E1C /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C7B95EB22A66246008F1E1C /* Photos.framework */; };
 		6C933D3A2181BE5D0093AAF9 /* CustomMessageCameraCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C933D372181BE5C0093AAF9 /* CustomMessageCameraCell.m */; };
 		6C933D3B2181BE5D0093AAF9 /* CustomMessageCameraCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C933D382181BE5C0093AAF9 /* CustomMessageCameraCell.xib */; };
@@ -174,7 +175,6 @@
 		9C440C8220C4DAED00A0DACC /* VSNetSendCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C440C7C20C4DAEC00A0DACC /* VSNetSendCommand.m */; };
 		9C440C8620C7C34F00A0DACC /* NSString+subValueFromRetString.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C440C8520C7C34F00A0DACC /* NSString+subValueFromRetString.m */; };
 		9CD216B52153A7F600EB72A6 /* oDropListStruct.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CD216B42153A7F600EB72A6 /* oDropListStruct.m */; };
-		9CD216B72154BDDE00EB72A6 /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CD216B62154BDDE00EB72A6 /* libstdc++.tbd */; };
 		B714817C1664A3E700085781 /* recoard.png in Resources */ = {isa = PBXBuildFile; fileRef = B714817B1664A3E700085781 /* recoard.png */; };
 		B7659688167C201D00105FA5 /* RemotePlaybackViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B7659686167C201D00105FA5 /* RemotePlaybackViewController.m */; };
 		B7659689167C201D00105FA5 /* RemotePlaybackViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B7659687167C201D00105FA5 /* RemotePlaybackViewController.xib */; };
@@ -603,6 +603,7 @@
 		6C35055C21806CAE00D17E87 /* MessageCameraCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MessageCameraCell.xib; sourceTree = "<group>"; };
 		6C35055F2180713300D17E87 /* CameraMessageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraMessageViewController.h; sourceTree = "<group>"; };
 		6C3505602180713400D17E87 /* CameraMessageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraMessageViewController.m; sourceTree = "<group>"; };
+		6C6EBFDF22F80FD700120C1C /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		6C7B95EB22A66246008F1E1C /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		6C933D372181BE5C0093AAF9 /* CustomMessageCameraCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomMessageCameraCell.m; sourceTree = "<group>"; };
 		6C933D382181BE5C0093AAF9 /* CustomMessageCameraCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CustomMessageCameraCell.xib; sourceTree = "<group>"; };
@@ -950,12 +951,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C6EBFE022F80FD700120C1C /* libc++.tbd in Frameworks */,
 				6C7B95EC22A66246008F1E1C /* Photos.framework in Frameworks */,
 				6C57C16721BA64B100DE9CCD /* libbz2.tbd in Frameworks */,
 				6C35055421805F2300D17E87 /* VSNetAPI.framework in Frameworks */,
 				6C2F0AF8226EACE900205018 /* libvsFisheye.a in Frameworks */,
 				6C260D02217F30610010BDE2 /* UserNotifications.framework in Frameworks */,
-				9CD216B72154BDDE00EB72A6 /* libstdc++.tbd in Frameworks */,
 				9C1CEB6C20D36EBF00086231 /* AssetsLibrary.framework in Frameworks */,
 				4AEA12C01CBDFC5C00A3D6DB /* libiconv.tbd in Frameworks */,
 				4AEA12BE1CBDFC3600A3D6DB /* libsqlite3.tbd in Frameworks */,
@@ -1444,6 +1445,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6C6EBFDF22F80FD700120C1C /* libc++.tbd */,
 				6C7B95EB22A66246008F1E1C /* Photos.framework */,
 				6C260D01217F30610010BDE2 /* UserNotifications.framework */,
 				6C260CFE217F1A170010BDE2 /* VSNetAPI.framework */,
@@ -1824,7 +1826,6 @@
 				LastUpgradeCheck = 0430;
 				TargetAttributes = {
 					1D6058900D05DD3D006BFB54 = {
-						DevelopmentTeam = 9XGDE5JWD8;
 						SystemCapabilities = {
 							com.apple.Push = {
 								enabled = 1;
@@ -2284,7 +2285,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
-				DEVELOPMENT_TEAM = 9XGDE5JWD8;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2334,7 +2335,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = 9XGDE5JWD8;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2386,7 +2387,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
-				DEVELOPMENT_TEAM = 9XGDE5JWD8;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
