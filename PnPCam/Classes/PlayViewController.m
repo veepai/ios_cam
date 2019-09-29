@@ -984,6 +984,42 @@
     return yuv420sp;
 }
 
+-(unsigned char *) NV12ToYUV420P: (CVPixelBufferRef) pixelBuffer
+{
+    unsigned char* dst = NULL;
+    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+    if (CVPixelBufferIsPlanar(pixelBuffer))
+    {
+        size_t pixelWidth = CVPixelBufferGetWidth(pixelBuffer);
+        size_t pixelHeight = CVPixelBufferGetHeight(pixelBuffer);
+        dst = (uint8_t *) malloc(pixelWidth*pixelHeight*3/2);
+        size_t bytesrow0 = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0);
+        size_t bytesrow1  = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 1);
+        UInt8 *bufferPtr = (UInt8 *)CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0);
+        UInt8 *bufferPtr1 = (UInt8 *)CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 1);
+        UInt8 *pY = bufferPtr;
+        UInt8 *pUV = bufferPtr1;
+        
+        UInt8 *pU = dst + pixelWidth * pixelHeight;
+        UInt8 *pV = pU + pixelWidth * pixelHeight / 4;
+        
+        for(int i =0; i < pixelHeight; i++){
+            memcpy(dst + i * pixelWidth, pY + i * bytesrow0, pixelWidth);
+        }
+        
+        for(int j = 0; j < pixelHeight / 2; j++)
+        {
+            for(int i = 0; i < pixelWidth / 2; i++){
+                *(pU++) = pUV[i<<1];
+                *(pV++) = pUV[(i<<1) + 1];
+            }
+            pUV += bytesrow1;
+        }
+    }
+    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+    return dst;
+}
+
 -(UIImage *)YUVtoUIImage:(int)width h:(int)height buffer:(unsigned char *)buffer{
     //YUV(NV12)-->CIImage--->UIImage Conversion
     uint8_t* nv12 = [self yuv420toN12:width h:height buffer:buffer];
@@ -2774,21 +2810,29 @@
     
     
     dispatch_async(dispatch_get_main_queue(),^{
-        CVPixelBufferLockBaseAddress(pixeBuffer, 0);
-        if(fishView){
-            [fishView display:CVPixelBufferGetBaseAddressOfPlane(pixeBuffer,0)
-                                   u:CVPixelBufferGetBaseAddressOfPlane(pixeBuffer,1)
-                                   v:CVPixelBufferGetBaseAddressOfPlane(pixeBuffer,2)
-                                Size:CGSizeMake((int)CVPixelBufferGetWidth(pixeBuffer), CVPixelBufferGetHeight(pixeBuffer))];
+        
+        unsigned char *pYuv = [self NV12ToYUV420P:pixeBuffer];
+        if(pYuv){
+            int w = (int)CVPixelBufferGetWidth(pixeBuffer);
+            int h = (int)CVPixelBufferGetHeight(pixeBuffer);
+            unsigned char *p = pYuv;
+            unsigned char *u = pYuv + w* h;
+            unsigned char *v = pYuv + w* h*5/4;
+            if(fishView){
+                [fishView display:p
+                                u:u
+                                v:v
+                             Size:CGSizeMake(w, h)];
+            }
+            
+            if(fishC61SView)
+                [fishC61SView display:p
+                                    u:u
+                                    v:v
+                                 Size:CGSizeMake(w, h)];
+            free(pYuv);
         }
         
-        if(fishC61SView)
-            [fishC61SView display:CVPixelBufferGetBaseAddressOfPlane(pixeBuffer,0)
-                            u:CVPixelBufferGetBaseAddressOfPlane(pixeBuffer,1)
-                            v:CVPixelBufferGetBaseAddressOfPlane(pixeBuffer,2)
-                         Size:CGSizeMake((int)CVPixelBufferGetWidth(pixeBuffer), CVPixelBufferGetHeight(pixeBuffer))];
-        
-        CVPixelBufferUnlockBaseAddress(pixeBuffer, 0);
         CVPixelBufferRelease(pixeBuffer);
     });
 }
