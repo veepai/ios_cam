@@ -37,6 +37,8 @@ FisheyeC61SView *fishC61SView; //C61s摄像机
 
 修复ios 13  极速显示问题
 
+⚠️⚠️⚠️ 由于平台大小限制，需要在VSNet/lib/libvsNet.a.zip解压出来在运行⚠️⚠️⚠️
+
 
 
 
