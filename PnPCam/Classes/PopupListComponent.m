@@ -1,10 +1,6 @@
 //
 //  PopupListComponent.m
 //  PopupList
-//
-//  Created by yan luke on 13-1-8.
-//  Copyright (c) 2013年 yan luke. All rights reserved.
-//
 
 #import "PopupListComponent.h"
 #import "WEPopoverController.h"

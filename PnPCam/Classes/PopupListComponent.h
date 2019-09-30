@@ -1,10 +1,7 @@
 //
 //  PopupListComponent.h
 //  PopupList
-//
-//  Created by yan luke on 13-1-8.
-//  Copyright (c) 2013年 yan luke. All rights reserved.
-//
+
 
 #import <Foundation/Foundation.h>
 #import <QuartzCore/QuartzCore.h>

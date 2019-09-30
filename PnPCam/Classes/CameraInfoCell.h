@@ -3,7 +3,7 @@
 //  IpCameraClient
 //
 //  Created by apple on 12-6-6.
-//  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
+//  Copyright Company MyCompanyName__. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

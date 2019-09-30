@@ -2,7 +2,7 @@
 //  FPPopoverView.h
 //
 //  Created by Alvise Susmel on 1/4/12.
-//  Copyright (c) 2012 Fifty Pixels Ltd. All rights reserved.
+//  Copyright Company  Pixels Ltd. All rights reserved.
 //
 //  https://github.com/50pixels/FPPopover
 

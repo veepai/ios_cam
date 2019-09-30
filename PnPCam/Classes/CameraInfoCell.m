@@ -1,10 +1,7 @@
 //
 //  CameraInfoCell.m
 //  IpCameraClient
-//
-//  Created by apple on 12-6-6.
-//  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
-//
+
 
 #import "CameraInfoCell.h"
 

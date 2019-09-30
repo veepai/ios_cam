@@ -1,10 +1,7 @@
 //
 //  CustomToolBarItem.h
 //  CustomToolBar
-//
-//  Created by yan luke on 13-6-14.
-//  Copyright (c) 2013年 yan luke. All rights reserved.
-//
+
 
 #import <UIKit/UIKit.h>
 @class CustomToolBarItem;

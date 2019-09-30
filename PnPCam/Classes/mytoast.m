@@ -3,7 +3,7 @@
 //  TestCustomView
 //
 //  Created by apple on 12-6-14.
-//  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
+//  Copyright Company MyCompanyName__. All rights reserved.
 //
 
 #import "mytoast.h"

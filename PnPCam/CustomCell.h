@@ -1,10 +1,7 @@
 //
 //  CustomCell.h
 //  FPPopoverDemo
-//
-//  Created by yan luke on 13-1-11.
-//  Copyright (c) 2013年 Fifty Pixels Ltd. All rights reserved.
-//
+
 
 #import <UIKit/UIKit.h>
 

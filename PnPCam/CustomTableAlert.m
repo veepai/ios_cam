@@ -1,10 +1,7 @@
 //
 //  CustomTableAlert.m
 //  AlertView
-//
-//  Created by yan luke on 13-3-1.
-//  Copyright (c) 2013年 yan luke. All rights reserved.
-//
+
 
 #import "CustomTableAlert.h"
 #import "obj_common.h"

@@ -1,10 +1,6 @@
 //
 //  CustomTableAlert.h
-//  AlertView
-//
-//  Created by yan luke on 13-3-1.
-//  Copyright (c) 2013年 yan luke. All rights reserved.
-//
+
 
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>

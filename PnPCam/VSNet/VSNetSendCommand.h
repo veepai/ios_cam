@@ -1,10 +1,6 @@
 //
 //  VSNetSendCommand.h
-//  Eye4
-//
-//  Created by 莫晓文 on 16/6/27.
-//  Copyright © 2016年 莫晓文. All rights reserved.
-//
+
 
 #import <Foundation/Foundation.h>
 
