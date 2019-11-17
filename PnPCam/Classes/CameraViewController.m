@@ -897,7 +897,27 @@
         return @"EEGDFHBOKCIGGFJPECHIFNEBGJNLHOMIHEFJBADPAGJELNKJDKANCBPJGHLAIALAADMDKPDGOENEBECCIK:vstarcam2018";
     }else if ([[strDID uppercaseString] rangeOfString:@"VSTH"].location != NSNotFound) {
         return @"EEGDFHBLKGJIGEJLEKGOFMEDHAMHHJNAGGFABMCOBGJOLHLJDFAFCPPHGILKIKLMANNHKEDKOINIBNCPJOMK:vstarcam2018";
-    }else if ([[strDID uppercaseString] rangeOfString:@"VSTF"].location != NSNotFound) {
+    }
+    else if ([[strDID uppercaseString] rangeOfString:@"VSTJ"].location != NSNotFound) {
+        return @"EEGDFHBLKGJIGEJNEOHEFBEIGANCHHMBHIFEAHDEAMJCKCKJDJAFDDPPHLKJIHLMBENHKDCHPHNJBODA:vstarcam2019";
+    }
+    else if ([[strDID uppercaseString] rangeOfString:@"VSTK"].location != NSNotFound) {
+        return @"EBGDEJBJKGJFGJJBEFHPFCEKHGNMHNNMHMFFBICPAJJNLDLLDHACCNONGLLPJGLKANMJLDDHODMEBOCIJEMA:vstarcam2019";
+    }
+    else if ([[strDID uppercaseString] rangeOfString:@"VSTM"].location != NSNotFound) {
+        return @"EBGEEOBOKHJNHGJGEAGAEPEPHDMGHINBGIECBBCBBJIKLKLCCDBBCFODHLKLJJKPBOMELECKPNMNAICEJCNNJH:vstarcam2019";
+    }
+    else if ([[strDID uppercaseString] rangeOfString:@"VSTN"].location != NSNotFound) {
+        return @"EEGDFHBBKBIFGAIAFGHDFLFJGJNIGEMOHFFPAMDMAAIIKBKNCDBDDMOGHLKCJCKFBFMPLMCBPEMG:vstarcam2019";
+    }
+       
+    else if ([[strDID uppercaseString] rangeOfString:@"VSTL"].location != NSNotFound) {
+        return @"EEGDFHBLKGJIGEJIEIGNFPEEHGNMHPNBGOFIBECEBLJDLMLGDKAPCNPFGOLLJFLJAOMKLBDFOGMAAFCJJPNFJP:vstarcam2019";
+    }
+    else if ([[strDID uppercaseString] rangeOfString:@"VSTP"].location != NSNotFound) {
+        return @"EEGDFHBLKGJIGEJLEIGJFLENHLNBHCNMGAFGBNCOAIJMLKKODNALCCPKGBLHJLLHAHMBKNDFOGNGBDCIJFMB:vstarcam2019";
+    }
+    else if ([[strDID uppercaseString] rangeOfString:@"VSTF"].location != NSNotFound) {
         return @"HZLXEJIALKHYATPCHULNSVLMEELSHWIHPFIBAOHXIDICSQEHENEKPAARSTELERPDLNEPLKEILPHUHXHZEJEEEHEGEM-$$";
     }else if ([[strDID uppercaseString] rangeOfString:@"VSTD"].location != NSNotFound) {
         return @"HZLXSXIALKHYEIEJHUASLMHWEESUEKAUIHPHSWAOSTEMENSQPDLRLNPAPEPGEPERIBLQLKHXELEHHULOEGIAEEHYEIEK-$$";

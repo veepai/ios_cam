@@ -39,6 +39,8 @@ FisheyeC61SView *fishC61SView; //C61s摄像机
 
 ⚠️⚠️⚠️ 由于平台大小限制，需要在VSNet/lib/libvsNet.a.zip解压出来在运行⚠️⚠️⚠️
 
+## 20191113
 
+支持前缀为VSTJ、VSTK、VSTM、VSTN、VSTL、VSTP的ID
 
 
