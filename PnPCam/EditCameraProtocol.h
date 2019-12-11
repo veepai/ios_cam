@@ -16,6 +16,7 @@
                    DID:(NSString *)did
                    User:(NSString *)user 
                     Pwd:(NSString *)pwd 
-                OldDID:(NSString *)olddid;
+                OldDID:(NSString *)olddid
+                    tmpDID:(NSString *)strtmpdid;
 
 @end

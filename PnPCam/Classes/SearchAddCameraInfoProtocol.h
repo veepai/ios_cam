@@ -10,6 +10,6 @@
 
 @protocol SearchAddCameraInfoProtocol <NSObject>
 
-- (void) AddCameraInfo: (NSString*) strCameraName DID: (NSString*) strDID;
+- (void) AddCameraInfo: (NSString*) strCameraName DID: (NSString*) strDID tmpdid: (NSString*) strTmpDID;
 
 @end

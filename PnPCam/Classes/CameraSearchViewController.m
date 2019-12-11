@@ -195,18 +195,21 @@
     NSDictionary *cameraDic = [searchListMgt GetCameraAtIndex:anIndexPath.row];
     NSString *name = [cameraDic objectForKey:@STR_NAME];
     NSString *did = [cameraDic objectForKey:@STR_DID];
-    [SearchAddCameraDelegate AddCameraInfo:name DID:did];
+    NSString *strtmpdid = [cameraDic objectForKey:@STR_TMP_DID];
+    [SearchAddCameraDelegate AddCameraInfo:name DID:did tmpdid:strtmpdid];
     [self.navigationController popViewControllerAnimated:YES];
     
 }
 
 #pragma mark SearchCamereResultDelegate
-- (void) VSNetSearchCameraResult:(NSString *)mac Name:(NSString *)name Addr:(NSString *)addr Port:(NSString *)port DID:(NSString*)did
+- (void) VSNetSearchCameraResult:(NSString *)mac Name:(NSString *)name Addr:(NSString *)addr Port:(NSString *)port DID:(NSString*)did VUID:(NSString*)strVUID
 {
-    if ([did length] == 0) {
-        return;
+    if([strVUID length] > 0){
+        [searchListMgt AddVuidCamera:mac Name:name Addr:addr Port:port DID:strVUID VUID:did];
     }
-    [searchListMgt AddCamera:mac Name:name Addr:addr Port:port DID:did];
+    else{
+        [searchListMgt AddVuidCamera:mac Name:name Addr:addr Port:port DID:did VUID:nil];
+    }
 }
 
 

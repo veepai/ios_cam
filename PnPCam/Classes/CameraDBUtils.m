@@ -57,7 +57,7 @@
     //NSLog(@"CreateTable.....tbName: %@",tbName);
     char createTableSql[256];
     memset(createTableSql, 0, sizeof(createTableSql));
-    sprintf(createTableSql, "CREATE TABLE IF NOT EXISTS %s(ID INTEGER PRIMARY KEY AUTOINCREMENT,name text, did text, user text, pwd text)",
+    sprintf(createTableSql, "CREATE TABLE IF NOT EXISTS %s(ID INTEGER PRIMARY KEY AUTOINCREMENT,name text, did text, user text, pwd text,tmpdid text,lasttime text)",
             [tbName UTF8String]);
     sqlite3_stmt *statement;
     NSInteger SqlOK = sqlite3_prepare(db, 
@@ -99,12 +99,12 @@
     return YES;
 }
 
-- (BOOL)InsertCamera:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd
+- (BOOL)InsertCamera:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd tmp:(NSString*)tmpDid time:(NSString*) strTime
 {
     sqlite3_stmt *statement;
     char insertSql[256];
     memset(insertSql, 0, sizeof(insertSql));
-    sprintf(insertSql, "INSERT INTO %s(name,did,user,pwd) VALUES(?,?,?,?)",[TableName UTF8String]);
+    sprintf(insertSql, "INSERT INTO %s(name,did,user,pwd,tmpdid,lasttime) VALUES(?,?,?,?,?,?)",[TableName UTF8String]);
     
     int preOK = sqlite3_prepare(db,
                                 insertSql,
@@ -122,7 +122,8 @@
     sqlite3_bind_text(statement, 2, [did UTF8String], -1, nil);
     sqlite3_bind_text(statement, 3, [user UTF8String], -1, nil);
     sqlite3_bind_text(statement, 4, [pwd UTF8String], -1, nil);
-    
+    sqlite3_bind_text(statement, 5, [tmpDid UTF8String], -1, nil);
+    sqlite3_bind_text(statement, 6, [strTime UTF8String], -1, nil);
     int sqlOK = sqlite3_step(statement);
     
     if (sqlOK == SQLITE_DONE) {
@@ -179,6 +180,43 @@
     }
     
     return YES;  
+}
+
+- (BOOL)UpdateVUIDCameraLastConnetTime:(NSString *)did tmpDID:(NSString *)strTmpdid Time:(NSString *)lastTime
+{
+    char updateSql[256];
+    memset(updateSql, 0, sizeof(updateSql));
+    sprintf(updateSql, "UPDATE %s SET tmpdid=? , lasttime=? WHERE did=?", [TableName UTF8String]);
+    
+    sqlite3_stmt *statement;
+    int preOK = sqlite3_prepare(db,
+                                updateSql,
+                                -1,
+                                &statement,
+                                nil);
+    if (preOK == SQLITE_OK) {
+        //NSLog(@"prepare update sql success!");
+    }else {
+        //NSLog(@"prepare updata sql failed!");
+        return NO;
+    }
+    
+    sqlite3_bind_text(statement, 1, [strTmpdid UTF8String], -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(statement, 2, [lastTime UTF8String], -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(statement, 3, [did UTF8String], -1, SQLITE_TRANSIENT);
+
+
+    int sqlOK = sqlite3_step(statement);
+    sqlite3_finalize(statement);
+    
+    if (sqlOK == SQLITE_DONE) {
+        NSLog(@"数据库更新成功!");
+    }else {
+        //NSLog(@"update failed!");
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (BOOL) RemoveCamera:(NSString *)did 
@@ -254,14 +292,18 @@
         char *str_user = (char*)sqlite3_column_text(statement, 3);
         char *str_pwd = (char*)sqlite3_column_text(statement, 4);
         
+        char *str_tmpdid = (char*)sqlite3_column_text(statement, 5);
+        char *str_time = (char*)sqlite3_column_text(statement, 6);
         //NSLog(@"result.. _id: %d name: %s  pwd: %s", _id, str_name,str_pwd);
         
         NSString *nsName = [NSString stringWithUTF8String:str_name];
         NSString *nsDID = [NSString stringWithUTF8String:str_did];
         NSString *nsUser = [NSString stringWithUTF8String:str_user];
         NSString *nsPwd = [NSString stringWithUTF8String:str_pwd];        
+        NSString *nsTMPDID = [NSString stringWithUTF8String:str_tmpdid];
+        NSString *nsTIME = [NSString stringWithUTF8String:str_time];
         
-        [self.selectDelegate SelectP2PResult:nsName DID:nsDID User:nsUser Pwd:nsPwd];
+        [self.selectDelegate SelectP2PResult:nsName DID:nsDID User:nsUser Pwd:nsPwd tmpdid:nsTMPDID LastTime:nsTIME];
         
         [pool release];        
                 

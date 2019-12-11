@@ -865,29 +865,40 @@
         NSString *strDID = [cameraDic objectForKey:@STR_DID];
         NSString *strUser = [cameraDic objectForKey:@STR_USER];
         NSString *strPwd = [cameraDic objectForKey:@STR_PWD];
-        NSNumber *nPPPPStatus = [cameraDic objectForKey:@STR_PPPP_STATUS];        
+        NSNumber *nPPPPStatus = [cameraDic objectForKey:@STR_PPPP_STATUS];
+        NSString *strTmpDID = [cameraDic objectForKey:@STR_TMP_DID];
+        NSString *strlasttime = [cameraDic objectForKey:@STR_LAST_CONNET_TIME];
+        
         if ([nPPPPStatus intValue] == PPPP_STATUS_INVALID_ID) {
             continue;
         }
         
         usleep(100000);
         NSString *p2pstring = [self getPPPPString:strDID];
-        int nRet = [[VSNet shareinstance] start:strDID  withUser:strUser withPassWord:strPwd initializeStr:p2pstring LanSearch:1];
-        [[VSNet shareinstance] setStatusDelegate:strDID withDelegate:self];
-        [[VSNet shareinstance] setControlDelegate:strDID withDelegate:self];
-        if(nRet == 0){
-            //连接不成功，3秒后再试一次
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [[VSNet shareinstance] start:strDID  withUser:strUser withPassWord:strPwd initializeStr:p2pstring LanSearch:1];
-               // [[VSNet shareinstance] setStatusDelegate:strDID withDelegate:self];
-                //[[VSNet shareinstance] setControlDelegate:strDID withDelegate:self];
-            });
+        if([[VSNet shareinstance] IsVUID:strDID]){
+            NSInteger lastTime =  [strlasttime integerValue];
+            [[VSNet shareinstance] StartVUID:strTmpDID withPassWord:strPwd initializeStr:p2pstring LanSearch:1 ID:nil ADD:NO VUID:strDID LastonlineTimestamp:lastTime withDelegate:self];
         }
         else
-        {
-           // [[VSNet shareinstance] setStatusDelegate:strDID withDelegate:self];
-            //[[VSNet shareinstance] setControlDelegate:strDID withDelegate:self];
-        }
+            [[VSNet shareinstance] start:strDID  withUser:strUser withPassWord:strPwd initializeStr:p2pstring LanSearch:1];
+        
+        //int nRet = [[VSNet shareinstance] start:strDID  withUser:strUser withPassWord:strPwd initializeStr:p2pstring LanSearch:1];
+        
+        [[VSNet shareinstance] setStatusDelegate:strDID withDelegate:self];
+        [[VSNet shareinstance] setControlDelegate:strDID withDelegate:self];
+//        if(nRet == 0){
+//            //连接不成功，3秒后再试一次
+//            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                [[VSNet shareinstance] start:strDID  withUser:strUser withPassWord:strPwd initializeStr:p2pstring LanSearch:1];
+//               // [[VSNet shareinstance] setStatusDelegate:strDID withDelegate:self];
+//                //[[VSNet shareinstance] setControlDelegate:strDID withDelegate:self];
+//            });
+//        }
+//        else
+//        {
+//           // [[VSNet shareinstance] setStatusDelegate:strDID withDelegate:self];
+//            //[[VSNet shareinstance] setControlDelegate:strDID withDelegate:self];
+//        }
     }
 }
 
@@ -1045,14 +1056,14 @@
 }
 
 #pragma mark EditCameraProtocol
-- (BOOL) EditP2PCameraInfo:(BOOL)bAdd Name:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd OldDID:(NSString *)olddid
+- (BOOL) EditP2PCameraInfo:(BOOL)bAdd Name:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd OldDID:(NSString *)olddid tmpDID:(NSString *)strtmpdid
 {
     NSLog(@"EditP2PCameraInfo  bAdd: %d, name: %@, did: %@, user: %@, pwd: %@, olddid: %@", bAdd, name, did, user, pwd, olddid);
     
     BOOL bRet;
     
     if (bAdd == YES) {
-        bRet = [cameraListMgt AddCamera:name DID:did User:user Pwd:pwd Snapshot:nil];
+        bRet = [cameraListMgt AddCamera:name DID:did User:user Pwd:pwd Snapshot:nil tmpdid:strtmpdid];
     }else {
         bRet = [cameraListMgt EditCamera:olddid Name:name DID:did User:user Pwd:pwd];
     }
@@ -1060,26 +1071,18 @@
     if (bRet == YES) {
         NSString *p2pstring = [self getPPPPString:did];
         if (bAdd) {//添加成功，增加P2P连接
-            
-            int nRet = [[VSNet shareinstance] start:did  withUser:user withPassWord:pwd initializeStr:p2pstring LanSearch:1];
-            if(nRet == 0){
-                //连接不成功，3秒后再试一次
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [[VSNet shareinstance] start:did  withUser:user withPassWord:user initializeStr:p2pstring LanSearch:1];
-                   // [[VSNet shareinstance] setStatusDelegate:did withDelegate:self];
-                   // [[VSNet shareinstance] setControlDelegate:did withDelegate:self];
-                });
-            }
+            if([[VSNet shareinstance] IsVUID:did])
+                [[VSNet shareinstance] StartVUID:strtmpdid withPassWord:pwd initializeStr:p2pstring LanSearch:1 ID:nil ADD:NO VUID:did LastonlineTimestamp:0 withDelegate:self];
             else
-            {
-               // [[VSNet shareinstance] setStatusDelegate:did withDelegate:self];
-               // [[VSNet shareinstance] setControlDelegate:did withDelegate:self];
-            }
+                [[VSNet shareinstance] start:did  withUser:user withPassWord:pwd initializeStr:p2pstring LanSearch:1];
+
         }else {//修改成功，重新启动P2P连接
             [[VSNet shareinstance] stop:did];
-            [[VSNet shareinstance] start:did withUser:user withPassWord:pwd initializeStr:p2pstring LanSearch:1];
-            //[[VSNet shareinstance] setStatusDelegate:did withDelegate:self];
-            //[[VSNet shareinstance] setControlDelegate:did withDelegate:self];
+            if([[VSNet shareinstance] IsVUID:did])
+                 [[VSNet shareinstance] StartVUID:strtmpdid withPassWord:pwd initializeStr:p2pstring LanSearch:1 ID:nil ADD:NO VUID:did LastonlineTimestamp:0 withDelegate:self];
+            else
+                [[VSNet shareinstance] start:did withUser:user withPassWord:pwd initializeStr:p2pstring LanSearch:1];
+            
             [self btnEdit:nil];
         }
         [[VSNet shareinstance] setStatusDelegate:did withDelegate:self];
@@ -1140,6 +1143,45 @@
         [RecordNotifyEventDelegate NotifyReloadData];
         return;        
     }    
+}
+
+- (void) VSNetStatusFromVUID:(NSString*) strVUID UID :(NSString*) strUID statusType:(NSInteger) statusType status:(NSInteger) status
+{
+    if(statusType == VSNET_NOTIFY_TYPE_VUIDSTATUS){
+        NSInteger index = [cameraListMgt UpdatePPPPStatus:strVUID status:status];
+        if ( index >= 0){
+            int Camindex = [cameraListMgt GetIndexFromDID:strVUID];
+            [self performSelectorOnMainThread:@selector(ReloadRowDataAtIndex:) withObject:[NSNumber numberWithInt:Camindex] waitUntilDone:NO];
+        }
+        
+        //如果是ID号无效，则停止该设备的P2P
+        if (status == VUIDSTATUS_INVALID_ID
+            || status == VUIDSTATUS_CONNECT_TIMEOUT
+            || status == VUIDSTATUS_DEVICE_NOT_ON_LINE
+            || status == VUIDSTATUS_CONNECT_FAILED
+            || status == VUIDSTATUS_INVALID_USER_PWD) {
+            [self performSelectorOnMainThread:@selector(StopPPPPByDID:) withObject:strVUID waitUntilDone:NO];
+        }
+        [RecordNotifyEventDelegate NotifyReloadData];
+        
+        //设备上的VUID对不上
+        if(VUIDSTATUS_VUID_VERIFICATION_FAIL == status || VUIDSTATUS_VUID_VERIFICATION_UIDCHANGE== status)
+        {
+            //延时3秒再去连接
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                int Camindex = [cameraListMgt GetIndexFromDID:strVUID];
+                NSDictionary* deviceDic = [cameraListMgt GetCameraAtIndex:Camindex];
+                NSString* strPwd = [deviceDic objectForKey:@STR_PWD];
+                [[VSNet shareinstance] StartVUID:nil withPassWord:strPwd initializeStr:nil LanSearch:1 ID:nil ADD:NO VUID:strVUID LastonlineTimestamp:0 withDelegate:self];
+            });
+        }
+        return;
+    }
+    else if (statusType == VSNET_NOTIFY_TYPE_VUIDTIME)
+    {
+        //更新已连接的VUID时间
+        [cameraListMgt UpdateVUIDLastConnetTime:strVUID tmpDID:strUID time:status];
+    }
 }
 
 #pragma mark -

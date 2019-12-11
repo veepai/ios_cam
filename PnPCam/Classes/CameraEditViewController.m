@@ -31,7 +31,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 @synthesize currentTextField;
 @synthesize tableView;
 @synthesize navigationBar;
-
+@synthesize strtmpDID;
 
 // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
 
@@ -44,6 +44,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         self.strOldDID = @"";
         self.strUser = @STR_DEFAULT_USER_NAME;
         self.strPwd = @"";
+        self.strtmpDID = @"";
     }
     return self;
 }
@@ -523,7 +524,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         return;
     }
     
-    BOOL bRet = [editCameraDelegate EditP2PCameraInfo:bAddCamera Name:strCameraName DID:strCameraID User:strUser Pwd:strPwd OldDID:self.strOldDID];
+    BOOL bRet = [editCameraDelegate EditP2PCameraInfo:bAddCamera Name:strCameraName DID:strCameraID User:strUser Pwd:strPwd OldDID:self.strOldDID tmpDID:strtmpDID];
     if (bRet == NO) {
     }
     if (NO == bAddCamera) {
@@ -539,10 +540,11 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 }
 
 #pragma mark SearchAddCameraInfoDelegate
-- (void) AddCameraInfo:(NSString *)astrCameraName DID:(NSString *)strDID
+- (void) AddCameraInfo:(NSString *)astrCameraName DID:(NSString *)strDID tmpdid:(NSString *)strTmpDID
 {
     self.strCameraName = astrCameraName;
     self.strCameraID = strDID;
+    self.strtmpDID = strTmpDID;
     
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:1 inSection:0];
     CameraInfoCell *cameraInfo = (CameraInfoCell*)[tableView cellForRowAtIndexPath:indexPath];  

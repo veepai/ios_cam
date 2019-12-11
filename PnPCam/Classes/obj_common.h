@@ -18,6 +18,8 @@
 #define STR_PPPP_STATUS "ppppstatus"
 #define STR_PPPP_MODE "ppppmode"
 #define STR_AUTHORITY "authority"
+#define STR_TMP_DID "tmpdid"
+#define STR_LAST_CONNET_TIME "lastconnetedtime"
 
 #define STR_SSID "ssid"
 #define STR_MAC "mac"

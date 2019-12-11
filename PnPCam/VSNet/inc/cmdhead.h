@@ -68,7 +68,6 @@
 #define CGI_SENSOR_LIST             0x60b6
 #define CGI_SENSOR_ALARM_FILE       0x60b5
 #define CGI_SENSOR_STATUS           0x60b2
-#define CGI_SENSOR_DELETE_STATUS    0x60b3
 #define CGI_SENSOR_ALARM            0x6040
 #define CGI_SENSOR_OPENCODE         0x60b1
 #define CGI_SENSOR_WHITELIST        0x60b8
@@ -76,11 +75,13 @@
 #define CGI_GET_CAMERA_LIST         0x60BC
 #define CGI_PUSH_ALARMSERVER        0x6009
 #define CGI_MUSIC_OPERATION         0x60d1
+#define CGI_IEGET_TFSTATUS          0x7a03
 
 
 #define STREAM_CODEC_TYPE   0x6040
 #define STREAM_CODEC_TYPE_JPEG 0
 #define STREAM_CODEC_TYPE_H264 1
+#define STREAM_CODEC_TYPE_H265 2
 
 #define CGI_SET_IIC				0x6031
 #define CGI_GET_IIC				0x6032
@@ -94,42 +95,201 @@
 #define CGI_IEGET_LIVESTREAM                    0X6037
  
 
-////视频参数
-//typedef struct tag_STRU_CAMERA_PARAM
-//{
-//    int resolution;
-//    int bright;
-//    int contrast;
-//    int hue;
-//    int saturation;
-//    int osdenable;
-//    int mode;
-//    int flip;
-//    int enc_framerate;
-//    int sub_enc_framerate;
-//}STRU_CAMERA_PARAM,*PSTRU_CAMERA_PARAM;
-//
-//typedef struct _stBcastParam
-//{
-//	char            szIpAddr[16];		//IP地址
-//	unsigned char            szMask[16];		//子网掩码
-//	char            szGateway[16];		//网关
-//	char            szDns1[16];		//dns1
-//	char            szDns2[16];		//dns2
-//	char            szMacAddr[6];		//设备MAC地址
-//	unsigned short          nPort;			//设备端口
-//	char            dwDeviceID[32]; 		//platform deviceid
-//	char            szDevName[32];		//设备名称
-//	char            sysver[16];		//固件版本
-//	char            appver[16];		//软件版本
-//	char            szUserName[32];		//修改时会对用户认证
-//	char            szPassword[32];		//修改时会对用户认证
-//	char            sysmode;        		//0->baby 1->HDIPCAM
-//	char            other[3];       		//other
-//	char            other1[20];     		//other1
-//	
-//}BCASTPARAM, *PBCASTPARAM;
+//视频参数
+typedef struct tag_STRU_CAMERA_PARAM
+{
+    int resolution;
+    int bright;
+    int contrast;
+    int hue;
+    int saturation;
+    int osdenable;
+    int mode;
+    int flip;
+    int enc_framerate;
+    int sub_enc_framerate;
+}STRU_CAMERA_PARAM,*PSTRU_CAMERA_PARAM;
 
+/*typedef struct _stBcastParam
+{
+	char            szIpAddr[16];		//IP地址
+	unsigned char            szMask[16];		//子网掩码
+	char            szGateway[16];		//网关
+	char            szDns1[16];		//dns1
+	char            szDns2[16];		//dns2
+	char            szMacAddr[6];		//设备MAC地址
+	unsigned short          nPort;			//设备端口
+	char            dwDeviceID[32]; 		//platform deviceid
+	char            szDevName[32];		//设备名称
+	char            sysver[16];		//固件版本
+	char            appver[16];		//软件版本
+	char            szUserName[32];		//修改时会对用户认证
+	char            szPassword[32];		//修改时会对用户认证
+	char            sysmode;        		//0->baby 1->HDIPCAM
+	char            other[3];       		//other
+	char            other1[20];     		//other1
+	
+}BCASTPARAM, *PBCASTPARAM;*/
 
+typedef struct _stBcastParam{
+    char szIpAddr[16];      //IP 地址，可以修改
+    char szMask[16];        //子网掩码，可以修改
+    char szGateway[16];     //网关，可以修改
+    char szDns1[16];        //dns1，可以修改
+    char szDns2[16];        //dns2，可以修改
+    char szMacAddr[6];      //设备MAC 地址
+    unsigned short  nPort;  //设备端口
+    char dwDeviceID[32];    //platform deviceid
+    char szDevName[80];     //设备名称
+    char sysver[16];        //固件版本
+    char appver[16];        //软件版本
+    char szUserName[32];    //修改时会对用户认证
+    char szPassword[32];    //修改时会对用户认证 char sysmode; //0->baby 1->HDIPCAM
+    char dhcp;              //DHCP
+    char other[2];          //other
+    char other1[20];        //other1
+}BCASTPARAM, *PBCASTPARAM;
+
+//通知消息类型
+enum VSNETSTATUE_NOTIFY_TYPE
+{
+    VSNET_NOTIFY_TYPE_P2PSTATUS =0,            //p2p状态(对应enum P2PSTATUS_NOTIFY_TYPE)
+    VSNET_NOTIFY_TYPE_P2PMODE =1,              //p2p连接模式
+    VSNET_NOTIFY_TYPE_DUALAUTHENTICATION = 5,  //双重认证消息通知(对应enum DUALAUTHENTICATION_NOTIFY_CONTENT)
+    VSNET_NOTIFY_TYPE_VUIDSTATUS =7,           //VUID p2p状态(对应enum VUIDSTATUS_NOTIFY_TYPE
+    VSNET_NOTIFY_TYPE_VUIDTIME =8,             //用于VUID 通知的UnixTimestamp
+};
+
+//订阅消息类型
+enum SUBSCRIBE_NOTIFY_TYPE
+{
+    VSNET_NOTIFY_TYPE_VIDEOSTATUS        = 6, //实时视频状态消息通知(对应enum VIDEOSTATUS_NOTIFY)
+};
+
+//p2p状态
+enum P2PSTATUS_NOTIFY_TYPE
+{
+    P2PSTATUS_CONNECTING  = 0,      /* connecting 正在连接中*/
+    P2PSTATUS_INITIALING  = 1 ,     /* initialing 正在初始化*/
+    P2PSTATUS_ON_LINE  = 2,         /* on line 在线状态*/
+    P2PSTATUS_CONNECT_FAILED  = 3,  /* connect failed 连接失败*/
+    P2PSTATUS_DISCONNECT  = 4,      /*connect is off 断开连接*/
+    P2PSTATUS_INVALID_ID  = 5,      /* invalid id 无效ID*/
+    P2PSTATUS_DEVICE_NOT_ON_LINE = 6, /* invalid id 不在线状态*/
+    P2PSTATUS_CONNECT_TIMEOUT  = 7, /* connect timeout 连接超时*/
+    P2PSTATUS_INVALID_USER_PWD = 8, /*user or pwd is invalid 用户名或者密码错误*/
+};
+
+//VUID p2p状态
+enum VUIDSTATUS_NOTIFY_TYPE
+{
+    VUIDSTATUS_CONNECTING  = 0,      /* connecting 正在连接中*/
+    VUIDSTATUS_INITIALING  = 1 ,     /* initialing 正在初始化*/
+    VUIDSTATUS_ON_LINE  = 2,         /* on line 在线状态*/
+    VUIDSTATUS_CONNECT_FAILED  = 3,  /* connect failed 连接失败*/
+    VUIDSTATUS_DISCONNECT  = 4,      /*connect is off 断开连接*/
+    VUIDSTATUS_INVALID_ID  = 5,      /* invalid id 无效ID*/
+    VUIDSTATUS_DEVICE_NOT_ON_LINE = 6, /* invalid id 不在线状态*/
+    VUIDSTATUS_CONNECT_TIMEOUT  = 7, /* connect timeout 连接超时*/
+    VUIDSTATUS_INVALID_USER_PWD = 8, /*user or pwd is invalid 用户名或者密码错误*/
+    VUIDSTATUS_VUID_VERIFICATION_FAIL = 9,  //VUID校验失败,并向服务器查了几次UID都没有查到.断开P2P
+    VUIDSTATUS_VUID_VERIFICATION_UIDCHANGE = 10,  //VUID校验失败,uid变了，断开P2P 需要重新调用StartVUID接口
+};
+
+//双重认证消息通知
+enum DUALAUTHENTICATION_NOTIFY_CONTENT
+{
+    //首次绑定时P2P不能时用 p2p连接状态时用
+    DUALAUTHENTICATION_P2PCONNECT_INVALID_HANDLE = -2302, //无效会话
+    DUALAUTHENTICATION_P2PCONNECT_NOTONLINE = -2301,     //设备不在线
+    DUALAUTHENTICATION_P2PCONNECT_TIMEOUT = -2300,       //设备超时
+    
+    //双重认证授权失败时用
+    DUALAUTHENTICATION_AUTHORIZED_FAIL_TOKEN_EXPIRE   = -2102,   //双重认证授权失败  token过期
+    DUALAUTHENTICATION_AUTHORIZED_FAIL_PRIVILEG       = -2101,   //双重认证授权失败  没有权限访问该设备
+    DUALAUTHENTICATION_AUTHORIZED_FAIL  = -2100,                 //双重认证授权失败
+    //双重认证授权成功
+    DUALAUTHENTICATION_AUTHORIZED_SUCCESSFUL = -1100,//双重认证授权成功
+    
+    //开启双重认证或第三方明文密时用
+    DUALAUTHENTICATION_WEBPWD_SUCCESSFUL = -2200, //WEB密码设置成功
+    DUALAUTHENTICATION_OPEN_FAIL        = -2000,  //开启双重认证失败
+    DUALAUTHENTICATION_OPEN_SUCCESSFUL  = -1000,  //开启双重认证成功
+    
+    //设备出现密码错误或重置
+    DUALAUTHENTICATION_TIMEOUT_NOTONLINE  = -10,  //自定义:超时或者设备断开
+    DUALAUTHENTICATION_RESET_DEVICE_INIT_GETCOUNT30 = -6,    //设备重置清除还在进行中并且这个设备是支持双重认证 -> 查了30次(只通知一次)
+    DUALAUTHENTICATION_RESET_DEVICE_INIT = -5,    //设备重置清除还在进行中并且这个设备是支持双重认证 -> 每秒查一次(每秒会通知1次)
+    DUALAUTHENTICATION_SECUSERERROR_PWD = -4,    //有双重认证情况：次用户错误的密码
+    DUALAUTHENTICATION_MAINUSERERROR_PWD = -3,   //有双重认证情况：主用户错误的密码
+    DUALAUTHENTICATION_ERROR_PWD = -2,           //无双重认证情况：错误的密码
+    
+    //设备是否支持双重认证 查讯结果
+    DUALAUTHENTICATION_NONSUPPORT = -1,         //不支持双重认证
+    DUALAUTHENTICATION_SUPPORT_NOTOPEN = 0,     //支持双重认证，但未开启
+    DUALAUTHENTICATION_SUPPORT_OPEN = 1,        //已经开启双重认证
+    DUALAUTHENTICATION_SUPPORT_OPENANDWEB = 2,  //已经开启双重认证并设置了第三方登录密码
+    
+    //非首次(绑定设备时)是没有以下状态的。请查看P2PConnet接口bAddDev参数，已经开启双重验证的交给SetDualAuthenticationParam接口后去处理验证Token
+    DUALAUTHENTICATION_NOTNET            =99,          //设备无网 连续多次查讯，6秒后还是查到设备没有联网（只通知一次）
+    DUALAUTHENTICATION_NOTNET_NONSUPPORT =100,         //设备无网并不支持双重认证（6秒内可能通知多次）提供给搜索设备用，出现这值代表不支持双重认证设备
+    DUALAUTHENTICATION_NOTNET_SUPPORT_NOTOPEN = 101,   //设备无网并支持双重认证，但未开启，（6秒内可能通知多次）提供给搜索设备用，出现这值代表支持双重认证设备
+};
+
+//实时视频状态消息通知
+enum VIDEOSTATUS_NOTIFY
+{
+    VIDEOSTATUS_NOTIFY_START = 50,  //实时视频解码开始
+    VIDEOSTATUS_NOTIFY_DECFIRST = 51,  //实时视频解码出第一张图
+    VIDEOSTATUS_NOTIFY_END = 52     //实时视频解码结束
+};
+
+//调用低功耗接口返回值
+enum EM_LOWPOWER_ERROR
+{
+    EM_LOWPOWER_ERROR_ENTERBACKGROUND= -200,  //APP置后台 调用用接口无效(使用了EnterBackground接口)
+    EM_LOWPOWER_ERROR_PARAMETER      = -100,  //参数是无效值，比如MagLowpowerDeviceConnect接口使用空值
+    
+    //MagLowpowerDeviceConnect 出现-90至-99错误的说明MagLowpowerDeviceConnect接口连接服务器失败了，需要重新调用
+    EM_LOWPOWER_ERROR_MASTER_INIT    = -99,  //连接MASTER服务器创建连接失败（MagLowpowerDeviceConnect接口）
+    EM_LOWPOWER_ERROR_MASTER_CONNECT = -98,  //连接不上MASTER服务器（MagLowpowerDeviceConnect接口）
+    EM_LOWPOWER_ERROR_MASTER_IP      = -97,  //无效IP地址 (MagLowpowerDeviceConnect传的IP地址是无效的)
+    EM_LOWPOWER_ERROR_MASTER_NOTINIT = -96,  //未初化连接器（是不是没调用MagLowpowerDeviceConnect接口）
+    EM_LOWPOWER_DEVICECONNECT_APIFAIL= -90,  //MagLowpowerDeviceConnect接口失败了
+    
+    //MagLowpowerInitDevice 出现-10至-14错误的说明MagLowpowerInitDevice接口连接节点服务器失败了，需要重新调用MagLowpowerInitDevice
+    EM_LOWPOWER_ERROR_INITDEVICE_NODEINFOFAIL = -10, //节点信息错误，
+    EM_LOWPOWER_ERROR_INITDEVICE_NODEIP   = -11,     //主服务器返回的节点IP错误
+    EM_LOWPOWER_ERROR_INITDEVICE_NODEPORT = -12,     //主服务器返回的节点端口错误
+    EM_LOWPOWER_ERROR_INITDEVICE_NODE_CONNECTFAIL = -13,  //是连接不上节点服务器
+    EM_LOWPOWER_ERROR_INITDEVICE_NODE_NOTREG = -14,      //节点服务器没有注册上
+    
+ 
+    EM_LOWPOWER_FAIL                 = 0,    //失败
+    EM_LOWPOWER_SUCCESS              = 1,    //调用成功
+};
+
+//低功耗状态
+enum EM_LOWPOWER_NOTIFY_STATUS
+{
+    //again
+    EM_LOWPOWER_NOTIFY_AGAIN_P2PSTART   = -3,//需要重新调用Start p2p接口
+    EM_LOWPOWER_NOTIFY_AGAIN_INITDEVICE = -2,//需要重新调用MagLowpowerInitDevice
+    
+    EM_LOWPOWER_NOTIFY_ONLINE         = 10,  //在线
+    EM_LOWPOWER_NOTIFY_OFFLINE        = 11,  //离线
+    EM_LOWPOWER_NOTIFY_GET_RET_SLEEP  = 12,  //休眠（APP主动获取的）
+    EM_LOWPOWER_NOTIFY_SLEEP          = 22,  //休眠（设备主动推送过来的）
+    
+    EM_LOWPOWER_NOTIFY_SET_ONLINE     = 30,  //在线(p2p在线，对应调用MagLowpowerKeepDeviceActive接口时P2P在线)
+    EM_LOWPOWER_NOTIFY_SET_SLEEP      = 32,  //休眠(app向设备发送立刻休眠成功 对应MagLowpowerSleepDevice接口)
+};
+
+//GetP2PConnetState 获取连接状态
+enum EM_GETP2PCONNET_STATE{
+    EM_GETP2PCONNET_STATE_NOTINIT       = -1,   //没用初始化(要调用start连接或者其它连接接口)
+    EM_GETP2PCONNET_STATE_CONNECTING    = 0,    //p2p连接中
+    EM_GETP2PCONNET_STATE_CONNECTED     = 1,    //p2p连接上
+};
 #endif
 

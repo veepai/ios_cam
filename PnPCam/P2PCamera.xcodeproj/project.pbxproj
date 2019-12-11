@@ -541,7 +541,6 @@
 		04FE57CD16536E4D00D48E04 /* PathSelectResultProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PathSelectResultProtocol.h; sourceTree = "<group>"; };
 		18B9FE57158998F5004DE175 /* mytoast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mytoast.h; sourceTree = "<group>"; };
 		18B9FE58158998F5004DE175 /* mytoast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = mytoast.m; sourceTree = "<group>"; };
-		18B9FE8F158A1660004DE175 /* cmdhead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmdhead.h; sourceTree = "<group>"; };
 		18C9A693157F873A00D80975 /* CameraInfoCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraInfoCell.h; path = Classes/CameraInfoCell.h; sourceTree = "<group>"; };
 		18C9A694157F873A00D80975 /* CameraInfoCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CameraInfoCell.m; path = Classes/CameraInfoCell.m; sourceTree = "<group>"; };
 		18C9A697157F875500D80975 /* CameraInfoCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CameraInfoCell.xib; sourceTree = "<group>"; };
@@ -1203,7 +1202,6 @@
 				CC87C4811549297B0086B180 /* SearchListMgt.h */,
 				044EFA5315D144F50098D45A /* MyAudioSession.h */,
 				CC87C69815494DC00086B180 /* defineutility.h */,
-				18B9FE8F158A1660004DE175 /* cmdhead.h */,
 				18B9FE57158998F5004DE175 /* mytoast.h */,
 			);
 			name = Header;
@@ -1826,7 +1824,6 @@
 				LastUpgradeCheck = 0430;
 				TargetAttributes = {
 					1D6058900D05DD3D006BFB54 = {
-						DevelopmentTeam = 9XGDE5JWD8;
 						SystemCapabilities = {
 							com.apple.Push = {
 								enabled = 1;
@@ -2286,7 +2283,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
-				DEVELOPMENT_TEAM = 9XGDE5JWD8;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2336,7 +2333,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = 9XGDE5JWD8;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2388,7 +2385,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
-				DEVELOPMENT_TEAM = 9XGDE5JWD8;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

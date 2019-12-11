@@ -9,16 +9,23 @@
 @interface VSNet : NSObject
 
 + (VSNet *)shareinstance;
+//获取本库版本号
+-(NSInteger) GetSDKVersion;
+//启用打印Bugly
+- (void) EnablePrintgBuglyLog;
 #pragma mark /**************************初始化接口************************************/
 - (void)PPPP_Initialize;
-
-- (void)PPPP_DeInitialize;
 
 - (void) RussP2P;
 
 - (void) Eye4P2P;
 
 - (void) ELSOP2P;
+
+- (void)PPPP_InitializeOther:(NSString*)initializeStr;
+
+- (void)PPPP_DeInitialize;
+
 
 - (void) XQP2P_Initialize;
 
@@ -39,6 +46,18 @@
  *  @return true or false
  */
 - ( BOOL ) start:(NSString*) deviceIdentity withUser:( NSString*)user withPassWord:(NSString*)pwd initializeStr:(NSString *)initializeStr LanSearch:(int) nEnable ;
+
+/**
+ *  开始链接指定设备(带参数代理，这样防止连接过快没有设置代理收不到连接状态)
+ *  @param deviceIdentity 设备id
+ *  @param user           用户名
+ *  @param pwd            密码
+ *  @param initializeStr  P2P串（此值尽量不要空，“前4个字符决定固定串”都应有固定的串，如果空了首次连接可能会失败）
+ *  @param LanSearch      指定服务器
+ *  @param delegate       连接状态通知代理
+ *  @return true or false
+ */
+- ( BOOL ) start2:(NSString*) deviceIdentity withUser:( NSString*)user withPassWord:(NSString*)pwd initializeStr:(NSString *)initializeStr LanSearch:(int) nEnable withDelegate:(id<VSNetStatueProtocol>) delegate;  ;
 
 
 /**
@@ -83,6 +102,89 @@
  *  @return true or false
  */
 - ( void ) stopAll;
+
+#pragma mark /**************************VUID************************************/
+/**
+ 适用于VUID连接
+ @param strUID         缓存的UID(没有UID时就传nil)
+ @param strPwd         设备密码
+ @param initializeStr  P2P串（此值尽量不要空，“前4个字符决定固定串”设备都应有固定的串，如果空了首次连接可能会失败）
+ @param LanSearch      指定服务器
+ @param strAccount     EYE4 id
+ @param bAddDev        YES：首次(绑定设备时)开启双重验证时
+ @param strVUID        设备VUID
+ @param timestamp      上次在线unix时间戳(取不到就传0)
+ @param delegate       代理
+ @return true or false
+ */
+- ( int ) StartVUID:(NSString*) strUID withPassWord:(NSString*)strPwd initializeStr:(NSString *)initializeStr LanSearch:(int) nEnable  ID:(NSString*)strAccount ADD:(BOOL)bAddDev VUID:(NSString*) strVUID LastonlineTimestamp:(NSUInteger)timestamp withDelegate:(id<VSNetStatueProtocol>) delegate;
+
+/**
+ 中断或停止VUID连接
+ @param strVUID         VUID
+ @return true or false
+ */
+- ( int ) StopVUID:(NSString*) strVUID;
+
+/**
+ 查ID是不是VUID
+ @param strID      设备VUID
+ @return YES:是  NO:不是
+ */
+-(BOOL) IsVUID:(NSString*) strID;
+
+#pragma mark /**************************双重认证接口************************************/
+/**
+ P2P连接(用于双重认证时P2P连接)
+ @param deviceIdentity 设备id
+ @param strPwd         设备密码
+ @param initializeStr  P2P串（此值尽量不要空，“前4个字符决定固定串”设备都应有固定的串，如果空了首次连接可能会失败）
+ @param LanSearch      指定服务器
+ @param strAccount     EYE4 id
+ @param bAddDev        YES：首次(绑定设备时)开启双重验证时
+ @return true or false
+ */
+- (int) P2PConnet:(NSString*) deviceIdentity pwd:(NSString*)strPwd initializeStr:(NSString *)initializeStr LanSearch:(int) nEnable ID:(NSString*)strAccount ADD:(BOOL)bAddDev withDelegate:(id<VSNetStatueProtocol>) delegate;
+
+/**
+ 设置双重认证的参数
+ @param deviceIdentity 设备id
+ @param strToken   Token
+ @param strPw      设备密码
+ @return true or false
+ */
+- (int) SetDualAuthenticationParam:(NSString*) deviceIdentity Token:(NSString*)strToken DevicePwd:(NSString*)strPw;
+
+/**
+ 设置双重验证时第三方登录时用的密码
+ @param deviceIdentity 设备id
+ @param strPwd 新的密码
+ @return true or false
+ */
+- (int) SetWebPassWord:(NSString*) deviceIdentity Pwd:(NSString*)strPwd;
+
+/**
+ 关闭第三方密码
+ @param deviceIdentity 设备id
+ @return true or false
+ */
+- (int) DisableWebPassWord:(NSString*) deviceIdentity;
+
+/**
+ 开启双重验证
+ @param deviceIdentity 设备id
+ @param strToken   Token
+ @param strPw      设备密码
+ @return true or false
+ */
+-(int) EnableDualAuthentication:(NSString*) deviceIdentity  Token:(NSString*)strToken DevicePwd:(NSString*)strPw;
+
+/**
+ 忽略双重验证信息，不等待设备清除信息了直接往下走(只有在提示设备重置未完成时使用)
+ @param deviceIdentity 设备id
+ @return true or false
+ */
+-(int)IgnoreDualAuthentication:(NSString*) deviceIdentity;
 
 #pragma mark /**************************设置代理接口************************************/
 /**
@@ -131,9 +233,10 @@
  *  开始预览视频
  *  @param deviceIdentity 设备id
  *  @param stream         主码流 APP定为10
- *  @param substream      子码流 0、1、14、15、16、17、18、19、20、21、22 -> 1280*720
- 2、3、7、8、9、10、11、12 -> 640*360
- 5、6 -> 320*180
+ *  @param substream      子码流 100 -> 2304*1296
+                                0、1、14、15、16、17、18、19、20、21、22 -> 1280*720
+                                2、3、7、8、9、10、11、12 -> 640*360
+                                5、6 -> 320*180
  *  @return true or false
  */
 - ( BOOL ) startLivestream:(NSString*) deviceIdentity withStream: (int) stream withSubStream: (int) substream;
@@ -207,8 +310,8 @@
  *  录制TF卡
  *  @param deviceIdentity 设备id
  *  @param fileName       录制文件存放路
- * @param width          视频宽
- * @param height         视频高
+  * @param width          视频宽
+  * @param height         视频高
  */
 - (void) startRcrodTF:(NSString *)deviceIdentity fileName:(NSString *)strRecordPath width:(int)videoW height:(int)videoH ;
 //停止录制TF卡
@@ -251,6 +354,27 @@
 - (int)MagLowpowerAwakenDevice:(NSString *)deviceIdentity;
 //是IPV6的网络
 -(void)SetMagLowpowerSocketIPV6;
+
+/**
+ *  保持设备激活
+ *  @param deviceIdentity 设备id
+ *  @param time      设备延时休眠时间不得少5秒
+ */
+-(int)MagLowpowerKeepDeviceActive:(NSString *)deviceIdentity Time:(int) time;
+
+/**
+ *  移除保持设备激活（与MagLowpowerKeepDeviceActive成对的）
+ *  @param deviceIdentity 设备id
+ */
+-(int)MagLowpowerRemoveKeepDeviceActive:(NSString *)deviceIdentity;
+/**
+ *  指定设备休眠倒计时
+ *  @param deviceIdentity 设备id
+*  @param time      设备延时休眠时间
+ */
+-(int)MagLowpowerSleepDevice:(NSString *)deviceIdentity Time:(int) time;
+
+
 #pragma mark/**************************低功耗设备端接口end************************************/
 
 #pragma mark/**************************局域网内搜索在线设备接口********************************/
@@ -300,5 +424,92 @@
 //加密 返回nil代表加密失败
 //sValue:明文 strKey:key
 -(NSString*)DeviceEncryptStr:(NSString*)sValue KEY:(NSString*)strKey;
+
+/**
+ 分享的内容加密
+ @param strContent 需要加密的字符串
+ @param returnResult strResult返回加密好的串，nil为加密失败 nError:-1->连网失败,-2,-3->网络时间出错 0->加密失败 1->加密成功
+ @return           成功与失败
+ */
+-(int) ShareUIDEncryptStr:(NSString*) strContent completion:(void (^)(NSString* strResult,int nError)) returnResult;
+
+/**
+ 分享的内容解密
+ @param strContent 需要解密的字符串
+ @param returnResult strResult返回解密好的串，nil为解密失败 nError:-1->连网失败,-2,-3->网络时间出错 0->解密失败 1->解密成功
+ @return           成功与失败
+ */
+-(int) ShareUIDDecryptStr:(NSString*) strContent completion:(void (^)(NSString* strResult,int nError)) returnResult;
+
+#pragma mark/***********************合并视频文件接口*****************************/
+/**
+ * 开始合并视频文件 H264
+ * @param deviceIdentity 设备id
+ * @param strInPath      输入文件(单个文件)
+ * @param strOutPath     输出文件
+ * @param nCount         输入文件个数(总文件个数)
+ * @param delegate       进度回调代理
+ * @return 1成功，0失败
+ */
+-(int) StratMergeMP4File:(NSString*)deviceIdentity InputPath:(NSString*)strInPath OutPath:(NSString*)strOutPath FileCount:(int)nCount Delegate:(id <MergerVideoProtocol>) delegate;
+
+/**
+ * 开始合并视频文件 H265
+ * @param deviceIdentity 设备id
+ * @param strInPath      输入文件(单个文件)
+ * @param strOutPath     输出文件
+ * @param nCount         输入文件个数(总文件个数)
+ * @param delegate       进度回调代理
+ * @return 1成功，0失败
+ */
+-(int) StratMergeH265File:(NSString*)deviceIdentity InputPath:(NSString*)strInPath OutPath:(NSString*)strOutPath FileCount:(int)nCount Delegate:(id <MergerVideoProtocol>) delegate;
+
+/**
+ * 往合并视频列表中添加文件
+ * @param deviceIdentity 设备id
+ * @param strInPath      输入文件(单个文件)
+ * @return 1成功，0失败
+ */
+-(int) PutFile:(NSString*)deviceIdentity InputPath:(NSString*)strInPath;
+
+/**
+ * 获取合并文件的合并文件进度
+ * @param deviceIdentity 设备id
+ * @return 0~1.0进度  -1代表错误
+ */
+-(float) GetMergeMP4FilePos:(NSString*)deviceIdentity;
+
+/**
+ * 中断合并
+ * @param deviceIdentity 设备id
+ * @return 1成功，0失败
+ */
+-(int) StopMergeMP4File:(NSString*)deviceIdentity;
+
+#pragma mark/***********************订阅消息*****************************/
+/**
+ * 订阅回调消息
+ * @param deviceIdentity 设备id
+ * @param nType           消息类型(参考enum SUBSCRIBE_NOTIFY_TYPE，所有消息类型都要订阅了才有通知，默认是不订阅的)
+ * @param nEnable         YES代表订阅 NO:不订阅
+ * @return 1成功，0失败
+ */
+-(int) SubscribeMsgNotify:(NSString*)deviceIdentity Type:(int) nType Enable:(BOOL) nEnable;
+
+/**
+ * 设置订阅消息回调代理
+ * @param deviceIdentity 设备id
+ * @param delegate       代理
+ * @return 1成功，0失败
+ */
+-(int) SetSubscribeMsgNotifyProtocol:(NSString*)deviceIdentity Delegate:(id<SubscribeMsgNotifyProtocol>) delegate;
+
+/**
+ * P2P获取连接情况
+ * @param deviceIdentity 设备id
+ * @return EM_GETP2PCONNET_STATE
+ */
+-(int) GetP2PConnetState:(NSString*)deviceIdentity;
+
 
 @end

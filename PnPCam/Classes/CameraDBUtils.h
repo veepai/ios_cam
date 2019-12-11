@@ -28,8 +28,9 @@
 - (BOOL)OpenDatabase:(NSString *)dbName;
 - (BOOL)CreateTable:(NSString *)tbName;
 - (NSString *)DatabaseFilePath:(NSString *)dbName;
-- (BOOL)InsertCamera:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd;
+- (BOOL) InsertCamera:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd tmp:(NSString*)tmpDid time:(NSString*) strTime;
 - (BOOL) UpdateCamera:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd OldDID:(NSString *)olddid;
+- (BOOL)UpdateVUIDCameraLastConnetTime:(NSString *)did tmpDID:(NSString *)strTmpdid Time:(NSString *)lastTime;
 - (BOOL) RemoveCamera:(NSString *)did;
 - (void) SelectAll;
                                                                                                               

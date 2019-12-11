@@ -91,9 +91,13 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
         
         //修改成功，重新启动P2P连接
         sleep(3.0f);
-        [[VSNet shareinstance] stop:did];
-        [[VSNet shareinstance] start:did withUser:user withPassWord:pwd initializeStr:nil LanSearch:1];
         CameraViewController *camereView = [self.navigationController.viewControllers objectAtIndex:0];
+        [[VSNet shareinstance] stop:did];
+        if([[VSNet shareinstance] IsVUID:did])
+           [[VSNet shareinstance] StartVUID:nil withPassWord:pwd initializeStr:nil LanSearch:1 ID:nil ADD:NO VUID:did LastonlineTimestamp:0 withDelegate:camereView];
+        else
+            [[VSNet shareinstance] start:did withUser:user withPassWord:pwd initializeStr:nil LanSearch:1];
+        
         [[VSNet shareinstance] setStatusDelegate:did withDelegate:camereView];
         [[VSNet shareinstance] setControlDelegate:did withDelegate:camereView];
         

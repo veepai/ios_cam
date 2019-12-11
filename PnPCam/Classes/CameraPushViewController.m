@@ -553,7 +553,7 @@ static const double PageViewControllerTextAnimationDuration = 0.33;
 }
 
 #pragma mark SearchAddCameraInfoDelegate
-- (void) AddCameraInfo:(NSString *)astrCameraName DID:(NSString *)strDID
+- (void) AddCameraInfo:(NSString *)astrCameraName DID:(NSString *)strDID tmpdid:(NSString *)strTmpDID
 {
     self.strCameraName = astrCameraName;
     self.strCameraID = strDID;

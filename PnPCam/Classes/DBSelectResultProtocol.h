@@ -11,6 +11,6 @@
 @protocol DBSelectResultProtocol
 
 
-- (void) SelectP2PResult:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd;
+- (void) SelectP2PResult:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd tmpdid:(NSString *) strTmpdid LastTime:(NSString*) strTime;
 
 @end

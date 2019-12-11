@@ -82,7 +82,7 @@
 }
 
 
-- (BOOL)AddCamera:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd Snapshot:(UIImage *)img
+- (BOOL)AddCamera:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd Snapshot:(UIImage *)img tmpdid:(NSString *) strtmpdid
 {
     [m_Lock lock];
     NSLog(@"Add Camera...name:%@, did: %@, user: %@, pwd: %@", name, did, user, pwd);
@@ -90,6 +90,11 @@
         [m_Lock unlock];
         return NO;
     }
+    
+    if(strtmpdid == nil){
+        strtmpdid = @"";
+    }
+    
     NSNumber *authority=[NSNumber numberWithBool:NO];
     NSNumber *nPPPPStatus = [NSNumber numberWithInt:PPPP_STATUS_UNKNOWN];
     NSNumber *nPPPPMode = [NSNumber numberWithInt:PPPP_MODE_UNKNOWN];
@@ -100,12 +105,12 @@
     NSDictionary *cameraDic = [NSDictionary dictionaryWithObjectsAndKeys:name, @STR_NAME,
                                did, @STR_DID, user ,@STR_USER, pwd,@STR_PWD,// img,@STR_IMG,
                                nPPPPStatus, @STR_PPPP_STATUS,
-                               nPPPPMode, @STR_PPPP_MODE,authority,@STR_AUTHORITY,nil];
+                               nPPPPMode, @STR_PPPP_MODE,authority,@STR_AUTHORITY,@"0",@STR_LAST_CONNET_TIME,strtmpdid,@STR_TMP_DID,nil];
     
-    if (NO == [cameraDB InsertCamera:name DID:did User:user Pwd:pwd])
+    if (NO == [cameraDB InsertCamera:name DID:did User:user Pwd:pwd tmp:strtmpdid time:@"0"])
     {
         NSLog(@"cameraDB InsertCamera return NO");
-        if (NO == [cameraDB InsertCamera:name DID:did User:user Pwd:pwd])
+        if (NO == [cameraDB InsertCamera:name DID:did User:user Pwd:pwd tmp:strtmpdid time:@"0"])
         {
             [m_Lock unlock];
             return NO;
@@ -274,6 +279,43 @@
     return -1;
 }
 
+- (NSInteger) UpdateVUIDLastConnetTime:(NSString *)did tmpDID:(NSString*)strTmpDID time:(NSInteger)lastTime
+{
+    [m_Lock lock];
+    int count = [self GetCount];
+    int i;
+    for ( i=0; i < count ; i++)
+    {
+        NSDictionary *cameraDic = [CameraArray objectAtIndex:i];
+        NSString *_did = [cameraDic objectForKey:@STR_DID];
+        
+        if ([_did caseInsensitiveCompare:did] == NSOrderedSame)
+        {
+            NSString *_name = [cameraDic objectForKey:@STR_NAME];
+            NSString *_user = [cameraDic objectForKey:@STR_USER];
+            NSString *_pwd = [cameraDic objectForKey:@STR_PWD];
+            UIImage *img = [cameraDic objectForKey:@STR_IMG];
+            NSNumber *PPPPMode = [cameraDic objectForKey:@STR_PPPP_MODE];
+            NSString* strLastTime = [NSString stringWithFormat:@"%ld",lastTime];
+            
+            NSDictionary *_cameraDic = [NSDictionary dictionaryWithObjectsAndKeys:_name, @STR_NAME,
+                                        _did, @STR_DID, _user ,@STR_USER, _pwd,@STR_PWD,
+                                        [cameraDic objectForKey:@STR_PPPP_STATUS], @STR_PPPP_STATUS,
+                                        PPPPMode, @STR_PPPP_MODE,
+                                        img, @STR_IMG,strTmpDID,@STR_TMP_DID,strLastTime,@STR_LAST_CONNET_TIME, nil];
+            
+            [CameraArray replaceObjectAtIndex:i withObject:_cameraDic];
+            [cameraDB UpdateVUIDCameraLastConnetTime:did tmpDID:strTmpDID Time:strLastTime];
+            
+            [m_Lock unlock];
+            return i;
+        }
+        
+    }
+    [m_Lock unlock];
+    return -1;
+}
+
 - (BOOL) RemoveCamerea:(NSString *)did
 {
     [m_Lock lock];
@@ -382,7 +424,7 @@
 #pragma mark -
 #pragma mark DBSelectResultDelegate
 
-- (void)SelectP2PResult:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd
+- (void)SelectP2PResult:(NSString *)name DID:(NSString *)did User:(NSString *)user Pwd:(NSString *)pwd tmpdid:(NSString *) strTmpdid LastTime:(NSString*) strTime
 {
     //NSLog(@"SelectP2PResult....name: %@, did: %@, user: %@, pwd: %@", name, did, user, pwd);
     
@@ -393,7 +435,7 @@
     NSDictionary *cameraDic = [NSDictionary dictionaryWithObjectsAndKeys:name, @STR_NAME, 
                                did, @STR_DID, user ,@STR_USER, pwd,@STR_PWD, //img, @STR_IMG,
                                nPPPPStatus, @STR_PPPP_STATUS,
-                               nPPPPMode, @STR_PPPP_MODE,nil];  
+                               nPPPPMode, @STR_PPPP_MODE,strTmpdid,@STR_TMP_DID,strTime,@STR_LAST_CONNET_TIME, nil];
     
     [CameraArray addObject:cameraDic];
     

@@ -77,6 +77,11 @@
 #define CMD_PTZ_RIGHT                   6
 #define CMD_PTZ_RIGHT_STOP              7
 
+#define CMD_PTZ_ZOOM_1X                 21
+#define CMD_PTZ_ZOOM_2X                 22
+#define CMD_PTZ_ZOOM_3X                 23
+#define CMD_PTZ_ZOOM_4X                 24
+
 #define CMD_PTZ_CENTER                  25
 #define CMD_PTZ_UP_DOWN                 26
 #define CMD_PTZ_UP_DOWN_STOP            27
@@ -121,6 +126,18 @@
 #define CMD_PTZ_PREFAB_BIT_RUND         57
 #define CMD_PTZ_PREFAB_BIT_RUNE         59
 #define CMD_PTZ_PREFAB_BIT_RUNF         61
+
+#define CMD_PTZ_PREFAB_BIT_DEL0         62
+#define CMD_PTZ_PREFAB_BIT_DEL1         63
+#define CMD_PTZ_PREFAB_BIT_DEL2         64
+#define CMD_PTZ_PREFAB_BIT_DEL3         65
+#define CMD_PTZ_PREFAB_BIT_DEL4         66
+
+#define CMD_PTZ_PREFAB_1_CRUISE         78
+#define CMD_PTZ_PREFAB_2_CRUISE         79
+#define CMD_PTZ_PREFAB_3_CRUISE         80
+
+
 
 //msgtype
 #define MSG_NOTIFY_TYPE_PPPP_STATUS 0   /* 设备连接状态 */
@@ -188,5 +205,3 @@ typedef struct tag_STRU_SENSOR_ALARM_INFO{
     int channel;//通道号
 }STRU_SENSOR_ALARM_INFO, *PSTRU_SENSOR_ALARM_INFO;
 #endif
-
-

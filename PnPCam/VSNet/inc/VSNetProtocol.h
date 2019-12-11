@@ -1,6 +1,10 @@
 //
 //  VSNetProtocol.h
 //  vsNet
+//
+//  Created by 莫晓文 on 16/6/15.
+//  Copyright © 2016年 莫晓文. All rights reserved.
+//
 
 #ifndef VSNetProtocol_h
 #define VSNetProtocol_h
@@ -15,6 +19,15 @@
  *  @param status         状态值
  */
 - (void) VSNetStatus: (NSString*) deviceIdentity statusType:(NSInteger) statusType status:(NSInteger) status;
+
+/**
+ *  状态返回协议(适用于VUID连接的设备)
+ *  @param strUID      设备uid
+ *  @param strVUID     设备Vuid
+ *  @param statusType     状态类型
+ *  @param status         状态值
+ */
+- (void) VSNetStatusFromVUID:(NSString*) strVUID UID :(NSString*) strUID statusType:(NSInteger) statusType status:(NSInteger) status;
 @end
 
 
@@ -81,7 +94,7 @@
  *  @param width          图像宽度
  */
 - (void) VSNetH264Data: (NSString*) deviceIdentity data:(Byte *) buff withLen:(NSInteger)len
-                height:(NSInteger)height width:(NSInteger)width time:(NSUInteger)timestame withType:(NSInteger)type;
+               height:(NSInteger)height width:(NSInteger)width time:(NSUInteger)timestame withType:(NSInteger)type;
 
 
 /**
@@ -113,7 +126,7 @@
  @param fpos        播放进度0.0~1.0
  @param fCachePospos缓存进度0.0~1.0
  @param VType       编码器：0->h264 1->h265 -1->回放失败
- **/
+**/
 - (void) TFYUVNotify: (Byte*) yuv length:(int)length width: (int) width height:(int)height timestamp:(unsigned int)timestamp szdid:(NSString*)szdid pos:(float)fpos cachePos:(float)fCachePospos VType:(int)nType;
 
 /**
@@ -123,7 +136,7 @@
  @param szdid       设备UID
  @param fpos        播放进度 0.0~1.0
  @param fCachePospos缓存进度 0.0~1.0
- **/
+**/
 - (void) TFImageNotify: (id)image timestamp: (NSInteger)timestamp szdid:(NSString*)szdid pos:(float)fpos cachePos:(float)fCachePospos ;
 
 /**
@@ -143,7 +156,30 @@
 
 //搜索设备返回
 @protocol VSNetSearchCameraResultProtocol
-- (void) VSNetSearchCameraResult:(NSString *)mac Name:(NSString *)name Addr:(NSString *)addr Port:(NSString *)port DID:(NSString*)did;
+- (void) VSNetSearchCameraResult:(NSString *)mac Name:(NSString *)name Addr:(NSString *)addr Port:(NSString *)port DID:(NSString*)did VUID:(NSString*)strVUID;
 @end
 
+//合并视频回调协议
+@protocol MergerVideoProtocol <NSObject>
+/**
+ 合并视频回调进度
+ @param strUID: 设备UID
+ @param fpos:   0~1.0进度(某个文件的进度)
+ @param index   文件索引(第几个文件)
+ @param nError  0:有错误 1:无错误 2:全部文件合并成功
+ **/
+-(void) MergerVideoPos:(NSString*)strUID Pos:(float) fpos Index:(int) index Error:(int)nError;
+@end
+
+//底层订阅消息回调协议
+@protocol SubscribeMsgNotifyProtocol <NSObject>
+/**
+ 订阅消息通知回调
+ @param deviceIdentity: 设备UID
+ @param nType:   消息类型
+ @param nState:  状态
+ **/
+- (void) CallbackSubscribeMsgNotify: (NSString*) deviceIdentity MsgType:(NSInteger) nType State:(NSInteger)nState;
+
+@end
 #endif /* VSNetProtocol_h */

@@ -48,6 +48,7 @@
 @property (nonatomic, copy) NSString *strUser;
 @property (nonatomic, copy) NSString *strPwd;
 @property (nonatomic, copy) NSString *strOldDID;
+@property (nonatomic, copy) NSString *strtmpDID;
 @property (nonatomic, retain) UITextField *currentTextField;
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) UINavigationBar *navigationBar;

@@ -33,6 +33,17 @@
     return YES;
 }
 
+- (BOOL) AddVuidCamera: (NSString *)mac Name:(NSString *)name Addr:(NSString *)addr Port:(NSString *)port DID:(NSString*)did VUID:(NSString*)strVid
+{
+    if ([self CheckCamere:addr Port:port] == NO) {
+        return NO;
+    }
+    NSDictionary *cameraDic = [NSDictionary dictionaryWithObjectsAndKeys:mac, @STR_MAC ,name, @STR_NAME,
+                               addr, @STR_IPADDR, port, @STR_PORT, did, @STR_DID, strVid,@STR_TMP_DID,nil];
+    [CameraArray addObject:cameraDic];
+    return YES;
+}
+
 - (NSDictionary*) GetCameraAtIndex:(NSInteger)index
 {
     if (index >= CameraArray.count)
